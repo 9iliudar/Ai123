@@ -1,0 +1,284 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { categories, categoryLabels, defaultTools } from "@/data/default-tools";
+
+const CUSTOM_TOOLS_KEY = "ai123_custom_tools";
+const TOOLS_ORDER_KEY = "ai123_tools_order";
+
+function getInitialOrder() {
+  return defaultTools.map((tool) => tool.id);
+}
+
+function getFaviconUrl(link) {
+  try {
+    const domain = new URL(link).hostname;
+    return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+  } catch {
+    return "";
+  }
+}
+
+function sortTools(tools, order) {
+  const rankMap = new Map(order.map((id, index) => [id, index]));
+  return [...tools].sort((left, right) => {
+    const leftRank = rankMap.has(left.id) ? rankMap.get(left.id) : Number.MAX_SAFE_INTEGER;
+    const rightRank = rankMap.has(right.id) ? rankMap.get(right.id) : Number.MAX_SAFE_INTEGER;
+    return leftRank - rightRank;
+  });
+}
+
+export default function Dashboard() {
+  const [search, setSearch] = useState("");
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [customTools, setCustomTools] = useState([]);
+  const [order, setOrder] = useState(getInitialOrder);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [draft, setDraft] = useState({
+    name: "",
+    link: "",
+    cat: "Other",
+    desc: "",
+  });
+  const [draggedId, setDraggedId] = useState(null);
+
+  useEffect(() => {
+    const storedTools = window.localStorage.getItem(CUSTOM_TOOLS_KEY);
+    const storedOrder = window.localStorage.getItem(TOOLS_ORDER_KEY);
+
+    if (storedTools) {
+      setCustomTools(JSON.parse(storedTools));
+    }
+
+    if (storedOrder) {
+      setOrder(JSON.parse(storedOrder));
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem(CUSTOM_TOOLS_KEY, JSON.stringify(customTools));
+  }, [customTools]);
+
+  useEffect(() => {
+    window.localStorage.setItem(TOOLS_ORDER_KEY, JSON.stringify(order));
+  }, [order]);
+
+  const tools = useMemo(() => {
+    const mergedTools = sortTools([...defaultTools, ...customTools], order);
+    return mergedTools.filter((tool) => {
+      const matchCategory = activeCategory === "All" || tool.cat === activeCategory;
+      const content = `${tool.name} ${tool.desc}`.toLowerCase();
+      return matchCategory && content.includes(search.toLowerCase());
+    });
+  }, [activeCategory, customTools, order, search]);
+
+  function handleDraftChange(event) {
+    const { name, value } = event.target;
+    setDraft((current) => ({ ...current, [name]: value }));
+  }
+
+  function handleAddTool(event) {
+    event.preventDefault();
+
+    if (!draft.name.trim() || !draft.link.trim()) {
+      return;
+    }
+
+    const nextLink = draft.link.startsWith("http") ? draft.link : `https://${draft.link}`;
+    const nextTool = {
+      id: `custom_${Date.now()}`,
+      name: draft.name.trim(),
+      link: nextLink,
+      desc: draft.desc.trim() || "自定义快捷方式",
+      cat: draft.cat,
+      isCustom: true,
+    };
+
+    setCustomTools((current) => [nextTool, ...current]);
+    setOrder((current) => [nextTool.id, ...current]);
+    setDraft({ name: "", link: "", cat: "Other", desc: "" });
+    setIsModalOpen(false);
+  }
+
+  function handleDeleteTool(id) {
+    setCustomTools((current) => current.filter((tool) => tool.id !== id));
+    setOrder((current) => current.filter((item) => item !== id));
+  }
+
+  function handleReset() {
+    window.localStorage.removeItem(CUSTOM_TOOLS_KEY);
+    window.localStorage.removeItem(TOOLS_ORDER_KEY);
+    setCustomTools([]);
+    setOrder(getInitialOrder());
+    setSearch("");
+    setActiveCategory("All");
+  }
+
+  function handleDragStart(id) {
+    setDraggedId(id);
+  }
+
+  function handleDrop(targetId) {
+    if (!draggedId || draggedId === targetId) {
+      return;
+    }
+
+    setOrder((current) => {
+      const next = current.filter((id) => id !== draggedId);
+      const targetIndex = next.indexOf(targetId);
+      next.splice(targetIndex, 0, draggedId);
+      return next;
+    });
+    setDraggedId(null);
+  }
+
+  function handleDragEnd() {
+    setDraggedId(null);
+  }
+
+  return (
+    <main className="page-shell">
+      <div className="bg-orb bg-orb-a" />
+      <div className="bg-orb bg-orb-b" />
+
+      <nav className="topbar">
+        <a className="brand" href="/">
+          AI <span>123</span>
+        </a>
+        <div className="topbar-actions">
+          <a className="ghost-link" href="https://github.com/9iliudar/Ai123.git" target="_blank" rel="noreferrer">
+            GitHub
+          </a>
+          <button className="primary-button" type="button" onClick={() => setIsModalOpen(true)}>
+            + 添加网站
+          </button>
+        </div>
+      </nav>
+
+      <section className="hero">
+        <p className="hero-kicker">Personal Startpage</p>
+        <h1>你的专属 AI 导航页</h1>
+        <p className="hero-copy">
+          完全参考 HotAI.Tools 的极简框架，保留分类、搜索、拖拽排序和本地添加能力，先作为你的个人常用站首页使用。
+        </p>
+
+        <div className="search-wrap">
+          <input
+            id="search"
+            type="text"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="搜索工具名称，例如 coding、video、chat..."
+          />
+        </div>
+
+        <div className="filter-row">
+          {categories.map((category) => (
+            <button
+              key={category}
+              className={`filter-chip ${activeCategory === category ? "active" : ""}`}
+              type="button"
+              onClick={() => setActiveCategory(category)}
+            >
+              {categoryLabels[category] ?? category}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="grid">
+        {tools.map((tool) => (
+          <article
+            key={tool.id}
+            className="card"
+            draggable
+            onDragStart={() => handleDragStart(tool.id)}
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={() => handleDrop(tool.id)}
+            onDragEnd={handleDragEnd}
+          >
+            <span className="drag-handle" aria-hidden="true">
+              ⋮⋮
+            </span>
+
+            {tool.isCustom ? (
+              <button className="delete-button" type="button" onClick={() => handleDeleteTool(tool.id)}>
+                删除
+              </button>
+            ) : null}
+
+            <a className="card-link" href={tool.link} target="_blank" rel="noreferrer">
+              <div className="card-top">
+                <div className="icon-wrap">
+                  {getFaviconUrl(tool.link) ? (
+                    <img src={getFaviconUrl(tool.link)} alt={`${tool.name} logo`} />
+                  ) : (
+                    <span>{tool.name.charAt(0)}</span>
+                  )}
+                </div>
+                {tool.badge ? <span className={`badge ${tool.badgeClass}`}>{tool.badge}</span> : null}
+              </div>
+
+              <h2>{tool.name}</h2>
+              <p>{tool.desc}</p>
+
+              <div className="tag-row">
+                <span className="tag">{categoryLabels[tool.cat] ?? tool.cat}</span>
+                {tool.isCustom ? <span className="tag tag-user">我的</span> : null}
+              </div>
+            </a>
+          </article>
+        ))}
+      </section>
+
+      <footer className="footer">
+        <p>Ai123 先使用浏览器本地存储保存你的自定义站点；后续如果你确认需要跨设备编辑，再接数据库。</p>
+        <button className="reset-button" type="button" onClick={handleReset}>
+          重置布局和自定义数据
+        </button>
+      </footer>
+
+      {isModalOpen ? (
+        <div className="modal-overlay" role="presentation" onClick={() => setIsModalOpen(false)}>
+          <div className="modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
+            <h3>添加自定义网站</h3>
+            <form onSubmit={handleAddTool}>
+              <label>
+                名称
+                <input name="name" type="text" value={draft.name} onChange={handleDraftChange} placeholder="例如：飞书后台" />
+              </label>
+              <label>
+                URL
+                <input name="link" type="text" value={draft.link} onChange={handleDraftChange} placeholder="https://..." />
+              </label>
+              <label>
+                分类
+                <select name="cat" value={draft.cat} onChange={handleDraftChange}>
+                  {categories
+                    .filter((category) => category !== "All")
+                    .map((category) => (
+                      <option key={category} value={category}>
+                        {categoryLabels[category] ?? category}
+                      </option>
+                    ))}
+                </select>
+              </label>
+              <label>
+                备注
+                <input name="desc" type="text" value={draft.desc} onChange={handleDraftChange} placeholder="一句话说明用途" />
+              </label>
+              <div className="modal-actions">
+                <button className="secondary-button" type="button" onClick={() => setIsModalOpen(false)}>
+                  取消
+                </button>
+                <button className="primary-button" type="submit">
+                  添加到导航页
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
+    </main>
+  );
+}
