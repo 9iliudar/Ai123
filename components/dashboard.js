@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import BrickWarehouse from "@/components/brick-warehouse";
 import ConceptUniverse from "@/components/concept-universe";
 import { categories, categoryLabels, defaultTools } from "@/data/default-tools";
 
@@ -76,6 +77,7 @@ export default function Dashboard() {
   const [order, setOrder] = useState(getInitialOrder);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConceptOpen, setIsConceptOpen] = useState(false);
+  const [isWarehouseOpen, setIsWarehouseOpen] = useState(false);
   const [draft, setDraft] = useState({
     name: "",
     link: "",
@@ -145,7 +147,7 @@ export default function Dashboard() {
       id: `custom_${Date.now()}`,
       name: draft.name.trim(),
       link: nextLink,
-      desc: draft.desc.trim() || "自定义快捷方式",
+      desc: draft.desc.trim() || "自定义快捷入口",
       cat: draft.cat,
       isCustom: true,
     };
@@ -218,6 +220,9 @@ export default function Dashboard() {
           <a className="ghost-link" href="https://github.com/9iliudar/Ai123.git" target="_blank" rel="noreferrer">
             GitHub
           </a>
+          <button className="ghost-button" type="button" onClick={() => setIsWarehouseOpen(true)}>
+            积木仓库
+          </button>
           <button className="ghost-button" type="button" onClick={() => setIsConceptOpen(true)}>
             概念宇宙
           </button>
@@ -231,7 +236,7 @@ export default function Dashboard() {
         <p className="hero-kicker">Personal Startpage</p>
         <h1>你的专属 AI 导航页</h1>
         <p className="hero-copy">
-          热门站点负责效率，概念宇宙负责认知。一个页面，既是你的日常工作台，也是你的 AI 词汇地图。
+          常用站点负责效率，概念宇宙负责认知，积木仓库负责沉淀未来可以反复组合的开源能力。
         </p>
 
         <div className="search-wrap">
@@ -240,7 +245,7 @@ export default function Dashboard() {
             type="text"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="搜索工具名称，例如 coding、video、chat..."
+            placeholder="搜索工具名称，例如：coding、video、chat..."
           />
         </div>
 
@@ -255,6 +260,19 @@ export default function Dashboard() {
               {categoryLabels[category] ?? category}
             </button>
           ))}
+        </div>
+
+        <div className="portal-strip">
+          <button type="button" className="portal-card" onClick={() => setIsWarehouseOpen(true)}>
+            <span className="portal-kicker">Open Source Building Blocks</span>
+            <strong>积木仓库</strong>
+            <p>收纳值得你反复理解、未来可以拼成新产品的开源能力模块。</p>
+          </button>
+          <button type="button" className="portal-card" onClick={() => setIsConceptOpen(true)}>
+            <span className="portal-kicker">Concept Universe</span>
+            <strong>概念宇宙</strong>
+            <p>用沉浸式视图持续强化 AI 术语、方法论和它们之间的关系。</p>
+          </button>
         </div>
       </section>
 
@@ -325,7 +343,7 @@ export default function Dashboard() {
       </section>
 
       <footer className="footer">
-        <p>Ai123 先用浏览器本地存储保存你的自定义站点；概念宇宙则内置高覆盖 AI 术语图谱，后续可继续接数据库和协同编辑。</p>
+        <p>Ai123 会先用浏览器本地存储保存你的自定义站点；概念宇宙与积木仓库则负责把认知地图和开源能力持续沉淀下来。</p>
         <button className="reset-button" type="button" onClick={handleReset}>
           重置布局和自定义数据
         </button>
@@ -374,6 +392,7 @@ export default function Dashboard() {
       ) : null}
 
       <ConceptUniverse open={isConceptOpen} onClose={() => setIsConceptOpen(false)} />
+      <BrickWarehouse open={isWarehouseOpen} onClose={() => setIsWarehouseOpen(false)} />
     </main>
   );
 }
