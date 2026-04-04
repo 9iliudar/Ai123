@@ -1728,7 +1728,7 @@ select {
 }
 
 .universe-overlay.warp-lock .universe-warp-ghost {
-  animation: universeWarpTargetLock 160ms cubic-bezier(0.2, 0.9, 0.28, 1) forwards;
+  animation: universeWarpTargetLock 280ms cubic-bezier(0.22, 0.78, 0.2, 1) forwards;
 }
 
 .universe-overlay.warp-out .universe-warp-ghost {
@@ -1748,7 +1748,7 @@ select {
 }
 
 .universe-overlay.warp-in .universe-node {
-  animation: universeNodeArrive 720ms cubic-bezier(0.14, 1, 0.3, 1);
+  animation: universeNodeArrive 320ms ease-out forwards;
 }
 
 @keyframes universeOverlayIn {
@@ -1776,14 +1776,9 @@ select {
 
 @keyframes universeNodeArrive {
   from {
-    opacity: 0.02;
-    transform: translate(-50%, -50%) translate3d(calc(var(--node-shift-x, 0px) + var(--node-entry-x, 0px)), calc(var(--node-shift-y, 0px) + var(--node-entry-y, 0px)), 0) scale(calc(var(--node-scale, 1) * 0.72));
-    filter: blur(20px) saturate(1.22);
-  }
-  68% {
-    opacity: 1;
-    transform: translate(-50%, -50%) translate3d(calc(var(--node-shift-x, 0px) + var(--node-entry-x, 0px) * 0.18), calc(var(--node-shift-y, 0px) + var(--node-entry-y, 0px) * 0.18), 0) scale(calc(var(--node-scale, 1) * 1.02));
-    filter: blur(2px) saturate(1.04);
+    opacity: 0;
+    transform: translate(-50%, -50%) translate3d(var(--node-shift-x, 0px), var(--node-shift-y, 0px), 0) scale(calc(var(--node-scale, 1) * 0.94));
+    filter: blur(10px) saturate(1.08);
   }
   to {
     opacity: 1;

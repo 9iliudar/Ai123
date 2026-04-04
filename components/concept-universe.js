@@ -354,7 +354,7 @@ export default function ConceptUniverse({ open, onClose }) {
     warpTimeoutsRef.current.push(
       window.setTimeout(() => {
         setWarpPhase("warp-out");
-      }, 160)
+      }, 280)
     );
     warpTimeoutsRef.current.push(
       window.setTimeout(() => {
@@ -376,7 +376,7 @@ export default function ConceptUniverse({ open, onClose }) {
         warpTimeoutsRef.current = [];
       }, 520)
       );
-    }, 420)
+    }, 560)
     );
   }
 
@@ -662,8 +662,8 @@ export default function ConceptUniverse({ open, onClose }) {
           </div>
 
           <div className="universe-stats">
-            <span>总词条: {conceptUniverse.nodes.length}</span>
-            <span>当前节点: {centerNode.name}</span>
+            <span>总词条：{conceptUniverse.nodes.length}</span>
+            <span>当前节点：{centerNode.name}</span>
           </div>
 
           <div className="universe-controls">
