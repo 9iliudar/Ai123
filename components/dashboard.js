@@ -159,6 +159,8 @@ export default function Dashboard() {
   const [dragArmedId, setDragArmedId] = useState(null);
   const [dropTargetId, setDropTargetId] = useState(null);
   const [isConceptOpen, setIsConceptOpen] = useState(false);
+  const [conceptSearch, setConceptSearch] = useState("");
+  const [activeConceptGroup, setActiveConceptGroup] = useState("全部");
   const [activeConceptId, setActiveConceptId] = useState(conceptEntries[0]?.id ?? null);
 
   useEffect(() => {
@@ -191,13 +193,29 @@ export default function Dashboard() {
     });
   }, [activeCategory, customTools, order, search]);
 
+  const conceptGroups = useMemo(() => {
+    return ["全部", ...new Set(conceptEntries.map((entry) => entry.group))];
+  }, []);
+  const filteredConcepts = useMemo(() => {
+    const query = conceptSearch.trim().toLowerCase();
+
+    return conceptEntries.filter((entry) => {
+      const matchGroup = activeConceptGroup === "全部" || entry.group === activeConceptGroup;
+      const corpus = `${entry.name} ${entry.group} ${entry.summary} ${entry.detail} ${entry.links.join(" ")}`.toLowerCase();
+      return matchGroup && corpus.includes(query);
+    });
+  }, [activeConceptGroup, conceptSearch]);
   const activeConcept = useMemo(
-    () => conceptEntries.find((entry) => entry.id === activeConceptId) ?? conceptEntries[0],
-    [activeConceptId]
+    () => conceptEntries.find((entry) => entry.id === activeConceptId) ?? filteredConcepts[0] ?? conceptEntries[0],
+    [activeConceptId, filteredConcepts]
   );
   const activeConceptTheme = conceptThemeMap[activeConcept?.color] ?? conceptThemeMap.violet;
   const conceptNodes = useMemo(() => {
-    return conceptEntries.map((entry, index) => {
+    return filteredConcepts
+      .slice()
+      .sort((left, right) => right.importance - left.importance || left.name.localeCompare(right.name, "zh-CN"))
+      .slice(0, conceptNodeLayout.length)
+      .map((entry, index) => {
       const layout = conceptNodeLayout[index % conceptNodeLayout.length];
       const depth = entry.importance >= 5 ? "near" : entry.importance === 4 ? "mid" : "far";
 
@@ -217,7 +235,12 @@ export default function Dashboard() {
         },
       };
     });
-  }, []);
+  }, [filteredConcepts]);
+  const conceptIndexEntries = useMemo(() => {
+    return filteredConcepts
+      .slice()
+      .sort((left, right) => right.importance - left.importance || left.name.localeCompare(right.name, "zh-CN"));
+  }, [filteredConcepts]);
   const conceptNameMap = useMemo(() => {
     return new Map(conceptEntries.map((entry) => [entry.name, entry.id]));
   }, []);
@@ -318,6 +341,17 @@ export default function Dashboard() {
       document.body.classList.remove("overlay-open");
     };
   }, [isConceptOpen, isModalOpen]);
+
+  useEffect(() => {
+    if (!filteredConcepts.length) {
+      return;
+    }
+
+    const hasActive = filteredConcepts.some((entry) => entry.id === activeConceptId);
+    if (!hasActive) {
+      setActiveConceptId(filteredConcepts[0].id);
+    }
+  }, [activeConceptId, filteredConcepts]);
 
   return (
     <main className="page-shell">
@@ -505,9 +539,35 @@ export default function Dashboard() {
               <div className="concept-stage-copy">
                 <p className="concept-kicker">Concept Cloud</p>
                 <h2>概念舱</h2>
-                <p>
-                  用一个沉浸式视图反复强化那些值得长期记住的新概念。点击任意节点查看解释，按 <kbd>ESC</kbd> 或点击空白处退出。
-                </p>
+                <p>把零散热词沉淀成自己的认知地图，看见它们之间的关系，比记住定义更重要。</p>
+              </div>
+
+              <div className="concept-toolbar">
+                <label className="concept-search">
+                  <span>检索概念</span>
+                  <input
+                    type="text"
+                    value={conceptSearch}
+                    onChange={(event) => setConceptSearch(event.target.value)}
+                    placeholder="搜索概念、分组或关键词"
+                  />
+                </label>
+                <div className="concept-filter-row" aria-label="概念分组">
+                  {conceptGroups.map((group) => (
+                    <button
+                      key={group}
+                      type="button"
+                      className={`concept-filter-chip ${activeConceptGroup === group ? "active" : ""}`}
+                      onClick={() => setActiveConceptGroup(group)}
+                    >
+                      {group}
+                    </button>
+                  ))}
+                </div>
+                <div className="concept-meta">
+                  <span>当前浮现 {conceptNodes.length} 个重点概念</span>
+                  <span>索引共 {conceptIndexEntries.length} 个</span>
+                </div>
               </div>
 
               <div className="concept-cloud" aria-label="概念云">
@@ -524,6 +584,27 @@ export default function Dashboard() {
                   </button>
                 ))}
               </div>
+
+              <div className="concept-index">
+                <div className="concept-index-top">
+                  <p className="concept-panel-label">概念索引</p>
+                  <span>大量概念时，漂浮层只承载重点，完整浏览走这里。</span>
+                </div>
+                <div className="concept-index-grid">
+                  {conceptIndexEntries.map((entry) => (
+                    <button
+                      key={entry.id}
+                      type="button"
+                      className={`concept-index-pill ${activeConcept?.id === entry.id ? "active" : ""}`}
+                      onClick={() => setActiveConceptId(entry.id)}
+                    >
+                      <span>{entry.name}</span>
+                      <small>{entry.group}</small>
+                    </button>
+                  ))}
+                  {!conceptIndexEntries.length ? <p className="concept-empty">没有匹配的概念，换个关键词试试。</p> : null}
+                </div>
+              </div>
             </div>
 
             <aside className="concept-panel">
@@ -531,6 +612,7 @@ export default function Dashboard() {
                 <div>
                   <p className="concept-panel-label">当前概念</p>
                   <h3>{activeConcept.name}</h3>
+                  <p className="concept-group-tag">{activeConcept.group}</p>
                 </div>
                 <button className="concept-close" type="button" onClick={() => setIsConceptOpen(false)}>
                   关闭

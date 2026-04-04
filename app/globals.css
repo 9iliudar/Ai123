@@ -573,6 +573,70 @@ select {
   line-height: 1.75;
 }
 
+.concept-toolbar {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.concept-search {
+  display: grid;
+  gap: 8px;
+}
+
+.concept-search span {
+  color: #d4d4d8;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.concept-search input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #fafafa;
+  outline: none;
+}
+
+.concept-search input:focus {
+  border-color: color-mix(in srgb, var(--concept-accent, #c4b5fd) 48%, rgba(255, 255, 255, 0.12));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--concept-accent-soft, rgba(124, 58, 237, 0.18)) 72%, transparent);
+}
+
+.concept-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.concept-filter-chip {
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #d4d4d8;
+}
+
+.concept-filter-chip.active,
+.concept-filter-chip:hover {
+  border-color: color-mix(in srgb, var(--concept-accent, #c4b5fd) 40%, rgba(255, 255, 255, 0.12));
+  background: var(--concept-accent-soft, rgba(124, 58, 237, 0.18));
+  color: #fff;
+}
+
+.concept-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  color: #a1a1aa;
+  font-size: 0.88rem;
+}
+
 .concept-stage-copy kbd {
   display: inline-flex;
   align-items: center;
@@ -588,7 +652,7 @@ select {
 .concept-cloud {
   position: relative;
   min-height: 540px;
-  margin-top: 28px;
+  margin-top: 22px;
   isolation: isolate;
 }
 
@@ -738,6 +802,16 @@ select {
   letter-spacing: -0.04em;
 }
 
+.concept-group-tag {
+  display: inline-flex;
+  margin: 12px 0 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--concept-accent-soft, rgba(124, 58, 237, 0.18));
+  color: var(--concept-accent, #c4b5fd);
+  font-size: 0.82rem;
+}
+
 .concept-close {
   padding: 10px 14px;
   border-radius: 12px;
@@ -764,6 +838,72 @@ select {
 
 .concept-section {
   margin-top: 24px;
+}
+
+.concept-index {
+  position: relative;
+  z-index: 1;
+  margin-top: 22px;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.concept-index-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.concept-index-top span {
+  color: #a1a1aa;
+  font-size: 0.9rem;
+}
+
+.concept-index-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
+  gap: 10px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.concept-index-pill {
+  display: grid;
+  gap: 4px;
+  min-height: 72px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #fafafa;
+  text-align: left;
+}
+
+.concept-index-pill span {
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.concept-index-pill small {
+  color: #a1a1aa;
+  font-size: 0.76rem;
+}
+
+.concept-index-pill:hover,
+.concept-index-pill.active {
+  border-color: color-mix(in srgb, var(--concept-accent, #c4b5fd) 40%, rgba(255, 255, 255, 0.12));
+  background: color-mix(in srgb, var(--concept-accent-soft, rgba(124, 58, 237, 0.18)) 52%, rgba(255, 255, 255, 0.03));
+}
+
+.concept-empty {
+  margin: 0;
+  color: #a1a1aa;
+  font-size: 0.92rem;
 }
 
 .concept-links {
@@ -918,12 +1058,12 @@ select {
   }
 
   .concept-stage {
-    min-height: 500px;
+    min-height: 460px;
     padding: 22px;
   }
 
   .concept-cloud {
-    min-height: 360px;
+    min-height: 300px;
     margin-top: 20px;
   }
 
@@ -938,6 +1078,22 @@ select {
   .concept-panel {
     max-height: min(44vh, 380px);
     overflow-y: auto;
+  }
+
+  .concept-index {
+    margin-top: 18px;
+    padding: 14px;
+  }
+
+  .concept-index-top {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .concept-index-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-height: 220px;
   }
 
   .concept-panel h3 {
