@@ -78,6 +78,8 @@ export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConceptOpen, setIsConceptOpen] = useState(false);
   const [isWarehouseOpen, setIsWarehouseOpen] = useState(false);
+  const [requestedConcept, setRequestedConcept] = useState("");
+  const [requestedBlockId, setRequestedBlockId] = useState(null);
   const [draft, setDraft] = useState({
     name: "",
     link: "",
@@ -207,6 +209,18 @@ export default function Dashboard() {
     setDragArmedId(null);
   }
 
+  function openConceptUniverse(conceptName = "") {
+    setRequestedConcept(conceptName);
+    setIsWarehouseOpen(false);
+    setIsConceptOpen(true);
+  }
+
+  function openBrickWarehouse(blockId = null) {
+    setRequestedBlockId(blockId);
+    setIsConceptOpen(false);
+    setIsWarehouseOpen(true);
+  }
+
   return (
     <main className="page-shell">
       <div className="bg-orb bg-orb-a" />
@@ -223,7 +237,7 @@ export default function Dashboard() {
           <button className="ghost-button" type="button" onClick={() => setIsWarehouseOpen(true)}>
             积木仓库
           </button>
-          <button className="ghost-button" type="button" onClick={() => setIsConceptOpen(true)}>
+          <button className="ghost-button" type="button" onClick={() => openConceptUniverse()}>
             概念宇宙
           </button>
           <button className="primary-button" type="button" onClick={() => setIsModalOpen(true)}>
@@ -263,12 +277,12 @@ export default function Dashboard() {
         </div>
 
         <div className="portal-strip">
-          <button type="button" className="portal-card" onClick={() => setIsWarehouseOpen(true)}>
+          <button type="button" className="portal-card" onClick={() => openBrickWarehouse()}>
             <span className="portal-kicker">Open Source Building Blocks</span>
             <strong>积木仓库</strong>
             <p>收纳值得你反复理解、未来可以拼成新产品的开源能力模块。</p>
           </button>
-          <button type="button" className="portal-card" onClick={() => setIsConceptOpen(true)}>
+          <button type="button" className="portal-card" onClick={() => openConceptUniverse()}>
             <span className="portal-kicker">Concept Universe</span>
             <strong>概念宇宙</strong>
             <p>用沉浸式视图持续强化 AI 术语、方法论和它们之间的关系。</p>
@@ -391,8 +405,18 @@ export default function Dashboard() {
         </div>
       ) : null}
 
-      <ConceptUniverse open={isConceptOpen} onClose={() => setIsConceptOpen(false)} />
-      <BrickWarehouse open={isWarehouseOpen} onClose={() => setIsWarehouseOpen(false)} />
+      <ConceptUniverse
+        open={isConceptOpen}
+        onClose={() => setIsConceptOpen(false)}
+        requestedConcept={requestedConcept}
+        onOpenWarehouse={openBrickWarehouse}
+      />
+      <BrickWarehouse
+        open={isWarehouseOpen}
+        onClose={() => setIsWarehouseOpen(false)}
+        onOpenConcept={openConceptUniverse}
+        initialSelectedId={requestedBlockId}
+      />
     </main>
   );
 }

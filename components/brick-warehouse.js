@@ -29,6 +29,7 @@ function matchesText(block, keyword) {
     ...block.tags,
     ...block.composeWith,
     ...block.outputs,
+    ...(block.relatedConcepts ?? []),
   ]
     .join(" ")
     .toLowerCase();
@@ -36,7 +37,7 @@ function matchesText(block, keyword) {
   return corpus.includes(keyword);
 }
 
-export default function BrickWarehouse({ open, onClose }) {
+export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSelectedId }) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeStatus, setActiveStatus] = useState("全部");
@@ -79,6 +80,17 @@ export default function BrickWarehouse({ open, onClose }) {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose, open]);
+
+  useEffect(() => {
+    if (!open || !initialSelectedId) {
+      return;
+    }
+
+    const exists = buildingBlocks.some((block) => block.id === initialSelectedId);
+    if (exists) {
+      setSelectedId(initialSelectedId);
+    }
+  }, [initialSelectedId, open]);
 
   const tags = useMemo(() => {
     return [...new Set(buildingBlocks.flatMap((block) => block.tags))].sort((left, right) => left.localeCompare(right));
@@ -131,6 +143,15 @@ export default function BrickWarehouse({ open, onClose }) {
     }));
   }
 
+  function jumpToConcept(conceptName) {
+    if (onOpenConcept) {
+      onClose();
+      onOpenConcept(conceptName);
+    } else {
+      setQuery(conceptName);
+    }
+  }
+
   return (
     <div className="blocks-overlay" role="presentation" onClick={onClose}>
       <div className="blocks-shell" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
@@ -147,7 +168,7 @@ export default function BrickWarehouse({ open, onClose }) {
                 type="text"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="搜索项目、能力标签、组合方向..."
+                placeholder="搜索项目、能力标签、相关概念..."
               />
             </label>
             <button type="button" className="blocks-close" aria-label="关闭积木仓库" title="关闭积木仓库" onClick={onClose}>
@@ -157,7 +178,7 @@ export default function BrickWarehouse({ open, onClose }) {
         </div>
 
         <div className="blocks-layout">
-          <aside className="blocks-sidebar">
+          <aside className="blocks-sidebar scroll-surface">
             <section className="blocks-filter-card">
               <div className="blocks-filter-head">
                 <span>分类</span>
@@ -209,15 +230,13 @@ export default function BrickWarehouse({ open, onClose }) {
             </section>
           </aside>
 
-          <section className="blocks-grid-panel">
+          <section className="blocks-grid-panel scroll-surface">
             <div className="blocks-grid-copy">
               <div>
                 <p className="blocks-panel-kicker">精选项目</p>
                 <h3>像整理能力积木一样整理开源项目</h3>
               </div>
-              <p>
-                这里不追热度榜单，只收那些值得你反复理解、未来能与其他能力发生化学反应的模块。
-              </p>
+              <p>这里不追热度榜单，只收那些值得你反复理解、未来能与其他能力发生化学反应的模块。</p>
             </div>
 
             <div className="blocks-grid">
@@ -251,7 +270,7 @@ export default function BrickWarehouse({ open, onClose }) {
             </div>
           </section>
 
-          <aside className="blocks-detail">
+          <aside className="blocks-detail scroll-surface">
             {selectedBlock ? (
               <>
                 <div className="blocks-detail-top">
@@ -296,6 +315,17 @@ export default function BrickWarehouse({ open, onClose }) {
                       <span key={item} className="blocks-pill blocks-pill-static">
                         {item}
                       </span>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="blocks-detail-section">
+                  <span>相关概念</span>
+                  <div className="blocks-pill-row">
+                    {(selectedBlock.relatedConcepts ?? []).map((item) => (
+                      <button key={item} type="button" className="blocks-pill" onClick={() => jumpToConcept(item)}>
+                        {item}
+                      </button>
                     ))}
                   </div>
                 </section>
