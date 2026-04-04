@@ -485,6 +485,9 @@ export default function ConceptUniverse({ open, onClose }) {
                 placeholder="检索任意 AI 概念"
               />
             </label>
+            <button type="button" className="universe-close" aria-label="关闭概念宇宙" title="关闭概念宇宙" onClick={onClose}>
+              ✕
+            </button>
           </div>
         </div>
 
@@ -587,9 +590,6 @@ export default function ConceptUniverse({ open, onClose }) {
               }}
             >
               ◎
-            </button>
-            <button type="button" aria-label="关闭概念宇宙" title="关闭概念宇宙" onClick={onClose}>
-              ✕
             </button>
           </div>
 
