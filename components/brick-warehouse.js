@@ -563,12 +563,8 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                     </div>
                     <h4>{block.name}</h4>
                     <p>{block.summary}</p>
-                    <div className="blocks-card-links">
-                      <span>GitHub</span>
-                      <code>{block.github.replace("https://github.com/", "")}</code>
-                    </div>
                     <div className="blocks-card-tags">
-                      {block.tags.slice(0, 3).map((tag) => (
+                      {block.tags.slice(0, 2).map((tag) => (
                         <span key={tag}>{tag}</span>
                       ))}
                     </div>
