@@ -127,7 +127,7 @@ export default function ConceptUniverse({ open, onClose }) {
   const [warpPhase, setWarpPhase] = useState("idle");
   const [warpTargetId, setWarpTargetId] = useState(null);
   const [warpGhost, setWarpGhost] = useState(null);
-  const [arrivalOffset, setArrivalOffset] = useState({ x: 0, y: 0 });
+  const [arrivalMetrics, setArrivalMetrics] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [isHudPinned, setIsHudPinned] = useState(false);
   const [isPointerDown, setIsPointerDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -207,12 +207,16 @@ export default function ConceptUniverse({ open, onClose }) {
         );
         const projection = projectPoint(rotated);
         const hudAvoidance = getHudAvoidance(projection, projection.depth, hasHud);
+        const finalOffsetX = arrivalMetrics.width ? ((projection.left - 50) / 100) * arrivalMetrics.width + hudAvoidance.x : 0;
+        const finalOffsetY = arrivalMetrics.height ? ((projection.top - 50) / 100) * arrivalMetrics.height + hudAvoidance.y : 0;
 
         return {
           ...node,
           ...projection,
           hudShiftX: `${hudAvoidance.x}px`,
           hudShiftY: `${hudAvoidance.y}px`,
+          entryOffsetX: `${arrivalMetrics.x - finalOffsetX}px`,
+          entryOffsetY: `${arrivalMetrics.y - finalOffsetY}px`,
           driftDelay: `${(index % 6) * 0.8}s`,
           floatX: `${((index % 5) - 2) * 0.8}px`,
           floatY: `${(((index * 2) % 5) - 2) * 0.7}px`,
@@ -220,7 +224,7 @@ export default function ConceptUniverse({ open, onClose }) {
         };
       })
       .sort((left, right) => left.z - right.z);
-  }, [rotation.x, rotation.y, selectedNode, visibleNodes]);
+  }, [arrivalMetrics.height, arrivalMetrics.width, arrivalMetrics.x, arrivalMetrics.y, rotation.x, rotation.y, selectedNode, visibleNodes]);
 
   const warpOrigin = useMemo(() => {
     const targetNode = projectedNodes.find((node) => node.id === warpTargetId);
@@ -247,7 +251,7 @@ export default function ConceptUniverse({ open, onClose }) {
       inertiaFrameRef.current = 0;
       moveFrameRef.current = 0;
       setWarpGhost(null);
-      setArrivalOffset({ x: 0, y: 0 });
+      setArrivalMetrics({ x: 0, y: 0, width: 0, height: 0 });
     }
   }, [open]);
 
@@ -332,9 +336,11 @@ export default function ConceptUniverse({ open, onClose }) {
       setWarpGhost(ghostNode);
       if (sceneRef.current) {
         const rect = sceneRef.current.getBoundingClientRect();
-        setArrivalOffset({
+        setArrivalMetrics({
           x: ((ghostNode.left - 50) / 100) * rect.width + Number.parseFloat(ghostNode.hudShiftX),
           y: ((ghostNode.top - 50) / 100) * rect.height + Number.parseFloat(ghostNode.hudShiftY),
+          width: rect.width,
+          height: rect.height,
         });
       }
     }
@@ -362,7 +368,7 @@ export default function ConceptUniverse({ open, onClose }) {
         setWarpPhase("idle");
         setWarpTargetId(null);
         setWarpGhost(null);
-        setArrivalOffset({ x: 0, y: 0 });
+        setArrivalMetrics({ x: 0, y: 0, width: 0, height: 0 });
         warpTimeoutsRef.current = [];
       }, 520)
       );
@@ -567,8 +573,6 @@ export default function ConceptUniverse({ open, onClose }) {
           style={{
             "--warp-origin-x": warpOrigin.x,
             "--warp-origin-y": warpOrigin.y,
-            "--arrival-offset-x": `${arrivalOffset.x}px`,
-            "--arrival-offset-y": `${arrivalOffset.y}px`,
           }}
           onClick={(event) => {
             if (event.target === event.currentTarget || event.target.classList.contains("universe-backdrop")) {
@@ -618,9 +622,14 @@ export default function ConceptUniverse({ open, onClose }) {
                   style={{
                     left: `${node.left}%`,
                     top: `${node.top}%`,
-                    transform: `translate(-50%, -50%) translate3d(${node.hudShiftX}, ${node.hudShiftY}, 0) scale(${node.scale})`,
+                    transform: `translate(-50%, -50%) translate3d(var(--node-shift-x), var(--node-shift-y), 0) scale(var(--node-scale))`,
                     opacity: node.opacity,
                     zIndex: Math.round(node.depth * 100) + 10,
+                    "--node-shift-x": node.hudShiftX,
+                    "--node-shift-y": node.hudShiftY,
+                    "--node-entry-x": node.entryOffsetX,
+                    "--node-entry-y": node.entryOffsetY,
+                    "--node-scale": node.scale,
                     "--node-drift-delay": node.driftDelay,
                     "--node-float-x": node.floatX,
                     "--node-float-y": node.floatY,
