@@ -1555,6 +1555,11 @@ select {
   font-size: 0.8rem;
 }
 
+.universe-stats strong {
+  color: var(--universe-accent, #c4b5fd);
+  font-weight: 800;
+}
+
 .universe-controls {
   right: 28px;
   bottom: 28px;
