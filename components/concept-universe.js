@@ -102,6 +102,7 @@ export default function ConceptUniverse({ open, onClose }) {
   const [history, setHistory] = useState([conceptUniverse.entryId]);
   const [query, setQuery] = useState("");
   const [rotation, setRotation] = useState({ x: -0.24, y: 0.42 });
+  const [driftVelocity, setDriftVelocity] = useState({ x: 0, y: 0 });
   const [tick, setTick] = useState(0);
   const [warpPhase, setWarpPhase] = useState("idle");
   const sceneRef = useRef(null);
@@ -189,9 +190,14 @@ export default function ConceptUniverse({ open, onClose }) {
     const loop = (time) => {
       setTick(time);
       if (!dragRef.current) {
-        setRotation((current) => ({
-          x: clamp(current.x + Math.sin(time * 0.00018) * 0.00045, -0.72, 0.72),
-          y: current.y + 0.0022,
+        setRotation((current) => {
+          const nextX = clamp(current.x + driftVelocity.x + Math.sin(time * 0.00014) * 0.00016, -1.04, 1.04);
+          const nextY = current.y + driftVelocity.y + 0.00055;
+          return { x: nextX, y: nextY };
+        });
+        setDriftVelocity((current) => ({
+          x: Math.abs(current.x) < 0.00002 ? 0 : current.x * 0.94,
+          y: Math.abs(current.y) < 0.00002 ? 0 : current.y * 0.94,
         }));
       }
       frameId = window.requestAnimationFrame(loop);
@@ -246,6 +252,7 @@ export default function ConceptUniverse({ open, onClose }) {
         x: -0.24 + Math.sin(performance.now() * 0.001) * 0.06,
         y: 0.42,
       });
+      setDriftVelocity({ x: 0, y: 0 });
       setWarpPhase("warp-in");
       window.setTimeout(() => {
         setWarpPhase("idle");
@@ -258,6 +265,7 @@ export default function ConceptUniverse({ open, onClose }) {
       setCenterId(conceptUniverse.entryId);
       setSelectedId(null);
       setHistory([conceptUniverse.entryId]);
+      setDriftVelocity({ x: 0, y: 0 });
       return;
     }
 
@@ -267,6 +275,7 @@ export default function ConceptUniverse({ open, onClose }) {
     setCenterId(previousId);
     setSelectedId(null);
     setRotation({ x: -0.24, y: 0.42 });
+    setDriftVelocity({ x: 0, y: 0 });
   }
 
   function handlePointerDown(event) {
@@ -280,6 +289,11 @@ export default function ConceptUniverse({ open, onClose }) {
       startY: event.clientY,
       originX: rotation.x,
       originY: rotation.y,
+      lastX: event.clientX,
+      lastY: event.clientY,
+      lastTime: performance.now(),
+      velocityX: 0,
+      velocityY: 0,
     };
     sceneRef.current?.setPointerCapture(event.pointerId);
   }
@@ -291,6 +305,14 @@ export default function ConceptUniverse({ open, onClose }) {
 
     const deltaX = event.clientX - dragRef.current.startX;
     const deltaY = event.clientY - dragRef.current.startY;
+    const now = performance.now();
+    const elapsed = Math.max(now - dragRef.current.lastTime, 16);
+
+    dragRef.current.velocityX = ((event.clientY - dragRef.current.lastY) * 0.0044) / elapsed;
+    dragRef.current.velocityY = ((event.clientX - dragRef.current.lastX) * 0.0052) / elapsed;
+    dragRef.current.lastX = event.clientX;
+    dragRef.current.lastY = event.clientY;
+    dragRef.current.lastTime = now;
 
     setRotation({
       x: clamp(dragRef.current.originX + deltaY * 0.0044, -1.04, 1.04),
@@ -304,6 +326,10 @@ export default function ConceptUniverse({ open, onClose }) {
     }
 
     sceneRef.current?.releasePointerCapture(event.pointerId);
+    setDriftVelocity({
+      x: clamp(dragRef.current.velocityX * 14, -0.012, 0.012),
+      y: clamp(dragRef.current.velocityY * 14, -0.014, 0.014),
+    });
     dragRef.current = null;
   }
 
@@ -335,9 +361,6 @@ export default function ConceptUniverse({ open, onClose }) {
                 placeholder="检索任意 AI 概念"
               />
             </label>
-            <button className="universe-close" type="button" onClick={onClose}>
-              关闭
-            </button>
           </div>
         </div>
 
@@ -371,6 +394,7 @@ export default function ConceptUniverse({ open, onClose }) {
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
           onPointerLeave={handlePointerUp}
         >
           <div className="universe-backdrop" />
@@ -408,19 +432,25 @@ export default function ConceptUniverse({ open, onClose }) {
           </div>
 
           <div className="universe-controls">
-            <button type="button" onClick={handleBack}>
-              返回上一级
+            <button type="button" aria-label="返回上一级" title="返回上一级" onClick={handleBack}>
+              ↶
             </button>
             <button
               type="button"
+              aria-label="返回核心"
+              title="返回核心"
               onClick={() => {
                 setCenterId(conceptUniverse.entryId);
                 setSelectedId(null);
                 setHistory([conceptUniverse.entryId]);
                 setRotation({ x: -0.24, y: 0.42 });
+                setDriftVelocity({ x: 0, y: 0 });
               }}
             >
-              返回核心
+              ◎
+            </button>
+            <button type="button" aria-label="关闭概念宇宙" title="关闭概念宇宙" onClick={onClose}>
+              ✕
             </button>
           </div>
 
@@ -444,8 +474,7 @@ export default function ConceptUniverse({ open, onClose }) {
                   <button
                     key={node.id}
                     type="button"
-                    onClick={() => setSelectedId(node.id)}
-                    onDoubleClick={() => enterNode(node.id)}
+                    onClick={() => enterNode(node.id)}
                   >
                     {node.name}
                   </button>

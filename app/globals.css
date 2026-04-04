@@ -1360,17 +1360,17 @@ select {
   left: 50%;
   top: 50%;
   background:
-    radial-gradient(circle, color-mix(in srgb, var(--universe-accent, #c4b5fd) 32%, rgba(255, 255, 255, 0.14)) 0%, transparent 62%),
-    radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 72%);
+    radial-gradient(circle, color-mix(in srgb, var(--universe-accent, #c4b5fd) 18%, rgba(255, 255, 255, 0.08)) 0%, transparent 48%),
+    radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 62%);
   position: absolute;
-  width: 220px;
-  height: 220px;
+  width: 132px;
+  height: 132px;
   border-radius: 999px;
   box-shadow:
-    0 0 80px color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 90%, transparent),
-    inset 0 0 32px rgba(255, 255, 255, 0.06);
+    0 0 54px color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 55%, transparent),
+    inset 0 0 18px rgba(255, 255, 255, 0.04);
   transform: translate(-50%, -50%);
-  opacity: 0.85;
+  opacity: 0.58;
   pointer-events: none;
 }
 
@@ -1396,6 +1396,7 @@ select {
   background: rgba(8, 11, 19, 0.66);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24);
   transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, opacity 180ms ease, filter 180ms ease;
+  animation: universeNodeDrift 10s ease-in-out infinite;
 }
 
 .universe-node.active {
@@ -1450,6 +1451,19 @@ select {
   bottom: 28px;
   display: flex;
   gap: 12px;
+}
+
+.universe-controls button {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 1rem;
+  opacity: 0.82;
+}
+
+.universe-controls button:hover {
+  opacity: 1;
 }
 
 .universe-hud {
@@ -1561,6 +1575,22 @@ select {
   }
 }
 
+@keyframes universeNodeDrift {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  25% {
+    translate: 4px -2px;
+  }
+  50% {
+    translate: -3px 2px;
+  }
+  75% {
+    translate: 2px 3px;
+  }
+}
+
 @media (max-width: 960px) {
   .universe-topbar {
     flex-direction: column;
@@ -1635,8 +1665,8 @@ select {
   }
 
   .universe-core {
-    width: 170px;
-    height: 170px;
+    width: 108px;
+    height: 108px;
   }
 
   .universe-node {
