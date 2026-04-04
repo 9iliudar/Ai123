@@ -101,6 +101,11 @@ function extractIconHref(html) {
 }
 
 async function findOfficialIcon(targetUrl) {
+  const directIcon = await fetchIconBinary(targetUrl.toString());
+  if (directIcon) {
+    return directIcon;
+  }
+
   for (const path of COMMON_ICON_PATHS) {
     const icon = await fetchIconBinary(`${targetUrl.origin}${path}`);
     if (icon) {

@@ -45,6 +45,7 @@ export const defaultTools = [
     desc: "顶尖开源模型工具，在数学和编程方面极其出色且免费。",
     cat: "Code",
     link: "https://chat.deepseek.com",
+    icon: "https://cdn.deepseek.com/chat/icon.png",
     badge: "HOT",
     badgeClass: "rank-hot",
   },
@@ -86,6 +87,7 @@ export const defaultTools = [
     desc: "超长文本和长文档处理能力很强。",
     cat: "Chat",
     link: "https://kimi.moonshot.cn",
+    icon: "https://statics.moonshot.cn/kimi-web-seo/favicon.ico",
   },
   {
     id: "qwen",
@@ -114,6 +116,7 @@ export const defaultTools = [
     desc: "目前效果很强的艺术图像生成工具。",
     cat: "Image",
     link: "https://midjourney.com",
+    icon: "https://www.midjourney.com/favicon.ico",
   },
   {
     id: "kling",
@@ -151,6 +154,7 @@ export const defaultTools = [
     desc: "用 AI 快速生成演示文稿和网页。",
     cat: "Other",
     link: "https://gamma.app",
+    icon: "https://gamma.app/favicon.ico",
   },
   {
     id: "poe",
@@ -202,6 +206,7 @@ export const defaultTools = [
     desc: "把文档变成研究摘要甚至播客的工具。",
     cat: "Audio",
     link: "https://notebooklm.google.com",
+    icon: "https://notebooklm.google.com/favicon.ico",
     badge: "HOT",
     badgeClass: "rank-hot",
   },

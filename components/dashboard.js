@@ -39,7 +39,7 @@ function ToolIcon({ tool }) {
   if (!failed) {
     return (
       <img
-        src={`/api/icon?url=${encodeURIComponent(tool.link)}&v=${ICON_VERSION}`}
+        src={`/api/icon?url=${encodeURIComponent(tool.icon || tool.link)}&v=${ICON_VERSION}`}
         alt={`${tool.name} logo`}
         onError={() => setFailed(true)}
       />
