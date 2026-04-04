@@ -338,7 +338,7 @@ export default function ConceptUniverse({ open, onClose }) {
   }
 
   function handlePointerDown(event) {
-    if (event.target.closest(".universe-hud, .universe-controls, .universe-search-panel, .universe-topbar, input")) {
+    if (event.target.closest(".universe-node, .universe-hud, .universe-controls, .universe-search-panel, .universe-topbar, input")) {
       return;
     }
 
@@ -519,8 +519,16 @@ export default function ConceptUniverse({ open, onClose }) {
                     "--node-float-y": node.floatY,
                     "--node-float-duration": node.floatDuration,
                   }}
-                  onClick={() => handleNodeClick(node.id)}
-                  onDoubleClick={() => enterNode(node.id)}
+                  onPointerDown={(event) => event.stopPropagation()}
+                  onPointerUp={(event) => event.stopPropagation()}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleNodeClick(node.id);
+                  }}
+                  onDoubleClick={(event) => {
+                    event.stopPropagation();
+                    enterNode(node.id);
+                  }}
                 >
                   <span className="universe-node-content">
                     <span>{node.name}</span>
