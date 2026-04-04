@@ -30,9 +30,20 @@ function getIconPalette(value) {
 }
 
 function ToolIcon({ tool }) {
+  const [failed, setFailed] = useState(false);
   const seed = `${tool.id}-${tool.name}`;
   const [start, end] = getIconPalette(seed);
   const label = tool.name.trim().charAt(0).toUpperCase();
+
+  if (!failed) {
+    return (
+      <img
+        src={`/api/icon?url=${encodeURIComponent(tool.link)}`}
+        alt={`${tool.name} logo`}
+        onError={() => setFailed(true)}
+      />
+    );
+  }
 
   return (
     <div
