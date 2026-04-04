@@ -127,6 +127,7 @@ export default function ConceptUniverse({ open, onClose }) {
   const [warpPhase, setWarpPhase] = useState("idle");
   const [warpTargetId, setWarpTargetId] = useState(null);
   const [warpGhost, setWarpGhost] = useState(null);
+  const [arrivalOffset, setArrivalOffset] = useState({ x: 0, y: 0 });
   const [isHudPinned, setIsHudPinned] = useState(false);
   const [isPointerDown, setIsPointerDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -246,6 +247,7 @@ export default function ConceptUniverse({ open, onClose }) {
       inertiaFrameRef.current = 0;
       moveFrameRef.current = 0;
       setWarpGhost(null);
+      setArrivalOffset({ x: 0, y: 0 });
     }
   }, [open]);
 
@@ -328,6 +330,13 @@ export default function ConceptUniverse({ open, onClose }) {
     const ghostNode = projectedNodes.find((node) => node.id === targetId);
     if (ghostNode) {
       setWarpGhost(ghostNode);
+      if (sceneRef.current) {
+        const rect = sceneRef.current.getBoundingClientRect();
+        setArrivalOffset({
+          x: ((ghostNode.left - 50) / 100) * rect.width + Number.parseFloat(ghostNode.hudShiftX),
+          y: ((ghostNode.top - 50) / 100) * rect.height + Number.parseFloat(ghostNode.hudShiftY),
+        });
+      }
     }
     setWarpTargetId(targetId);
     setSelectedId(targetId);
@@ -353,6 +362,7 @@ export default function ConceptUniverse({ open, onClose }) {
         setWarpPhase("idle");
         setWarpTargetId(null);
         setWarpGhost(null);
+        setArrivalOffset({ x: 0, y: 0 });
         warpTimeoutsRef.current = [];
       }, 520)
       );
@@ -557,6 +567,8 @@ export default function ConceptUniverse({ open, onClose }) {
           style={{
             "--warp-origin-x": warpOrigin.x,
             "--warp-origin-y": warpOrigin.y,
+            "--arrival-offset-x": `${arrivalOffset.x}px`,
+            "--arrival-offset-y": `${arrivalOffset.y}px`,
           }}
           onClick={(event) => {
             if (event.target === event.currentTarget || event.target.classList.contains("universe-backdrop")) {

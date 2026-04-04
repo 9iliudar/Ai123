@@ -1739,7 +1739,7 @@ select {
 }
 
 .universe-overlay.warp-in .universe-field {
-  animation: universeWarpIn 520ms cubic-bezier(0.14, 1, 0.3, 1);
+  animation: universeWarpIn 720ms cubic-bezier(0.14, 1, 0.3, 1);
 }
 
 .universe-overlay.warp-in .universe-warp-veil {
@@ -1762,8 +1762,13 @@ select {
 @keyframes universeWarpIn {
   from {
     opacity: 0.02;
-    transform: scale(0.66) translateZ(-520px);
+    transform: translate3d(var(--arrival-offset-x, 0px), var(--arrival-offset-y, 0px), 0) scale(0.72) translateZ(-520px);
     filter: blur(20px) saturate(1.22);
+  }
+  68% {
+    opacity: 1;
+    transform: translate3d(calc(var(--arrival-offset-x, 0px) * 0.18), calc(var(--arrival-offset-y, 0px) * 0.18), 0) scale(1.02) translateZ(0);
+    filter: blur(2px) saturate(1.04);
   }
   to {
     opacity: 1;
