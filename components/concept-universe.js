@@ -221,7 +221,7 @@ export default function ConceptUniverse({ open, onClose }) {
           entryOffsetX: `${entryOffsetX}px`,
           entryOffsetY: `${entryOffsetY}px`,
           entryDepth: `${entryDepth}px`,
-          arrivalDelay: `${96 + index * 28}ms`,
+          arrivalDelay: `${160 + index * 42}ms`,
           driftDelay: `${(index % 6) * 0.8}s`,
           floatX: `${((index % 5) - 2) * 0.8}px`,
           floatY: `${(((index * 2) % 5) - 2) * 0.7}px`,
