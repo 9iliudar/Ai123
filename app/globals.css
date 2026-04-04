@@ -19,6 +19,7 @@
 
 html {
   scroll-behavior: smooth;
+  scrollbar-width: none;
 }
 
 body {
@@ -30,6 +31,14 @@ body {
     linear-gradient(180deg, #09090b 0%, #0c0c12 100%);
   color: var(--text);
   font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 a {
@@ -259,6 +268,16 @@ select {
   box-shadow: 0 28px 70px rgba(0, 0, 0, 0.42);
 }
 
+.card.is-dragging {
+  opacity: 0.52;
+  transform: scale(0.985);
+}
+
+.card.is-drop-target {
+  border-color: rgba(167, 139, 250, 0.95);
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.3), 0 28px 70px rgba(0, 0, 0, 0.42);
+}
+
 .card-link {
   display: flex;
   flex-direction: column;
@@ -270,9 +289,32 @@ select {
   position: absolute;
   top: 14px;
   right: 16px;
-  color: #52525b;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #71717a;
   font-size: 0.95rem;
   user-select: none;
+  cursor: grab;
+  transition: 180ms ease;
+}
+
+.drag-handle:hover,
+.drag-handle:focus-visible {
+  color: #f4f4f5;
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(124, 58, 237, 0.35);
+  outline: none;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+  background: rgba(124, 58, 237, 0.12);
 }
 
 .delete-button {

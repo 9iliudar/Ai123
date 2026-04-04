@@ -41,6 +41,8 @@ export default function Dashboard() {
     desc: "",
   });
   const [draggedId, setDraggedId] = useState(null);
+  const [dragArmedId, setDragArmedId] = useState(null);
+  const [dropTargetId, setDropTargetId] = useState(null);
 
   useEffect(() => {
     const storedTools = window.localStorage.getItem(CUSTOM_TOOLS_KEY);
@@ -114,12 +116,21 @@ export default function Dashboard() {
     setActiveCategory("All");
   }
 
-  function handleDragStart(id) {
+  function handleDragStart(event, id) {
+    if (dragArmedId !== id) {
+      event.preventDefault();
+      return;
+    }
+
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", id);
     setDraggedId(id);
   }
 
   function handleDrop(targetId) {
     if (!draggedId || draggedId === targetId) {
+      setDropTargetId(null);
+      setDragArmedId(null);
       return;
     }
 
@@ -130,10 +141,14 @@ export default function Dashboard() {
       return next;
     });
     setDraggedId(null);
+    setDropTargetId(null);
+    setDragArmedId(null);
   }
 
   function handleDragEnd() {
     setDraggedId(null);
+    setDropTargetId(null);
+    setDragArmedId(null);
   }
 
   return (
@@ -190,16 +205,40 @@ export default function Dashboard() {
         {tools.map((tool) => (
           <article
             key={tool.id}
-            className="card"
-            draggable
-            onDragStart={() => handleDragStart(tool.id)}
-            onDragOver={(event) => event.preventDefault()}
+            className={`card ${draggedId === tool.id ? "is-dragging" : ""} ${dropTargetId === tool.id ? "is-drop-target" : ""}`}
+            draggable={dragArmedId === tool.id}
+            onDragStart={(event) => handleDragStart(event, tool.id)}
+            onDragOver={(event) => {
+              event.preventDefault();
+              event.dataTransfer.dropEffect = "move";
+            }}
+            onDragEnter={() => {
+              if (draggedId && draggedId !== tool.id) {
+                setDropTargetId(tool.id);
+              }
+            }}
+            onDragLeave={() => {
+              if (dropTargetId === tool.id) {
+                setDropTargetId(null);
+              }
+            }}
             onDrop={() => handleDrop(tool.id)}
             onDragEnd={handleDragEnd}
           >
-            <span className="drag-handle" aria-hidden="true">
+            <button
+              className="drag-handle"
+              type="button"
+              aria-label={`拖动 ${tool.name}`}
+              onMouseDown={() => setDragArmedId(tool.id)}
+              onMouseUp={() => setDragArmedId(null)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  setDragArmedId(tool.id);
+                }
+              }}
+            >
               ⋮⋮
-            </span>
+            </button>
 
             {tool.isCustom ? (
               <button className="delete-button" type="button" onClick={() => handleDeleteTool(tool.id)}>
