@@ -103,9 +103,15 @@ export default function ConceptUniverse({ open, onClose }) {
   const [query, setQuery] = useState("");
   const [rotation, setRotation] = useState({ x: -0.24, y: 0.42 });
   const [warpPhase, setWarpPhase] = useState("idle");
+  const [isPointerDown, setIsPointerDown] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isSettling, setIsSettling] = useState(false);
   const sceneRef = useRef(null);
   const dragRef = useRef(null);
   const inertiaFrameRef = useRef(0);
+  const moveFrameRef = useRef(0);
+  const rotationRef = useRef(rotation);
+  const suppressClickUntilRef = useRef(0);
 
   const centerNode = nodeMap.get(centerId) ?? conceptUniverse.nodes[0];
   const selectedNode = selectedId ? nodeMap.get(selectedId) ?? null : null;
@@ -177,15 +183,24 @@ export default function ConceptUniverse({ open, onClose }) {
           ...node,
           ...projection,
           driftDelay: `${(index % 6) * 0.8}s`,
+          floatX: `${((index % 5) - 2) * 0.8}px`,
+          floatY: `${(((index * 2) % 5) - 2) * 0.7}px`,
+          floatDuration: `${11 + (index % 5) * 1.8}s`,
         };
       })
       .sort((left, right) => left.z - right.z);
   }, [rotation.x, rotation.y, visibleNodes]);
 
   useEffect(() => {
+    rotationRef.current = rotation;
+  }, [rotation]);
+
+  useEffect(() => {
     if (!open) {
       window.cancelAnimationFrame(inertiaFrameRef.current);
+      window.cancelAnimationFrame(moveFrameRef.current);
       inertiaFrameRef.current = 0;
+      moveFrameRef.current = 0;
     }
   }, [open]);
 
@@ -222,25 +237,32 @@ export default function ConceptUniverse({ open, onClose }) {
   function stopInertia() {
     window.cancelAnimationFrame(inertiaFrameRef.current);
     inertiaFrameRef.current = 0;
+    setIsSettling(false);
   }
 
   function startInertia(initialVelocity) {
     stopInertia();
+    setIsSettling(true);
     let velocity = initialVelocity;
 
     const step = () => {
       velocity = {
-        x: Math.abs(velocity.x) < 0.00006 ? 0 : velocity.x * 0.92,
-        y: Math.abs(velocity.y) < 0.00006 ? 0 : velocity.y * 0.92,
+        x: Math.abs(velocity.x) < 0.00004 ? 0 : velocity.x * 0.93,
+        y: Math.abs(velocity.y) < 0.00004 ? 0 : velocity.y * 0.93,
       };
 
-      setRotation((current) => ({
-        x: clamp(current.x + velocity.x, -1.04, 1.04),
-        y: current.y + velocity.y,
-      }));
+      setRotation((current) => {
+        const next = {
+          x: clamp(current.x + velocity.x, -1.04, 1.04),
+          y: current.y + velocity.y,
+        };
+        rotationRef.current = next;
+        return next;
+      });
 
       if (velocity.x === 0 && velocity.y === 0) {
         inertiaFrameRef.current = 0;
+        setIsSettling(false);
         return;
       }
 
@@ -291,23 +313,52 @@ export default function ConceptUniverse({ open, onClose }) {
     stopInertia();
   }
 
+  function scheduleDragRotation() {
+    if (!dragRef.current || moveFrameRef.current) {
+      return;
+    }
+
+    moveFrameRef.current = window.requestAnimationFrame(() => {
+      moveFrameRef.current = 0;
+      if (!dragRef.current) {
+        return;
+      }
+
+      const deltaX = dragRef.current.currentX - dragRef.current.startX;
+      const deltaY = dragRef.current.currentY - dragRef.current.startY;
+
+      const next = {
+        x: clamp(dragRef.current.originX + deltaY * 0.0041, -1.04, 1.04),
+        y: dragRef.current.originY + deltaX * 0.0049,
+      };
+
+      rotationRef.current = next;
+      setRotation(next);
+    });
+  }
+
   function handlePointerDown(event) {
-    if (event.target.closest("button, input")) {
+    if (event.target.closest(".universe-hud, .universe-controls, .universe-search-panel, .universe-topbar, input")) {
       return;
     }
 
     stopInertia();
+    setIsPointerDown(true);
+    setIsDragging(false);
     dragRef.current = {
       pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
-      originX: rotation.x,
-      originY: rotation.y,
+      currentX: event.clientX,
+      currentY: event.clientY,
+      originX: rotationRef.current.x,
+      originY: rotationRef.current.y,
       lastX: event.clientX,
       lastY: event.clientY,
       lastTime: performance.now(),
       velocityX: 0,
       velocityY: 0,
+      moved: false,
     };
     sceneRef.current?.setPointerCapture(event.pointerId);
   }
@@ -317,21 +368,26 @@ export default function ConceptUniverse({ open, onClose }) {
       return;
     }
 
-    const deltaX = event.clientX - dragRef.current.startX;
-    const deltaY = event.clientY - dragRef.current.startY;
+    dragRef.current.currentX = event.clientX;
+    dragRef.current.currentY = event.clientY;
     const now = performance.now();
     const elapsed = Math.max(now - dragRef.current.lastTime, 16);
+    const deltaX = event.clientX - dragRef.current.startX;
+    const deltaY = event.clientY - dragRef.current.startY;
+    const movedEnough = Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4;
 
-    dragRef.current.velocityX = ((event.clientY - dragRef.current.lastY) * 0.0044) / elapsed;
-    dragRef.current.velocityY = ((event.clientX - dragRef.current.lastX) * 0.0052) / elapsed;
+    if (movedEnough) {
+      dragRef.current.moved = true;
+      setIsDragging(true);
+    }
+
+    dragRef.current.velocityX = ((event.clientY - dragRef.current.lastY) * 0.0041) / elapsed;
+    dragRef.current.velocityY = ((event.clientX - dragRef.current.lastX) * 0.0049) / elapsed;
     dragRef.current.lastX = event.clientX;
     dragRef.current.lastY = event.clientY;
     dragRef.current.lastTime = now;
 
-    setRotation({
-      x: clamp(dragRef.current.originX + deltaY * 0.0044, -1.04, 1.04),
-      y: dragRef.current.originY + deltaX * 0.0052,
-    });
+    scheduleDragRotation();
   }
 
   function handlePointerUp(event) {
@@ -339,13 +395,42 @@ export default function ConceptUniverse({ open, onClose }) {
       return;
     }
 
+    window.cancelAnimationFrame(moveFrameRef.current);
+    moveFrameRef.current = 0;
     sceneRef.current?.releasePointerCapture(event.pointerId);
-    startInertia({
-      x: clamp(dragRef.current.velocityX * 12, -0.01, 0.01),
-      y: clamp(dragRef.current.velocityY * 12, -0.012, 0.012),
-    });
+    setIsPointerDown(false);
+
+    const shouldSuppressClick = dragRef.current.moved;
+    if (shouldSuppressClick) {
+      suppressClickUntilRef.current = performance.now() + 220;
+      startInertia({
+        x: clamp(dragRef.current.velocityX * 10, -0.008, 0.008),
+        y: clamp(dragRef.current.velocityY * 10, -0.01, 0.01),
+      });
+    } else {
+      setIsSettling(false);
+    }
+
+    setIsDragging(false);
     dragRef.current = null;
   }
+
+  function handleNodeClick(nodeId) {
+    if (performance.now() < suppressClickUntilRef.current) {
+      return;
+    }
+
+    setSelectedId(nodeId);
+  }
+
+  const sceneStateClass = [
+    "universe-scene",
+    isPointerDown ? "is-pointer-down" : "",
+    isDragging ? "is-dragging" : "",
+    !isDragging && !isSettling && warpPhase === "idle" ? "is-idle" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div
@@ -367,7 +452,6 @@ export default function ConceptUniverse({ open, onClose }) {
 
           <div className="universe-top-actions">
             <label className="universe-search">
-              <span>搜索概念</span>
               <input
                 type="text"
                 value={query}
@@ -399,7 +483,7 @@ export default function ConceptUniverse({ open, onClose }) {
 
         <div
           ref={sceneRef}
-          className="universe-scene"
+          className={sceneStateClass}
           onClick={(event) => {
             if (event.target === event.currentTarget || event.target.classList.contains("universe-backdrop")) {
               setSelectedId(null);
@@ -410,6 +494,7 @@ export default function ConceptUniverse({ open, onClose }) {
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
           onPointerLeave={handlePointerUp}
+          onLostPointerCapture={handlePointerUp}
         >
           <div className="universe-backdrop" />
           <div className="universe-core" aria-hidden="true" />
@@ -430,12 +515,17 @@ export default function ConceptUniverse({ open, onClose }) {
                     opacity: node.opacity,
                     zIndex: Math.round(node.depth * 100) + 10,
                     "--node-drift-delay": node.driftDelay,
+                    "--node-float-x": node.floatX,
+                    "--node-float-y": node.floatY,
+                    "--node-float-duration": node.floatDuration,
                   }}
-                  onClick={() => setSelectedId(node.id)}
+                  onClick={() => handleNodeClick(node.id)}
                   onDoubleClick={() => enterNode(node.id)}
                 >
-                  <span>{node.name}</span>
-                  <small>{getSecondaryLabel(node) || node.domain}</small>
+                  <span className="universe-node-content">
+                    <span>{node.name}</span>
+                    <small>{getSecondaryLabel(node) || node.domain}</small>
+                  </span>
                 </button>
               );
             })}

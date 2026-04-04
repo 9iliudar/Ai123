@@ -723,8 +723,25 @@ function slugifyTerm(term) {
     .replace(/^-+|-+$/g, "");
 }
 
+const foundationalLowPriorityTerms = new Set([
+  "universal-approximation-theorem",
+  "gguf",
+  "slow-thinking",
+  "fast-thinking",
+  "phi-series",
+  "gemma",
+]);
+
 function makeGlossaryItems(label, items) {
-  return items.map((item) => {
+  return items
+    .filter((item) => {
+      const english = item.english ?? item.name ?? "";
+      const chinese = item.chinese ?? "";
+      const id = item.id ?? slugifyTerm(english || chinese);
+
+      return (item.importance ?? 2) > 2 || foundationalLowPriorityTerms.has(id);
+    })
+    .map((item) => {
     const english = item.english ?? item.name ?? "";
     const chinese = item.chinese ?? "";
     return {
@@ -736,7 +753,7 @@ function makeGlossaryItems(label, items) {
       detail: item.detail ?? `${english}${chinese ? `（${chinese}）` : ""} 在 ${label} 语境中是高频基础术语，适合作为概念宇宙的长期节点保留。`,
       importance: item.importance ?? 2,
     };
-  });
+    });
 }
 
 const supplementalClusters = [

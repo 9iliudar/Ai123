@@ -1144,11 +1144,11 @@ select {
   inset: 0;
   z-index: 50;
   background:
-    radial-gradient(circle at 16% 18%, color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 100%, transparent), transparent 26%),
-    radial-gradient(circle at 84% 20%, rgba(59, 130, 246, 0.12), transparent 24%),
-    radial-gradient(circle at 50% 85%, rgba(255, 255, 255, 0.06), transparent 28%),
-    #05060b;
-  backdrop-filter: blur(12px);
+    radial-gradient(circle at 16% 18%, color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 82%, transparent), transparent 28%),
+    radial-gradient(circle at 84% 20%, rgba(59, 130, 246, 0.1), transparent 24%),
+    radial-gradient(circle at 50% 85%, rgba(255, 255, 255, 0.045), transparent 30%),
+    rgba(5, 6, 11, 0.58);
+  backdrop-filter: blur(8px) saturate(1.08);
   animation: universeOverlayIn 260ms ease-out;
 }
 
@@ -1193,7 +1193,7 @@ select {
 
 .universe-brand h2 {
   margin: 0;
-  font-size: clamp(2.2rem, 4vw, 4rem);
+  font-size: clamp(1.8rem, 3.1vw, 3rem);
   letter-spacing: -0.06em;
 }
 
@@ -1220,19 +1220,12 @@ select {
   min-width: min(360px, 42vw);
 }
 
-.universe-search span {
-  color: #cbd5e1;
-  font-size: 0.78rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
 .universe-search input {
   width: 100%;
   padding: 14px 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 18px;
-  background: rgba(8, 11, 19, 0.72);
+  background: rgba(8, 11, 19, 0.58);
   color: #f8fafc;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.22);
   outline: none;
@@ -1303,10 +1296,18 @@ select {
   touch-action: none;
   cursor: grab;
   perspective: 1200px;
+  user-select: none;
 }
 
-.universe-scene:active {
+.universe-scene.is-pointer-down,
+.universe-scene.is-dragging {
   cursor: grabbing;
+}
+
+.universe-scene.is-pointer-down .universe-node,
+.universe-scene.is-dragging,
+.universe-scene.is-dragging * {
+  cursor: grabbing !important;
 }
 
 .universe-backdrop,
@@ -1360,17 +1361,17 @@ select {
   left: 50%;
   top: 50%;
   background:
-    radial-gradient(circle, color-mix(in srgb, var(--universe-accent, #c4b5fd) 18%, rgba(255, 255, 255, 0.08)) 0%, transparent 48%),
-    radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 62%);
+    radial-gradient(circle, color-mix(in srgb, var(--universe-accent, #c4b5fd) 10%, rgba(255, 255, 255, 0.05)) 0%, transparent 52%),
+    radial-gradient(circle, rgba(255, 255, 255, 0.025) 0%, transparent 68%);
   position: absolute;
-  width: 132px;
-  height: 132px;
+  width: 116px;
+  height: 116px;
   border-radius: 999px;
   box-shadow:
-    0 0 54px color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 55%, transparent),
-    inset 0 0 18px rgba(255, 255, 255, 0.04);
+    0 0 36px color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 35%, transparent),
+    inset 0 0 10px rgba(255, 255, 255, 0.025);
   transform: translate(-50%, -50%);
-  opacity: 0.58;
+  opacity: 0.32;
   pointer-events: none;
 }
 
@@ -1396,6 +1397,7 @@ select {
   background: rgba(8, 11, 19, 0.66);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24);
   transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, opacity 180ms ease, filter 180ms ease;
+  cursor: pointer;
 }
 
 .universe-node.active {
@@ -1406,6 +1408,21 @@ select {
 
 .universe-node.is-distant {
   filter: blur(0.35px) saturate(0.88);
+}
+
+.universe-node-content {
+  display: block;
+  transform: translate3d(0, 0, 0);
+}
+
+.universe-scene.is-idle .universe-node-content {
+  animation: universeNodeIdle var(--node-float-duration, 12s) ease-in-out infinite;
+  animation-delay: var(--node-drift-delay, 0s);
+}
+
+.universe-scene.is-pointer-down .universe-node-content,
+.universe-scene.is-dragging .universe-node-content {
+  animation: none;
 }
 
 .universe-distant-node {
@@ -1571,6 +1588,19 @@ select {
     opacity: 1;
     transform: scale(1);
     filter: blur(0);
+  }
+}
+
+@keyframes universeNodeIdle {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  35% {
+    transform: translate3d(var(--node-float-x, 1px), calc(var(--node-float-y, 1px) * -0.7), 0);
+  }
+  68% {
+    transform: translate3d(calc(var(--node-float-x, 1px) * -0.75), var(--node-float-y, 1px), 0);
   }
 }
 
