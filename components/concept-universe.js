@@ -102,11 +102,10 @@ export default function ConceptUniverse({ open, onClose }) {
   const [history, setHistory] = useState([conceptUniverse.entryId]);
   const [query, setQuery] = useState("");
   const [rotation, setRotation] = useState({ x: -0.24, y: 0.42 });
-  const [driftVelocity, setDriftVelocity] = useState({ x: 0, y: 0 });
-  const [tick, setTick] = useState(0);
   const [warpPhase, setWarpPhase] = useState("idle");
   const sceneRef = useRef(null);
   const dragRef = useRef(null);
+  const inertiaFrameRef = useRef(0);
 
   const centerNode = nodeMap.get(centerId) ?? conceptUniverse.nodes[0];
   const selectedNode = selectedId ? nodeMap.get(selectedId) ?? null : null;
@@ -162,49 +161,32 @@ export default function ConceptUniverse({ open, onClose }) {
     return visibleNodes
       .map((node, index) => {
         const base = spherePoints[index];
-        const pulse = tick * 0.0012 + index * 0.42;
-        const radius = CLOUD_RADIUS + (node.importance - 3) * 16 + Math.sin(pulse) * 18;
-        const dynamicPoint = {
-          x: base.x * radius + Math.cos(pulse * 1.3) * 12,
-          y: base.y * radius + Math.sin(pulse) * 14,
-          z: base.z * radius + Math.cos(pulse * 0.8) * 22,
-        };
-        const rotated = rotatePoint(dynamicPoint, rotation.x, rotation.y);
+        const radius = CLOUD_RADIUS + (node.importance - 3) * 14;
+        const rotated = rotatePoint(
+          {
+            x: base.x * radius,
+            y: base.y * radius,
+            z: base.z * radius,
+          },
+          rotation.x,
+          rotation.y
+        );
         const projection = projectPoint(rotated);
 
         return {
           ...node,
           ...projection,
+          driftDelay: `${(index % 6) * 0.8}s`,
         };
       })
       .sort((left, right) => left.z - right.z);
-  }, [rotation.x, rotation.y, tick, visibleNodes]);
+  }, [rotation.x, rotation.y, visibleNodes]);
 
   useEffect(() => {
     if (!open) {
-      return;
+      window.cancelAnimationFrame(inertiaFrameRef.current);
+      inertiaFrameRef.current = 0;
     }
-
-    let frameId = 0;
-
-    const loop = (time) => {
-      setTick(time);
-      if (!dragRef.current) {
-        setRotation((current) => {
-          const nextX = clamp(current.x + driftVelocity.x + Math.sin(time * 0.00014) * 0.00016, -1.04, 1.04);
-          const nextY = current.y + driftVelocity.y + 0.00055;
-          return { x: nextX, y: nextY };
-        });
-        setDriftVelocity((current) => ({
-          x: Math.abs(current.x) < 0.00002 ? 0 : current.x * 0.94,
-          y: Math.abs(current.y) < 0.00002 ? 0 : current.y * 0.94,
-        }));
-      }
-      frameId = window.requestAnimationFrame(loop);
-    };
-
-    frameId = window.requestAnimationFrame(loop);
-    return () => window.cancelAnimationFrame(frameId);
   }, [open]);
 
   useEffect(() => {
@@ -237,6 +219,37 @@ export default function ConceptUniverse({ open, onClose }) {
     return null;
   }
 
+  function stopInertia() {
+    window.cancelAnimationFrame(inertiaFrameRef.current);
+    inertiaFrameRef.current = 0;
+  }
+
+  function startInertia(initialVelocity) {
+    stopInertia();
+    let velocity = initialVelocity;
+
+    const step = () => {
+      velocity = {
+        x: Math.abs(velocity.x) < 0.00006 ? 0 : velocity.x * 0.92,
+        y: Math.abs(velocity.y) < 0.00006 ? 0 : velocity.y * 0.92,
+      };
+
+      setRotation((current) => ({
+        x: clamp(current.x + velocity.x, -1.04, 1.04),
+        y: current.y + velocity.y,
+      }));
+
+      if (velocity.x === 0 && velocity.y === 0) {
+        inertiaFrameRef.current = 0;
+        return;
+      }
+
+      inertiaFrameRef.current = window.requestAnimationFrame(step);
+    };
+
+    inertiaFrameRef.current = window.requestAnimationFrame(step);
+  }
+
   function enterNode(targetId) {
     if (!nodeMap.has(targetId) || targetId === centerId) {
       setSelectedId(targetId);
@@ -244,6 +257,7 @@ export default function ConceptUniverse({ open, onClose }) {
     }
 
     setWarpPhase("warp-out");
+    stopInertia();
     window.setTimeout(() => {
       setCenterId(targetId);
       setSelectedId(null);
@@ -252,7 +266,6 @@ export default function ConceptUniverse({ open, onClose }) {
         x: -0.24 + Math.sin(performance.now() * 0.001) * 0.06,
         y: 0.42,
       });
-      setDriftVelocity({ x: 0, y: 0 });
       setWarpPhase("warp-in");
       window.setTimeout(() => {
         setWarpPhase("idle");
@@ -265,7 +278,7 @@ export default function ConceptUniverse({ open, onClose }) {
       setCenterId(conceptUniverse.entryId);
       setSelectedId(null);
       setHistory([conceptUniverse.entryId]);
-      setDriftVelocity({ x: 0, y: 0 });
+      stopInertia();
       return;
     }
 
@@ -275,7 +288,7 @@ export default function ConceptUniverse({ open, onClose }) {
     setCenterId(previousId);
     setSelectedId(null);
     setRotation({ x: -0.24, y: 0.42 });
-    setDriftVelocity({ x: 0, y: 0 });
+    stopInertia();
   }
 
   function handlePointerDown(event) {
@@ -283,6 +296,7 @@ export default function ConceptUniverse({ open, onClose }) {
       return;
     }
 
+    stopInertia();
     dragRef.current = {
       pointerId: event.pointerId,
       startX: event.clientX,
@@ -326,9 +340,9 @@ export default function ConceptUniverse({ open, onClose }) {
     }
 
     sceneRef.current?.releasePointerCapture(event.pointerId);
-    setDriftVelocity({
-      x: clamp(dragRef.current.velocityX * 14, -0.012, 0.012),
-      y: clamp(dragRef.current.velocityY * 14, -0.014, 0.014),
+    startInertia({
+      x: clamp(dragRef.current.velocityX * 12, -0.01, 0.01),
+      y: clamp(dragRef.current.velocityY * 12, -0.012, 0.012),
     });
     dragRef.current = null;
   }
@@ -415,6 +429,7 @@ export default function ConceptUniverse({ open, onClose }) {
                     transform: `translate(-50%, -50%) scale(${node.scale})`,
                     opacity: node.opacity,
                     zIndex: Math.round(node.depth * 100) + 10,
+                    "--node-drift-delay": node.driftDelay,
                   }}
                   onClick={() => setSelectedId(node.id)}
                   onDoubleClick={() => enterNode(node.id)}
@@ -427,7 +442,7 @@ export default function ConceptUniverse({ open, onClose }) {
           </div>
 
           <div className="universe-stats">
-            <span>概念节点 {conceptUniverse.nodes.length}</span>
+            <span>总概念 {conceptUniverse.nodes.length}</span>
             <span>当前中心 {centerNode.name}</span>
           </div>
 
@@ -444,7 +459,7 @@ export default function ConceptUniverse({ open, onClose }) {
                 setSelectedId(null);
                 setHistory([conceptUniverse.entryId]);
                 setRotation({ x: -0.24, y: 0.42 });
-                setDriftVelocity({ x: 0, y: 0 });
+                stopInertia();
               }}
             >
               ◎
@@ -471,11 +486,7 @@ export default function ConceptUniverse({ open, onClose }) {
               </div>
               <div className="universe-quick-links">
                 {quickLinks.map((node) => (
-                  <button
-                    key={node.id}
-                    type="button"
-                    onClick={() => enterNode(node.id)}
-                  >
+                  <button key={node.id} type="button" onClick={() => enterNode(node.id)}>
                     {node.name}
                   </button>
                 ))}
