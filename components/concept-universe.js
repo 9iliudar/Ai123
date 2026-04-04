@@ -127,6 +127,7 @@ export default function ConceptUniverse({ open, onClose }) {
   const [warpPhase, setWarpPhase] = useState("idle");
   const [warpTargetId, setWarpTargetId] = useState(null);
   const [warpGhost, setWarpGhost] = useState(null);
+  const [warpGhostCenterOffset, setWarpGhostCenterOffset] = useState({ x: 0, y: 0 });
   const [arrivalMetrics, setArrivalMetrics] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [isHudPinned, setIsHudPinned] = useState(false);
   const [isPointerDown, setIsPointerDown] = useState(false);
@@ -251,6 +252,7 @@ export default function ConceptUniverse({ open, onClose }) {
       inertiaFrameRef.current = 0;
       moveFrameRef.current = 0;
       setWarpGhost(null);
+      setWarpGhostCenterOffset({ x: 0, y: 0 });
       setArrivalMetrics({ x: 0, y: 0, width: 0, height: 0 });
     }
   }, [open]);
@@ -336,12 +338,13 @@ export default function ConceptUniverse({ open, onClose }) {
       setWarpGhost(ghostNode);
       if (sceneRef.current) {
         const rect = sceneRef.current.getBoundingClientRect();
-        setArrivalMetrics({
-          x: ((ghostNode.left - 50) / 100) * rect.width + Number.parseFloat(ghostNode.hudShiftX),
-          y: ((ghostNode.top - 50) / 100) * rect.height + Number.parseFloat(ghostNode.hudShiftY),
-          width: rect.width,
-          height: rect.height,
+        const offsetX = ((ghostNode.left - 50) / 100) * rect.width + Number.parseFloat(ghostNode.hudShiftX);
+        const offsetY = ((ghostNode.top - 50) / 100) * rect.height + Number.parseFloat(ghostNode.hudShiftY);
+        setWarpGhostCenterOffset({
+          x: -offsetX,
+          y: -offsetY,
         });
+        setArrivalMetrics({ x: 0, y: 0, width: rect.width, height: rect.height });
       }
     }
     setWarpTargetId(targetId);
@@ -368,6 +371,7 @@ export default function ConceptUniverse({ open, onClose }) {
         setWarpPhase("idle");
         setWarpTargetId(null);
         setWarpGhost(null);
+        setWarpGhostCenterOffset({ x: 0, y: 0 });
         setArrivalMetrics({ x: 0, y: 0, width: 0, height: 0 });
         warpTimeoutsRef.current = [];
       }, 520)
@@ -571,8 +575,8 @@ export default function ConceptUniverse({ open, onClose }) {
           ref={sceneRef}
           className={sceneStateClass}
           style={{
-            "--warp-origin-x": warpOrigin.x,
-            "--warp-origin-y": warpOrigin.y,
+            "--warp-origin-x": warpPhase === "idle" ? warpOrigin.x : "50%",
+            "--warp-origin-y": warpPhase === "idle" ? warpOrigin.y : "50%",
           }}
           onClick={(event) => {
             if (event.target === event.currentTarget || event.target.classList.contains("universe-backdrop")) {
@@ -600,6 +604,8 @@ export default function ConceptUniverse({ open, onClose }) {
                 top: `${warpGhost.top}%`,
                 "--ghost-shift-x": warpGhost.hudShiftX,
                 "--ghost-shift-y": warpGhost.hudShiftY,
+                "--ghost-center-x": `${warpGhostCenterOffset.x}px`,
+                "--ghost-center-y": `${warpGhostCenterOffset.y}px`,
                 "--ghost-scale": warpGhost.scale,
               }}
             >
@@ -657,7 +663,7 @@ export default function ConceptUniverse({ open, onClose }) {
 
           <div className="universe-stats">
             <span>总词条: {conceptUniverse.nodes.length}</span>
-            <span>当前节点 {centerNode.name}</span>
+            <span>当前节点: {centerNode.name}</span>
           </div>
 
           <div className="universe-controls">

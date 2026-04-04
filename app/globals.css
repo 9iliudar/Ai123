@@ -1834,19 +1834,19 @@ select {
     transform: translate(-50%, -50%) translate3d(var(--ghost-shift-x, 0px), var(--ghost-shift-y, 0px), 0) scale(var(--ghost-scale, 1));
   }
   100% {
-    transform: translate(-50%, -50%) translate3d(var(--ghost-shift-x, 0px), var(--ghost-shift-y, 0px), 0) scale(calc(var(--ghost-scale, 1) * 1.16));
+    transform: translate(-50%, -50%) translate3d(calc(var(--ghost-shift-x, 0px) + var(--ghost-center-x, 0px)), calc(var(--ghost-shift-y, 0px) + var(--ghost-center-y, 0px)), 0) scale(calc(var(--ghost-scale, 1) * 1.2));
   }
 }
 
 @keyframes universeWarpGhostOut {
   0% {
     opacity: 1;
-    transform: translate(-50%, -50%) translate3d(var(--ghost-shift-x, 0px), var(--ghost-shift-y, 0px), 0) scale(calc(var(--ghost-scale, 1) * 1.16));
+    transform: translate(-50%, -50%) translate3d(calc(var(--ghost-shift-x, 0px) + var(--ghost-center-x, 0px)), calc(var(--ghost-shift-y, 0px) + var(--ghost-center-y, 0px)), 0) scale(calc(var(--ghost-scale, 1) * 1.2));
     filter: brightness(1.02);
   }
   100% {
     opacity: 0.78;
-    transform: translate(-50%, -50%) translate3d(var(--ghost-shift-x, 0px), var(--ghost-shift-y, 0px), 0) scale(calc(var(--ghost-scale, 1) * 1.96));
+    transform: translate(-50%, -50%) translate3d(calc(var(--ghost-shift-x, 0px) + var(--ghost-center-x, 0px)), calc(var(--ghost-shift-y, 0px) + var(--ghost-center-y, 0px)), 0) scale(calc(var(--ghost-scale, 1) * 2.05));
     filter: brightness(1.24) blur(1px);
   }
 }
