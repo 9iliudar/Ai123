@@ -126,6 +126,7 @@ export default function ConceptUniverse({ open, onClose }) {
   const [rotation, setRotation] = useState({ x: -0.24, y: 0.42 });
   const [warpPhase, setWarpPhase] = useState("idle");
   const [warpTargetId, setWarpTargetId] = useState(null);
+  const [warpGhost, setWarpGhost] = useState(null);
   const [isHudPinned, setIsHudPinned] = useState(false);
   const [isPointerDown, setIsPointerDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -244,6 +245,7 @@ export default function ConceptUniverse({ open, onClose }) {
       warpTimeoutsRef.current = [];
       inertiaFrameRef.current = 0;
       moveFrameRef.current = 0;
+      setWarpGhost(null);
     }
   }, [open]);
 
@@ -323,6 +325,10 @@ export default function ConceptUniverse({ open, onClose }) {
 
     warpTimeoutsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId));
     warpTimeoutsRef.current = [];
+    const ghostNode = projectedNodes.find((node) => node.id === targetId);
+    if (ghostNode) {
+      setWarpGhost(ghostNode);
+    }
     setWarpTargetId(targetId);
     setSelectedId(targetId);
     setWarpPhase("warp-lock");
@@ -346,6 +352,7 @@ export default function ConceptUniverse({ open, onClose }) {
         window.setTimeout(() => {
         setWarpPhase("idle");
         setWarpTargetId(null);
+        setWarpGhost(null);
         warpTimeoutsRef.current = [];
       }, 520)
       );
@@ -568,6 +575,22 @@ export default function ConceptUniverse({ open, onClose }) {
           <div className="universe-backdrop" />
           <div className="universe-warp-veil" aria-hidden="true" />
           <div className="universe-warp-lines" aria-hidden="true" />
+          {warpGhost ? (
+            <div
+              className="universe-warp-ghost"
+              aria-hidden="true"
+              style={{
+                left: `${warpGhost.left}%`,
+                top: `${warpGhost.top}%`,
+                "--ghost-shift-x": warpGhost.hudShiftX,
+                "--ghost-shift-y": warpGhost.hudShiftY,
+                "--ghost-scale": warpGhost.scale,
+              }}
+            >
+              <span>{warpGhost.name}</span>
+              <small>{getSecondaryLabel(warpGhost) || warpGhost.domain}</small>
+            </div>
+          ) : null}
           <div className="universe-core" aria-hidden="true" />
 
           <div className="universe-field">
