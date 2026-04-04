@@ -116,7 +116,7 @@ export const defaultTools = [
     desc: "目前效果很强的艺术图像生成工具。",
     cat: "Image",
     link: "https://midjourney.com",
-    icon: "https://www.midjourney.com/favicon.ico",
+    icon: "/icons/midjourney.svg",
   },
   {
     id: "kling",
@@ -206,7 +206,7 @@ export const defaultTools = [
     desc: "把文档变成研究摘要甚至播客的工具。",
     cat: "Audio",
     link: "https://notebooklm.google.com",
-    icon: "https://notebooklm.google.com/favicon.ico",
+    icon: "/icons/notebooklm.svg",
     badge: "HOT",
     badgeClass: "rank-hot",
   },
