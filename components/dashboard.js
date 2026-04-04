@@ -10,13 +10,41 @@ function getInitialOrder() {
   return defaultTools.map((tool) => tool.id);
 }
 
-function getFaviconUrl(link) {
-  try {
-    const domain = new URL(link).hostname;
-    return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
-  } catch {
-    return "";
-  }
+function getIconSeed(value) {
+  return [...value].reduce((accumulator, character) => accumulator + character.charCodeAt(0), 0);
+}
+
+function getIconPalette(value) {
+  const palettes = [
+    ["#7c3aed", "#a78bfa"],
+    ["#2563eb", "#60a5fa"],
+    ["#059669", "#34d399"],
+    ["#ea580c", "#fb923c"],
+    ["#dc2626", "#f87171"],
+    ["#0891b2", "#22d3ee"],
+    ["#ca8a04", "#facc15"],
+    ["#9333ea", "#c084fc"],
+  ];
+
+  return palettes[getIconSeed(value) % palettes.length];
+}
+
+function ToolIcon({ tool }) {
+  const seed = `${tool.id}-${tool.name}`;
+  const [start, end] = getIconPalette(seed);
+  const label = tool.name.trim().charAt(0).toUpperCase();
+
+  return (
+    <div
+      className="icon-fallback"
+      style={{
+        background: `linear-gradient(135deg, ${start}, ${end})`,
+      }}
+      aria-hidden="true"
+    >
+      {label}
+    </div>
+  );
 }
 
 function sortTools(tools, order) {
@@ -249,11 +277,7 @@ export default function Dashboard() {
             <a className="card-link" href={tool.link} target="_blank" rel="noreferrer">
               <div className="card-top">
                 <div className="icon-wrap">
-                  {getFaviconUrl(tool.link) ? (
-                    <img src={getFaviconUrl(tool.link)} alt={`${tool.name} logo`} />
-                  ) : (
-                    <span>{tool.name.charAt(0)}</span>
-                  )}
+                  <ToolIcon tool={tool} />
                 </div>
                 {tool.badge ? <span className={`badge ${tool.badgeClass}`}>{tool.badge}</span> : null}
               </div>
