@@ -1217,7 +1217,8 @@ select {
 .universe-search {
   display: grid;
   gap: 8px;
-  min-width: min(360px, 42vw);
+  width: min(360px, calc(100vw - 132px));
+  min-width: min(360px, calc(100vw - 132px));
 }
 
 .universe-search input {
@@ -1268,7 +1269,7 @@ select {
 .universe-search-panel {
   position: absolute;
   top: 104px;
-  right: 96px;
+  right: 88px;
   z-index: 5;
   display: grid;
   gap: 8px;
@@ -1374,16 +1375,18 @@ select {
 }
 
 .universe-warp-lines {
-  inset: 8% 12%;
+  inset: 0;
   background:
-    repeating-linear-gradient(
-      90deg,
-      transparent 0 2.8%,
-      rgba(255, 255, 255, 0.12) 3%,
-      transparent 3.4% 8.8%
+    repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      rgba(255, 255, 255, 0.14) 0deg 1.2deg,
+      transparent 1.2deg 11deg
     );
-  filter: blur(1px);
+  mask-image: radial-gradient(circle at center, transparent 0 6%, rgba(0, 0, 0, 0.96) 18%, rgba(0, 0, 0, 0.8) 44%, transparent 78%);
+  -webkit-mask-image: radial-gradient(circle at center, transparent 0 6%, rgba(0, 0, 0, 0.96) 18%, rgba(0, 0, 0, 0.8) 44%, transparent 78%);
+  filter: blur(1.4px);
   transform-origin: center;
+  mix-blend-mode: screen;
 }
 
 .universe-node,
@@ -1733,25 +1736,25 @@ select {
 @keyframes universeWarpLinesOut {
   0% {
     opacity: 0;
-    transform: perspective(1200px) translateZ(0) scaleX(0.82);
-    filter: blur(1px);
+    transform: scale(0.24) rotate(0deg);
+    filter: blur(0.8px);
   }
   100% {
     opacity: 0.85;
-    transform: perspective(1200px) translateZ(380px) scaleX(2.8);
-    filter: blur(3px);
+    transform: scale(1.7) rotate(18deg);
+    filter: blur(3.2px);
   }
 }
 
 @keyframes universeWarpLinesIn {
   0% {
     opacity: 0.62;
-    transform: perspective(1200px) translateZ(-240px) scaleX(2.2);
-    filter: blur(2px);
+    transform: scale(1.44) rotate(12deg);
+    filter: blur(2.4px);
   }
   100% {
     opacity: 0;
-    transform: perspective(1200px) translateZ(0) scaleX(1);
+    transform: scale(0.92) rotate(0deg);
     filter: blur(1px);
   }
 }
