@@ -286,9 +286,6 @@ select {
 }
 
 .drag-handle {
-  position: absolute;
-  top: 14px;
-  right: 16px;
   display: grid;
   place-items: center;
   width: 34px;
@@ -302,6 +299,14 @@ select {
   user-select: none;
   cursor: grab;
   transition: 180ms ease;
+}
+
+.card-top-meta {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: fit-content;
 }
 
 .drag-handle:hover,
@@ -364,12 +369,16 @@ select {
 }
 
 .badge {
-  margin-left: auto;
   padding: 5px 8px;
   border-radius: 999px;
   font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.badge-placeholder {
+  visibility: hidden;
 }
 
 .rank-1 {

@@ -265,21 +265,6 @@ export default function Dashboard() {
             onDrop={() => handleDrop(tool.id)}
             onDragEnd={handleDragEnd}
           >
-            <button
-              className="drag-handle"
-              type="button"
-              aria-label={`拖动 ${tool.name}`}
-              onMouseDown={() => setDragArmedId(tool.id)}
-              onMouseUp={() => setDragArmedId(null)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  setDragArmedId(tool.id);
-                }
-              }}
-            >
-              ⋮⋮
-            </button>
-
             {tool.isCustom ? (
               <button className="delete-button" type="button" onClick={() => handleDeleteTool(tool.id)}>
                 删除
@@ -291,7 +276,23 @@ export default function Dashboard() {
                 <div className="icon-wrap">
                   <ToolIcon tool={tool} />
                 </div>
-                {tool.badge ? <span className={`badge ${tool.badgeClass}`}>{tool.badge}</span> : null}
+                <div className="card-top-meta">
+                  {tool.badge ? <span className={`badge ${tool.badgeClass}`}>{tool.badge}</span> : <span className="badge badge-placeholder" aria-hidden="true" />}
+                  <button
+                    className="drag-handle"
+                    type="button"
+                    aria-label={`拖动 ${tool.name}`}
+                    onMouseDown={() => setDragArmedId(tool.id)}
+                    onMouseUp={() => setDragArmedId(null)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        setDragArmedId(tool.id);
+                      }
+                    }}
+                  >
+                    ⋮⋮
+                  </button>
+                </div>
               </div>
 
               <h2>{tool.name}</h2>
