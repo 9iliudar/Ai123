@@ -134,6 +134,7 @@ export default function ConceptUniverse({ open, onClose }) {
   const dragRef = useRef(null);
   const inertiaFrameRef = useRef(0);
   const moveFrameRef = useRef(0);
+  const warpTimeoutsRef = useRef([]);
   const rotationRef = useRef(rotation);
   const suppressClickUntilRef = useRef(0);
 
@@ -239,6 +240,8 @@ export default function ConceptUniverse({ open, onClose }) {
     if (!open) {
       window.cancelAnimationFrame(inertiaFrameRef.current);
       window.cancelAnimationFrame(moveFrameRef.current);
+      warpTimeoutsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId));
+      warpTimeoutsRef.current = [];
       inertiaFrameRef.current = 0;
       moveFrameRef.current = 0;
     }
@@ -318,10 +321,19 @@ export default function ConceptUniverse({ open, onClose }) {
       return;
     }
 
+    warpTimeoutsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId));
+    warpTimeoutsRef.current = [];
     setWarpTargetId(targetId);
-    setWarpPhase("warp-out");
+    setSelectedId(targetId);
+    setWarpPhase("warp-lock");
     stopInertia();
-    window.setTimeout(() => {
+    warpTimeoutsRef.current.push(
+      window.setTimeout(() => {
+        setWarpPhase("warp-out");
+      }, 160)
+    );
+    warpTimeoutsRef.current.push(
+      window.setTimeout(() => {
       setCenterId(targetId);
       setSelectedId(targetId);
       setHistory((current) => [...current, targetId].slice(-12));
@@ -330,11 +342,15 @@ export default function ConceptUniverse({ open, onClose }) {
         y: 0.42,
       });
       setWarpPhase("warp-in");
-      window.setTimeout(() => {
+      warpTimeoutsRef.current.push(
+        window.setTimeout(() => {
         setWarpPhase("idle");
         setWarpTargetId(null);
-      }, 420);
-    }, 260);
+        warpTimeoutsRef.current = [];
+      }, 520)
+      );
+    }, 420)
+    );
   }
 
   function handleBack() {
