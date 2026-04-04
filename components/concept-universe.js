@@ -209,9 +209,9 @@ export default function ConceptUniverse({ open, onClose }) {
         const hudAvoidance = getHudAvoidance(projection, projection.depth, hasHud);
         const finalOffsetX = arrivalOrigin.width ? ((projection.left - 50) / 100) * arrivalOrigin.width + hudAvoidance.x : 0;
         const finalOffsetY = arrivalOrigin.height ? ((projection.top - 50) / 100) * arrivalOrigin.height + hudAvoidance.y : 0;
-        const entryOffsetX = arrivalOrigin.width ? (arrivalOrigin.x - finalOffsetX) * 0.82 : 0;
-        const entryOffsetY = arrivalOrigin.height ? (arrivalOrigin.y - finalOffsetY) * 0.82 : 0;
-        const entryDepth = -120 + (1 - projection.depth) * -72;
+        const entryOffsetX = arrivalOrigin.width ? arrivalOrigin.x - finalOffsetX : 0;
+        const entryOffsetY = arrivalOrigin.height ? arrivalOrigin.y - finalOffsetY : 0;
+        const entryDepth = -72 + (1 - projection.depth) * -48;
 
         return {
           ...node,
@@ -221,7 +221,7 @@ export default function ConceptUniverse({ open, onClose }) {
           entryOffsetX: `${entryOffsetX}px`,
           entryOffsetY: `${entryOffsetY}px`,
           entryDepth: `${entryDepth}px`,
-          arrivalDelay: `${70 + index * 24}ms`,
+          arrivalDelay: `${96 + index * 28}ms`,
           driftDelay: `${(index % 6) * 0.8}s`,
           floatX: `${((index % 5) - 2) * 0.8}px`,
           floatY: `${(((index * 2) % 5) - 2) * 0.7}px`,
