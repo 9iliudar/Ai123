@@ -127,8 +127,6 @@ export default function ConceptUniverse({ open, onClose }) {
   const [warpPhase, setWarpPhase] = useState("idle");
   const [warpTargetId, setWarpTargetId] = useState(null);
   const [warpGhost, setWarpGhost] = useState(null);
-  const [warpGhostCenterOffset, setWarpGhostCenterOffset] = useState({ x: 0, y: 0 });
-  const [arrivalMetrics, setArrivalMetrics] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [isHudPinned, setIsHudPinned] = useState(false);
   const [isPointerDown, setIsPointerDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -208,16 +206,12 @@ export default function ConceptUniverse({ open, onClose }) {
         );
         const projection = projectPoint(rotated);
         const hudAvoidance = getHudAvoidance(projection, projection.depth, hasHud);
-        const finalOffsetX = arrivalMetrics.width ? ((projection.left - 50) / 100) * arrivalMetrics.width + hudAvoidance.x : 0;
-        const finalOffsetY = arrivalMetrics.height ? ((projection.top - 50) / 100) * arrivalMetrics.height + hudAvoidance.y : 0;
 
         return {
           ...node,
           ...projection,
           hudShiftX: `${hudAvoidance.x}px`,
           hudShiftY: `${hudAvoidance.y}px`,
-          entryOffsetX: `${arrivalMetrics.x - finalOffsetX}px`,
-          entryOffsetY: `${arrivalMetrics.y - finalOffsetY}px`,
           driftDelay: `${(index % 6) * 0.8}s`,
           floatX: `${((index % 5) - 2) * 0.8}px`,
           floatY: `${(((index * 2) % 5) - 2) * 0.7}px`,
@@ -225,7 +219,7 @@ export default function ConceptUniverse({ open, onClose }) {
         };
       })
       .sort((left, right) => left.z - right.z);
-  }, [arrivalMetrics.height, arrivalMetrics.width, arrivalMetrics.x, arrivalMetrics.y, rotation.x, rotation.y, selectedNode, visibleNodes]);
+  }, [rotation.x, rotation.y, selectedNode, visibleNodes]);
 
   const warpOrigin = useMemo(() => {
     const targetNode = projectedNodes.find((node) => node.id === warpTargetId);
@@ -252,8 +246,6 @@ export default function ConceptUniverse({ open, onClose }) {
       inertiaFrameRef.current = 0;
       moveFrameRef.current = 0;
       setWarpGhost(null);
-      setWarpGhostCenterOffset({ x: 0, y: 0 });
-      setArrivalMetrics({ x: 0, y: 0, width: 0, height: 0 });
     }
   }, [open]);
 
@@ -336,16 +328,6 @@ export default function ConceptUniverse({ open, onClose }) {
     const ghostNode = projectedNodes.find((node) => node.id === targetId);
     if (ghostNode) {
       setWarpGhost(ghostNode);
-      if (sceneRef.current) {
-        const rect = sceneRef.current.getBoundingClientRect();
-        const offsetX = ((ghostNode.left - 50) / 100) * rect.width + Number.parseFloat(ghostNode.hudShiftX);
-        const offsetY = ((ghostNode.top - 50) / 100) * rect.height + Number.parseFloat(ghostNode.hudShiftY);
-        setWarpGhostCenterOffset({
-          x: -offsetX,
-          y: -offsetY,
-        });
-        setArrivalMetrics({ x: 0, y: 0, width: rect.width, height: rect.height });
-      }
     }
     setWarpTargetId(targetId);
     setSelectedId(targetId);
@@ -371,8 +353,6 @@ export default function ConceptUniverse({ open, onClose }) {
         setWarpPhase("idle");
         setWarpTargetId(null);
         setWarpGhost(null);
-        setWarpGhostCenterOffset({ x: 0, y: 0 });
-        setArrivalMetrics({ x: 0, y: 0, width: 0, height: 0 });
         warpTimeoutsRef.current = [];
       }, 520)
       );
@@ -575,8 +555,8 @@ export default function ConceptUniverse({ open, onClose }) {
           ref={sceneRef}
           className={sceneStateClass}
           style={{
-            "--warp-origin-x": warpPhase === "idle" ? warpOrigin.x : "50%",
-            "--warp-origin-y": warpPhase === "idle" ? warpOrigin.y : "50%",
+            "--warp-origin-x": warpOrigin.x,
+            "--warp-origin-y": warpOrigin.y,
           }}
           onClick={(event) => {
             if (event.target === event.currentTarget || event.target.classList.contains("universe-backdrop")) {
@@ -604,8 +584,6 @@ export default function ConceptUniverse({ open, onClose }) {
                 top: `${warpGhost.top}%`,
                 "--ghost-shift-x": warpGhost.hudShiftX,
                 "--ghost-shift-y": warpGhost.hudShiftY,
-                "--ghost-center-x": `${warpGhostCenterOffset.x}px`,
-                "--ghost-center-y": `${warpGhostCenterOffset.y}px`,
                 "--ghost-scale": warpGhost.scale,
               }}
             >
@@ -633,8 +611,6 @@ export default function ConceptUniverse({ open, onClose }) {
                     zIndex: Math.round(node.depth * 100) + 10,
                     "--node-shift-x": node.hudShiftX,
                     "--node-shift-y": node.hudShiftY,
-                    "--node-entry-x": node.entryOffsetX,
-                    "--node-entry-y": node.entryOffsetY,
                     "--node-scale": node.scale,
                     "--node-drift-delay": node.driftDelay,
                     "--node-float-x": node.floatX,
