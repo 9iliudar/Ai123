@@ -656,10 +656,8 @@ export default function ConceptUniverse({ open, onClose }) {
           </div>
 
           <div className="universe-stats">
-            <span>总词条 {conceptUniverse.nodes.length}</span>
-            <span>
-              当前中心 <strong>{centerNode.name}</strong>
-            </span>
+            <span>总词条: {conceptUniverse.nodes.length}</span>
+            <span>当前节点 {centerNode.name}</span>
           </div>
 
           <div className="universe-controls">
