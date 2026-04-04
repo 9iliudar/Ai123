@@ -95,6 +95,28 @@ function projectPoint(point) {
   };
 }
 
+function getHudAvoidance(projection, depth, hasHud) {
+  if (!hasHud) {
+    return { x: 0, y: 0 };
+  }
+
+  const threshold = 54;
+  const pressure = clamp((projection.left - threshold) / 22, 0, 1);
+
+  if (pressure === 0) {
+    return { x: 0, y: 0 };
+  }
+
+  const depthWeight = 0.34 + depth * 0.76;
+  const horizontalShift = -(18 + pressure * 64) * depthWeight;
+  const verticalShift = (50 - projection.top) * 0.18 * pressure;
+
+  return {
+    x: horizontalShift,
+    y: verticalShift,
+  };
+}
+
 export default function ConceptUniverse({ open, onClose }) {
   const nodeMap = useMemo(() => buildNodeMap(conceptUniverse.nodes), []);
   const [centerId, setCenterId] = useState(conceptUniverse.entryId);
@@ -163,6 +185,7 @@ export default function ConceptUniverse({ open, onClose }) {
 
   const projectedNodes = useMemo(() => {
     const spherePoints = fibonacciSphere(Math.max(visibleNodes.length, 1));
+    const hasHud = Boolean(selectedNode);
 
     return visibleNodes
       .map((node, index) => {
@@ -178,10 +201,13 @@ export default function ConceptUniverse({ open, onClose }) {
           rotation.y
         );
         const projection = projectPoint(rotated);
+        const hudAvoidance = getHudAvoidance(projection, projection.depth, hasHud);
 
         return {
           ...node,
           ...projection,
+          hudShiftX: `${hudAvoidance.x}px`,
+          hudShiftY: `${hudAvoidance.y}px`,
           driftDelay: `${(index % 6) * 0.8}s`,
           floatX: `${((index % 5) - 2) * 0.8}px`,
           floatY: `${(((index * 2) % 5) - 2) * 0.7}px`,
@@ -189,7 +215,7 @@ export default function ConceptUniverse({ open, onClose }) {
         };
       })
       .sort((left, right) => left.z - right.z);
-  }, [rotation.x, rotation.y, visibleNodes]);
+  }, [rotation.x, rotation.y, selectedNode, visibleNodes]);
 
   useEffect(() => {
     rotationRef.current = rotation;
@@ -511,7 +537,7 @@ export default function ConceptUniverse({ open, onClose }) {
                   style={{
                     left: `${node.left}%`,
                     top: `${node.top}%`,
-                    transform: `translate(-50%, -50%) scale(${node.scale})`,
+                    transform: `translate(-50%, -50%) translate3d(${node.hudShiftX}, ${node.hudShiftY}, 0) scale(${node.scale})`,
                     opacity: node.opacity,
                     zIndex: Math.round(node.depth * 100) + 10,
                     "--node-drift-delay": node.driftDelay,
