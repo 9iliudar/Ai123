@@ -282,7 +282,7 @@ export default function ConceptUniverse({ open, onClose }) {
     stopInertia();
     window.setTimeout(() => {
       setCenterId(targetId);
-      setSelectedId(null);
+      setSelectedId(targetId);
       setHistory((current) => [...current, targetId].slice(-12));
       setRotation({
         x: -0.24 + Math.sin(performance.now() * 0.001) * 0.06,
