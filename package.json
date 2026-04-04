@@ -2,6 +2,8 @@
   "name": "ai123",
   "version": "0.1.0",
   "private": true,
+  "description": "A personal AI navigation startpage built with Next.js.",
+  "homepage": "https://iliudar.com",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
