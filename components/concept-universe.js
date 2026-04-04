@@ -125,6 +125,7 @@ export default function ConceptUniverse({ open, onClose }) {
   const [query, setQuery] = useState("");
   const [rotation, setRotation] = useState({ x: -0.24, y: 0.42 });
   const [warpPhase, setWarpPhase] = useState("idle");
+  const [isHudPinned, setIsHudPinned] = useState(false);
   const [isPointerDown, setIsPointerDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isSettling, setIsSettling] = useState(false);
@@ -325,6 +326,7 @@ export default function ConceptUniverse({ open, onClose }) {
     if (history.length <= 1) {
       setCenterId(conceptUniverse.entryId);
       setSelectedId(null);
+      setIsHudPinned(false);
       setHistory([conceptUniverse.entryId]);
       stopInertia();
       return;
@@ -335,6 +337,7 @@ export default function ConceptUniverse({ open, onClose }) {
     setHistory(nextHistory);
     setCenterId(previousId);
     setSelectedId(null);
+    setIsHudPinned(false);
     setRotation({ x: -0.24, y: 0.42 });
     stopInertia();
   }
@@ -515,7 +518,9 @@ export default function ConceptUniverse({ open, onClose }) {
           className={sceneStateClass}
           onClick={(event) => {
             if (event.target === event.currentTarget || event.target.classList.contains("universe-backdrop")) {
-              setSelectedId(null);
+              if (!isHudPinned) {
+                setSelectedId(null);
+              }
             }
           }}
           onPointerDown={handlePointerDown}
@@ -584,6 +589,7 @@ export default function ConceptUniverse({ open, onClose }) {
               onClick={() => {
                 setCenterId(conceptUniverse.entryId);
                 setSelectedId(null);
+                setIsHudPinned(false);
                 setHistory([conceptUniverse.entryId]);
                 setRotation({ x: -0.24, y: 0.42 });
                 stopInertia();
@@ -595,7 +601,18 @@ export default function ConceptUniverse({ open, onClose }) {
 
           {selectedNode ? (
             <aside className="universe-hud">
-              <p className="universe-hud-label">当前术语</p>
+              <div className="universe-hud-top">
+                <p className="universe-hud-label">当前术语</p>
+                <button
+                  type="button"
+                  className={`universe-hud-pin ${isHudPinned ? "is-active" : ""}`}
+                  aria-label={isHudPinned ? "取消固定浮窗" : "固定浮窗"}
+                  title={isHudPinned ? "取消固定浮窗" : "固定浮窗"}
+                  onClick={() => setIsHudPinned((current) => !current)}
+                >
+                  📌
+                </button>
+              </div>
               <h3>{selectedNode.name}</h3>
               {getSecondaryLabel(selectedNode) ? <p className="universe-hud-alt">{getSecondaryLabel(selectedNode)}</p> : null}
               <p className="universe-hud-domain">{selectedNode.domain}</p>
