@@ -219,6 +219,18 @@ export default function ConceptUniverse({ open, onClose }) {
       .sort((left, right) => left.z - right.z);
   }, [rotation.x, rotation.y, selectedNode, visibleNodes]);
 
+  const warpOrigin = useMemo(() => {
+    const targetNode = projectedNodes.find((node) => node.id === warpTargetId);
+    if (!targetNode) {
+      return { x: "50%", y: "50%" };
+    }
+
+    return {
+      x: `calc(${targetNode.left}% + ${targetNode.hudShiftX})`,
+      y: `calc(${targetNode.top}% + ${targetNode.hudShiftY})`,
+    };
+  }, [projectedNodes, warpTargetId]);
+
   useEffect(() => {
     rotationRef.current = rotation;
   }, [rotation]);
@@ -519,6 +531,10 @@ export default function ConceptUniverse({ open, onClose }) {
         <div
           ref={sceneRef}
           className={sceneStateClass}
+          style={{
+            "--warp-origin-x": warpOrigin.x,
+            "--warp-origin-y": warpOrigin.y,
+          }}
           onClick={(event) => {
             if (event.target === event.currentTarget || event.target.classList.contains("universe-backdrop")) {
               if (!isHudPinned) {

@@ -1217,8 +1217,8 @@ select {
 .universe-search {
   display: grid;
   gap: 8px;
-  width: min(360px, calc(100vw - 132px));
-  min-width: min(360px, calc(100vw - 132px));
+  width: min(300px, calc(100vw - 132px));
+  min-width: min(300px, calc(100vw - 132px));
 }
 
 .universe-search input {
@@ -1273,7 +1273,7 @@ select {
   z-index: 5;
   display: grid;
   gap: 8px;
-  width: min(360px, calc(100vw - 40px));
+  width: min(300px, calc(100vw - 40px));
   max-height: min(48vh, 420px);
   overflow: auto;
   padding: 14px;
@@ -1368,8 +1368,8 @@ select {
 
 .universe-warp-veil {
   background:
-    radial-gradient(circle at center, rgba(255, 255, 255, 0.18), transparent 16%),
-    radial-gradient(circle at center, color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 88%, transparent), transparent 38%);
+    radial-gradient(circle at var(--warp-origin-x, 50%) var(--warp-origin-y, 50%), rgba(255, 255, 255, 0.18), transparent 16%),
+    radial-gradient(circle at var(--warp-origin-x, 50%) var(--warp-origin-y, 50%), color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 88%, transparent), transparent 38%);
   mix-blend-mode: screen;
   transform: scale(0.72);
 }
@@ -1378,14 +1378,14 @@ select {
   inset: 0;
   background:
     repeating-conic-gradient(
-      from 0deg at 50% 50%,
+      from 0deg at var(--warp-origin-x, 50%) var(--warp-origin-y, 50%),
       rgba(255, 255, 255, 0.14) 0deg 1.2deg,
       transparent 1.2deg 11deg
     );
-  mask-image: radial-gradient(circle at center, transparent 0 6%, rgba(0, 0, 0, 0.96) 18%, rgba(0, 0, 0, 0.8) 44%, transparent 78%);
-  -webkit-mask-image: radial-gradient(circle at center, transparent 0 6%, rgba(0, 0, 0, 0.96) 18%, rgba(0, 0, 0, 0.8) 44%, transparent 78%);
+  mask-image: radial-gradient(circle at var(--warp-origin-x, 50%) var(--warp-origin-y, 50%), transparent 0 6%, rgba(0, 0, 0, 0.96) 18%, rgba(0, 0, 0, 0.8) 44%, transparent 78%);
+  -webkit-mask-image: radial-gradient(circle at var(--warp-origin-x, 50%) var(--warp-origin-y, 50%), transparent 0 6%, rgba(0, 0, 0, 0.96) 18%, rgba(0, 0, 0, 0.8) 44%, transparent 78%);
   filter: blur(1.4px);
-  transform-origin: center;
+  transform-origin: var(--warp-origin-x, 50%) var(--warp-origin-y, 50%);
   mix-blend-mode: screen;
 }
 
