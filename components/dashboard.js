@@ -5,6 +5,7 @@ import { categories, categoryLabels, defaultTools } from "@/data/default-tools";
 
 const CUSTOM_TOOLS_KEY = "ai123_custom_tools";
 const TOOLS_ORDER_KEY = "ai123_tools_order";
+const ICON_VERSION = "2";
 
 function getInitialOrder() {
   return defaultTools.map((tool) => tool.id);
@@ -38,7 +39,7 @@ function ToolIcon({ tool }) {
   if (!failed) {
     return (
       <img
-        src={`/api/icon?url=${encodeURIComponent(tool.link)}`}
+        src={`/api/icon?url=${encodeURIComponent(tool.link)}&v=${ICON_VERSION}`}
         alt={`${tool.name} logo`}
         onError={() => setFailed(true)}
       />

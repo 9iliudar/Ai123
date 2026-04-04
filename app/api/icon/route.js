@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 
 const COMMON_ICON_PATHS = [
-  "/favicon.ico",
   "/apple-touch-icon.png",
   "/apple-touch-icon-precomposed.png",
+  "/favicon-32x32.png",
+  "/favicon-16x16.png",
+  "/favicon.ico",
 ];
 
 const REQUEST_HEADERS = {
@@ -35,14 +37,67 @@ async function fetchIconBinary(iconUrl) {
   return { buffer, contentType };
 }
 
-function extractIconHref(html) {
-  const linkMatches = html.match(/<link[^>]+rel=["'][^"']*icon[^"']*["'][^>]*href=["']([^"']+)["'][^>]*>/i);
-  if (linkMatches?.[1]) {
-    return linkMatches[1];
+function scoreIconCandidate(href, rel, sizes) {
+  let score = 0;
+  const normalizedHref = href.toLowerCase();
+  const normalizedRel = rel.toLowerCase();
+  const normalizedSizes = (sizes || "").toLowerCase();
+
+  if (normalizedRel.includes("apple-touch-icon")) {
+    score += 400;
+  } else if (normalizedRel.includes("icon")) {
+    score += 200;
   }
 
-  const shortcutMatches = html.match(/<link[^>]+href=["']([^"']+)["'][^>]*rel=["'][^"']*icon[^"']*["'][^>]*>/i);
-  return shortcutMatches?.[1] || null;
+  if (normalizedHref.endsWith(".svg")) {
+    score += 300;
+  } else if (normalizedHref.endsWith(".png")) {
+    score += 220;
+  } else if (normalizedHref.endsWith(".ico")) {
+    score += 60;
+  }
+
+  const sizeMatches = normalizedSizes.match(/(\d+)x(\d+)/);
+  if (sizeMatches) {
+    score += Math.min(Number(sizeMatches[1]), 512);
+  }
+
+  if (normalizedHref.includes("mask-icon")) {
+    score -= 100;
+  }
+
+  return score;
+}
+
+function extractIconHref(html) {
+  const matches = [...html.matchAll(/<link\b[^>]*>/gi)];
+  const candidates = [];
+
+  for (const match of matches) {
+    const tag = match[0];
+    const relMatch = tag.match(/\brel=["']([^"']+)["']/i);
+    const hrefMatch = tag.match(/\bhref=["']([^"']+)["']/i);
+
+    if (!relMatch?.[1] || !hrefMatch?.[1]) {
+      continue;
+    }
+
+    const rel = relMatch[1];
+    if (!rel.toLowerCase().includes("icon")) {
+      continue;
+    }
+
+    const sizesMatch = tag.match(/\bsizes=["']([^"']+)["']/i);
+    candidates.push({
+      href: hrefMatch[1],
+      rel,
+      sizes: sizesMatch?.[1] || "",
+      score: scoreIconCandidate(hrefMatch[1], rel, sizesMatch?.[1] || ""),
+    });
+  }
+
+  candidates.sort((left, right) => right.score - left.score);
+  return candidates[0]?.href || null;
 }
 
 async function findOfficialIcon(targetUrl) {
