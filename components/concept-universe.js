@@ -125,6 +125,7 @@ export default function ConceptUniverse({ open, onClose }) {
   const [query, setQuery] = useState("");
   const [rotation, setRotation] = useState({ x: -0.24, y: 0.42 });
   const [warpPhase, setWarpPhase] = useState("idle");
+  const [warpTargetId, setWarpTargetId] = useState(null);
   const [isHudPinned, setIsHudPinned] = useState(false);
   const [isPointerDown, setIsPointerDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -305,6 +306,7 @@ export default function ConceptUniverse({ open, onClose }) {
       return;
     }
 
+    setWarpTargetId(targetId);
     setWarpPhase("warp-out");
     stopInertia();
     window.setTimeout(() => {
@@ -318,6 +320,7 @@ export default function ConceptUniverse({ open, onClose }) {
       setWarpPhase("warp-in");
       window.setTimeout(() => {
         setWarpPhase("idle");
+        setWarpTargetId(null);
       }, 420);
     }, 260);
   }
@@ -531,17 +534,20 @@ export default function ConceptUniverse({ open, onClose }) {
           onLostPointerCapture={handlePointerUp}
         >
           <div className="universe-backdrop" />
+          <div className="universe-warp-veil" aria-hidden="true" />
+          <div className="universe-warp-lines" aria-hidden="true" />
           <div className="universe-core" aria-hidden="true" />
 
           <div className="universe-field">
             {projectedNodes.map((node) => {
               const isActive = selectedId === node.id;
+              const isWarpTarget = warpTargetId === node.id;
 
               return (
                 <button
                   key={node.id}
                   type="button"
-                  className={`universe-node ${isActive ? "active" : ""} ${node.z < -30 ? "is-distant" : ""}`}
+                  className={`universe-node ${isActive ? "active" : ""} ${isWarpTarget ? "is-warp-target" : ""} ${node.z < -30 ? "is-distant" : ""}`}
                   style={{
                     left: `${node.left}%`,
                     top: `${node.top}%`,
