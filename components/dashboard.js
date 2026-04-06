@@ -655,7 +655,7 @@ export default function Dashboard() {
               {draftType === "tool" ? (
                 <label>
                   URL
-                  <input name="link" type="text" value={draft.link} onChange={handleDraftChange} placeholder="https://..." />
+                  <input name="link" type="url" value={draft.link} onChange={handleDraftChange} placeholder="https://..." />
                 </label>
               ) : null}
 
@@ -691,10 +691,10 @@ export default function Dashboard() {
                 <input
                   className="modal-code-input"
                   name="syncCode"
-                  type="text"
+                  type="password"
                   value={draft.syncCode}
                   onChange={handleDraftChange}
-                  placeholder="入库校验码，可选填"
+                  placeholder="入库校验码"
                 />
                 <button className="primary-button" type="submit" disabled={isSubmitting}>
                   {isSubmitting
@@ -728,3 +728,4 @@ export default function Dashboard() {
     </main>
   );
 }
+

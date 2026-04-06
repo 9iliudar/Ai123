@@ -781,13 +781,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                             </option>
                           ))}
                         </select>
-                        <input
-                          className="blocks-status-sync"
-                          type="text"
-                          value={syncCode}
-                          onChange={(event) => setSyncCode(event.target.value)}
-                          placeholder="入库校验码，可选填"
-                        />
                       </section>
 
                       <section className="blocks-detail-section blocks-side-card">
@@ -801,9 +794,18 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                             onChange={(event) => setRecordDraft(event.target.value)}
                             placeholder="追加一条新的判断、试用结论、组合灵感或待验证问题。"
                           />
-                          <button type="button" className="primary-button blocks-record-submit" onClick={appendRecord}>
-                            追加记录
-                          </button>
+                          <div className="blocks-record-actions">
+                            <input
+                              className="blocks-status-sync"
+                              type="password"
+                              value={syncCode}
+                              onChange={(event) => setSyncCode(event.target.value)}
+                              placeholder="入库校验码"
+                            />
+                            <button type="button" className="primary-button blocks-record-submit" onClick={appendRecord}>
+                              追加记录
+                            </button>
+                          </div>
                         </div>
                         <div className="blocks-record-list">
                           {selectedRecords.length ? (
@@ -983,3 +985,4 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     </div>
   );
 }
+
