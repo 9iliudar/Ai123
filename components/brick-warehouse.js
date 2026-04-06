@@ -776,7 +776,8 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                       <div className="blocks-detail-top">
                         <div>
                           <h3>{digestSelectedBlock.name}</h3>
-                          <p className="blocks-detail-summary">{digestSelectedBlock.summary}</p>
+                          <p className="blocks-detail-summary">{digestSelectedBlock.positioning ?? digestSelectedBlock.summary}</p>
+                          <p className="blocks-detail-summary blocks-detail-summary-secondary">{digestSelectedBlock.summary}</p>
                         </div>
                         <div className="blocks-detail-meta">
                           <span className="blocks-detail-category">{blockCategoryLabels[digestSelectedBlock.category] ?? digestSelectedBlock.category}</span>
@@ -799,11 +800,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
 
                   <div className="blocks-focus-grid">
                     <section className="blocks-focus-main">
-                      <section className="blocks-detail-section">
-                        <span>它在体系里的位置</span>
-                        <p>{digestSelectedBlock.positioning ?? digestSelectedBlock.summary}</p>
-                      </section>
-
                       <section className="blocks-detail-section">
                         <span>它解决什么问题</span>
                         <p>{digestSelectedBlock.solves}</p>
@@ -834,21 +830,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                             </span>
                           ))}
                         </div>
-                      </section>
-
-                      <section className="blocks-detail-section">
-                        <span>先怎么开始研究它</span>
-                        <p>{digestSelectedBlock.entryPath}</p>
-                      </section>
-
-                      <section className="blocks-detail-section">
-                        <span>研究时重点看什么</span>
-                        <p>{digestSelectedBlock.evaluationFocus}</p>
-                      </section>
-
-                      <section className="blocks-detail-section">
-                        <span>容易误判的点</span>
-                        <p>{digestSelectedBlock.watchouts}</p>
                       </section>
 
                       <section className="blocks-detail-section">

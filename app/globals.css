@@ -1468,7 +1468,9 @@ select {
 .blocks-card-links span,
 .blocks-detail-section span {
   color: #e4e4e7;
-  font-size: 0.82rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 .blocks-card-tags span {
@@ -1488,7 +1490,17 @@ select {
 }
 
 .blocks-detail-summary {
-  margin-top: 16px;
+  margin-top: 14px;
+  font-size: 1.06rem;
+  line-height: 1.9;
+  color: #e7e5ff;
+}
+
+.blocks-detail-summary-secondary {
+  margin-top: 12px;
+  font-size: 0.96rem;
+  line-height: 1.8;
+  color: rgba(226, 232, 240, 0.76);
 }
 
 .blocks-detail-actions {
@@ -1497,6 +1509,7 @@ select {
 
 .blocks-detail-section {
   margin-top: 20px;
+  padding-top: 4px;
 }
 
 .blocks-detail-section p,
