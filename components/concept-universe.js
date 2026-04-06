@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { buildingBlocks } from "@/data/building-blocks";
 import { conceptUniverse } from "@/data/concept-graph";
 
 const themeMap = {
@@ -118,7 +117,7 @@ function getHudAvoidance(projection, depth, hasHud) {
   };
 }
 
-export default function ConceptUniverse({ open, onClose, requestedConcept, onOpenWarehouse }) {
+export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   const nodeMap = useMemo(() => buildNodeMap(conceptUniverse.nodes), []);
   const [centerId, setCenterId] = useState(conceptUniverse.entryId);
   const [selectedId, setSelectedId] = useState(null);
@@ -173,16 +172,6 @@ export default function ConceptUniverse({ open, onClose, requestedConcept, onOpe
       .sort((left, right) => scoreNode(right) - scoreNode(left))
       .slice(0, 8);
   }, [nodeMap, selectedNode]);
-
-  const relatedBlocks = useMemo(() => {
-    if (!selectedNode) {
-      return [];
-    }
-
-    return buildingBlocks
-      .filter((block) => (block.relatedConcepts ?? []).includes(selectedNode.name))
-      .slice(0, 6);
-  }, [selectedNode]);
 
   const searchResults = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -757,18 +746,6 @@ export default function ConceptUniverse({ open, onClose, requestedConcept, onOpe
                   </button>
                 ))}
               </div>
-              {relatedBlocks.length ? (
-                <div className="universe-related-blocks">
-                  <p className="universe-hud-label">相关积木</p>
-                  <div className="universe-quick-links">
-                    {relatedBlocks.map((block) => (
-                      <button key={block.id} type="button" onClick={() => onOpenWarehouse?.(block.id)}>
-                        {block.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
             </aside>
           ) : null}
         </div>
