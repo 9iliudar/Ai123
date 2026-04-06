@@ -525,6 +525,12 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
             <section className="blocks-focus scroll-surface">
               {digestSelectedBlock ? (
                 <>
+                  <div className="blocks-focus-toolbar">
+                    <button type="button" className="blocks-inline-action blocks-back-action" onClick={() => setSelectedId(null)}>
+                      返回结果列表
+                    </button>
+                  </div>
+
                   <div className="blocks-focus-hero">
                     <div className="blocks-focus-copy">
                       <p className="blocks-panel-kicker">当前聚焦项目</p>
@@ -538,9 +544,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                     </div>
 
                     <div className="blocks-focus-actions">
-                      <button type="button" className="blocks-inline-action blocks-back-action" onClick={() => setSelectedId(null)}>
-                        返回结果列表
-                      </button>
                       <a href={digestSelectedBlock.github} target="_blank" rel="noreferrer" className="blocks-link-row">
                         <span>GitHub 地址</span>
                         <code>{digestSelectedBlock.github}</code>
