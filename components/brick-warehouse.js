@@ -443,14 +443,14 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 className={`blocks-workspace-tab ${activeWorkspace === "digest" ? "active" : ""}`}
                 onClick={() => setActiveWorkspace("digest")}
               >
-                <span>项目消化</span>
+                <span>Building blocks</span>
               </button>
               <button
                 type="button"
                 className={`blocks-workspace-tab ${activeWorkspace === "idea" ? "active" : ""}`}
                 onClick={() => setActiveWorkspace("idea")}
               >
-                <span>Idear idea</span>
+                <span>idea</span>
               </button>
             </div>
             <button type="button" className="blocks-close" aria-label="关闭积木仓库" title="关闭积木仓库" onClick={onClose} />
