@@ -9,56 +9,57 @@ import {
 } from "@/data/building-blocks";
 
 const BLOCK_STATE_KEY = "ai123_building_blocks_state";
+const ALL_STATUS = "ALL_STATUS";
 
 const IDEA_EXAMPLES = [
-  "做一个自动抓网页并进入知识库的研究助手",
-  "做一个能操作浏览器和桌面的办公代理",
-  "做一个企业内部多模型 AI 工作台",
+  "research assistant that crawls websites and builds a knowledge base",
+  "desktop operator that can use browser and local apps",
+  "internal multi-model AI workspace for a company",
 ];
 
 const IDEA_SIGNAL_MAP = [
   {
-    phrases: ["浏览器", "网页", "表单", "抓取", "采集", "站点", "web", "browser", "crawl"],
+    phrases: ["browser", "web", "crawl", "scrape", "form", "website"],
     category: "Browser Automation",
     labels: ["Browser Agent", "Automation", "Crawling"],
   },
   {
-    phrases: ["桌面", "界面", "应用", "电脑", "gui", "desktop", "computer use"],
+    phrases: ["desktop", "gui", "computer use", "app", "screen"],
     category: "GUI Agent",
     labels: ["GUI Agent", "Computer Use", "Desktop"],
   },
   {
-    phrases: ["知识库", "文档", "rag", "检索", "问答", "pdf", "资料", "搜索"],
+    phrases: ["knowledge", "docs", "rag", "search", "pdf", "qa"],
     category: "Knowledge",
     labels: ["RAG", "Knowledge Base", "Search", "Documents"],
   },
   {
-    phrases: ["工作流", "自动化", "流程", "编排", "连接器", "触发", "automation", "workflow"],
+    phrases: ["workflow", "automation", "pipeline", "orchestration", "trigger"],
     category: "Workflow",
     labels: ["Workflow", "Automation", "Integrations"],
   },
   {
-    phrases: ["代码", "开发", "编程", "仓库", "修复", "coding", "repo", "developer"],
+    phrases: ["code", "coding", "repo", "developer", "debug", "fix"],
     category: "Coding",
     labels: ["Coding", "Code Agent", "Developer Experience"],
   },
   {
-    phrases: ["多模态", "视觉", "图片", "图像", "视频", "音频", "语音", "vision", "multimodal"],
+    phrases: ["multimodal", "vision", "image", "video", "audio", "voice"],
     category: "Multimodal",
     labels: ["Multimodal", "Vision", "Image Generation"],
   },
   {
-    phrases: ["本地", "部署", "推理", "网关", "路由", "模型服务", "infra", "serving", "gateway"],
+    phrases: ["infra", "serving", "gateway", "routing", "inference", "deploy"],
     category: "Infra",
     labels: ["Serving", "Gateway", "Inference", "Model Router"],
   },
   {
-    phrases: ["机器人", "机械臂", "具身", "robot", "robotics"],
+    phrases: ["robot", "robotics", "embodied"],
     category: "Robotics",
     labels: ["Robotics", "Embodied AI", "Policies"],
   },
   {
-    phrases: ["代理", "智能体", "agent", "copilot"],
+    phrases: ["agent", "copilot", "assistant"],
     category: "Agent",
     labels: ["Agent", "Autonomous", "Planner"],
   },
@@ -73,9 +74,11 @@ function normalizeStoredState(rawState) {
     return {};
   }
 
+  const defaultStatus = blockStatuses[0] ?? "";
+
   return Object.fromEntries(
     Object.entries(rawState).map(([blockId, value]) => {
-      const status = value?.status && blockStatuses.includes(value.status) ? value.status : "未开始";
+      const status = value?.status && blockStatuses.includes(value.status) ? value.status : defaultStatus;
       const records = Array.isArray(value?.records)
         ? value.records
         : value?.note
@@ -163,7 +166,7 @@ function scoreBlockForIdea(block, idea) {
   }
 
   const customKeywords = normalizedIdea
-    .split(/[\s,，。；;、/]+/)
+    .split(/[\s,.;:/\\|_-]+/)
     .map((item) => item.trim())
     .filter((item) => item.length >= 2);
 
@@ -188,8 +191,8 @@ function buildIdeaPlans(recommendedBlocks) {
     const workflowBlock = categories.get("Workflow") ?? categories.get("Agent");
 
     plans.push({
-      title: "采集到知识库",
-      summary: "先抓信息，再整理入库，最后接成可问可用的知识系统。",
+      title: "Acquire to Knowledge Base",
+      summary: "Collect information first, organize it second, then connect it into a searchable system.",
       stack: [browserBlock, knowledgeBlock, workflowBlock].filter(Boolean).map((block) => block.name),
     });
   }
@@ -200,8 +203,8 @@ function buildIdeaPlans(recommendedBlocks) {
     const infraBlock = categories.get("Infra");
 
     plans.push({
-      title: "执行型代理",
-      summary: "让代理不仅会理解任务，还能真正操作界面、调用工具并跑完整流程。",
+      title: "Execution Agent",
+      summary: "Let the agent move beyond understanding and actually operate interfaces and tools.",
       stack: [agentBlock, executionBlock, infraBlock].filter(Boolean).map((block) => block.name),
     });
   }
@@ -212,8 +215,8 @@ function buildIdeaPlans(recommendedBlocks) {
     const infraBlock = categories.get("Infra");
 
     plans.push({
-      title: "研发加速台",
-      summary: "把代码生成、任务编排和模型路由放在一条链路里，适合快速出原型。",
+      title: "Builder Workbench",
+      summary: "Put code generation, workflow orchestration, and model routing on the same path.",
       stack: [codingBlock, workflowBlock, infraBlock].filter(Boolean).map((block) => block.name),
     });
   }
@@ -232,10 +235,12 @@ function formatRecordDate(value) {
 }
 
 export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSelectedId }) {
+  const defaultStatus = blockStatuses[0] ?? "";
+  const [activeWorkspace, setActiveWorkspace] = useState("digest");
   const [query, setQuery] = useState("");
   const [ideaInput, setIdeaInput] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
-  const [activeStatus, setActiveStatus] = useState("全部");
+  const [activeStatus, setActiveStatus] = useState(ALL_STATUS);
   const [selectedId, setSelectedId] = useState(buildingBlocks[0]?.id ?? null);
   const [blockState, setBlockState] = useState(getInitialBlockState);
   const [recordDraft, setRecordDraft] = useState("");
@@ -300,12 +305,12 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     const keyword = query.trim().toLowerCase();
 
     return buildingBlocks.filter((block) => {
-      const status = blockState[block.id]?.status ?? "未开始";
+      const status = blockState[block.id]?.status ?? defaultStatus;
       const matchCategory = activeCategory === "All" || block.category === activeCategory;
-      const matchStatus = activeStatus === "全部" || status === activeStatus;
+      const matchStatus = activeStatus === ALL_STATUS || status === activeStatus;
       return matchCategory && matchStatus && matchesText(block, keyword);
     });
-  }, [activeCategory, activeStatus, blockState, query]);
+  }, [activeCategory, activeStatus, blockState, defaultStatus, query]);
 
   const ideaRecommendations = useMemo(() => {
     const scored = buildingBlocks
@@ -337,8 +342,8 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     return null;
   }
 
-  const selectedBlock = filteredBlocks.find((block) => block.id === selectedId) ?? filteredBlocks[0] ?? null;
-  const selectedStatus = selectedBlock ? blockState[selectedBlock.id]?.status ?? "未开始" : "未开始";
+  const selectedBlock = buildingBlocks.find((block) => block.id === selectedId) ?? filteredBlocks[0] ?? null;
+  const selectedStatus = selectedBlock ? blockState[selectedBlock.id]?.status ?? defaultStatus : defaultStatus;
   const selectedRecords = selectedBlock ? [...(blockState[selectedBlock.id]?.records ?? [])].reverse() : [];
 
   function updateSelectedBlock(nextPatch) {
@@ -349,7 +354,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     setBlockState((current) => ({
       ...current,
       [selectedBlock.id]: {
-        status: current[selectedBlock.id]?.status ?? "未开始",
+        status: current[selectedBlock.id]?.status ?? defaultStatus,
         records: current[selectedBlock.id]?.records ?? [],
         ...current[selectedBlock.id],
         ...nextPatch,
@@ -384,14 +389,19 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     }
   }
 
+  function focusBlock(blockId) {
+    setSelectedId(blockId);
+    setActiveWorkspace("digest");
+  }
+
   return (
     <div className="blocks-overlay" role="presentation" onClick={onClose}>
       <div className="blocks-shell" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
         <div className="blocks-topbar">
           <div className="blocks-brand">
             <p className="blocks-kicker">Open Source Building Blocks</p>
-            <h2>积木仓库</h2>
-            <p>把值得反复研究的开源能力模块沉淀下来，未来再拼成真正适合你的产品。</p>
+            <h2>Brick Warehouse</h2>
+            <p>Collect the open-source building blocks worth repeated study, then recombine them into real products.</p>
           </div>
 
           <div className="blocks-top-actions">
@@ -400,130 +410,311 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 type="text"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="搜索项目、能力标签、相关概念..."
+                placeholder="Search projects, tags, concepts..."
               />
               {query ? (
                 <button
                   type="button"
                   className="blocks-search-clear"
-                  aria-label="清除搜索"
-                  title="清除搜索"
+                  aria-label="Clear search"
+                  title="Clear search"
                   onClick={() => setQuery("")}
                 >
-                  ×
+                  x
                 </button>
               ) : null}
             </label>
-            <button type="button" className="blocks-close" aria-label="关闭积木仓库" title="关闭积木仓库" onClick={onClose}>
-              ×
+            <button type="button" className="blocks-close" aria-label="Close brick warehouse" title="Close brick warehouse" onClick={onClose}>
+              x
             </button>
           </div>
         </div>
 
-        <div className="blocks-layout">
-          <aside className="blocks-sidebar scroll-surface">
-            <section className="blocks-filter-card blocks-filter-card-muted">
-              <div className="blocks-filter-head">
-                <span>分类</span>
+        <div className="blocks-workspace-switch">
+          <button
+            type="button"
+            className={`blocks-workspace-tab ${activeWorkspace === "digest" ? "active" : ""}`}
+            onClick={() => setActiveWorkspace("digest")}
+          >
+            <span>Project Digest</span>
+            <small>Search, read deeply, annotate</small>
+          </button>
+          <button
+            type="button"
+            className={`blocks-workspace-tab ${activeWorkspace === "idea" ? "active" : ""}`}
+            onClick={() => setActiveWorkspace("idea")}
+          >
+            <span>Idea Composer</span>
+            <small>Describe once, generate stacks</small>
+          </button>
+        </div>
+
+        {activeWorkspace === "digest" ? (
+          <div className="blocks-browse-layout">
+            <aside className="blocks-explorer scroll-surface">
+              <div className="blocks-explorer-head">
+                <div>
+                  <p className="blocks-panel-kicker">Project Explorer</p>
+                  <h3>Find a project, then give it the whole stage</h3>
+                </div>
                 <strong>{filteredBlocks.length}</strong>
               </div>
-              <div className="blocks-chip-group">
-                {blockCategories.map((category) => (
-                  <button
-                    key={category}
-                    type="button"
-                    className={`blocks-chip ${activeCategory === category ? "active" : ""}`}
-                    onClick={() => setActiveCategory(category)}
-                  >
-                    {blockCategoryLabels[category] ?? category}
-                  </button>
-                ))}
-              </div>
-            </section>
 
-            <section className="blocks-filter-card blocks-filter-card-muted">
-              <div className="blocks-filter-head">
-                <span>状态</span>
-              </div>
-              <div className="blocks-chip-group">
-                {["全部", ...blockStatuses].map((status) => (
-                  <button
-                    key={status}
-                    type="button"
-                    className={`blocks-chip ${activeStatus === status ? "active" : ""}`}
-                    onClick={() => setActiveStatus(status)}
-                  >
-                    {status}
-                  </button>
-                ))}
-              </div>
-            </section>
+              <div className="blocks-explorer-stack">
+                <section className="blocks-filter-card blocks-filter-card-muted">
+                  <div className="blocks-filter-head">
+                    <span>Category</span>
+                    <strong>{filteredBlocks.length}</strong>
+                  </div>
+                  <div className="blocks-chip-group">
+                    {blockCategories.map((category) => (
+                      <button
+                        key={category}
+                        type="button"
+                        className={`blocks-chip ${activeCategory === category ? "active" : ""}`}
+                        onClick={() => setActiveCategory(category)}
+                      >
+                        {blockCategoryLabels[category] ?? category}
+                      </button>
+                    ))}
+                  </div>
+                </section>
 
-            <section className="blocks-filter-card blocks-filter-card-muted">
-              <div className="blocks-filter-head">
-                <span>能力标签</span>
-              </div>
-              <div className="blocks-tag-cloud">
-                {tags.map((tag) => (
-                  <button key={tag} type="button" className="blocks-mini-tag" onClick={() => setQuery(tag)}>
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </section>
-          </aside>
-
-          <section className="blocks-grid-panel scroll-surface">
-            <section className="blocks-idea-lab">
-              <div className="blocks-idea-copy">
-                <p className="blocks-panel-kicker">一句话想法</p>
-                <h3>先写目标，再反推积木组合</h3>
-                <p>描述你想做的东西，我先给你适合参考的积木与组合路径。</p>
-              </div>
-
-              <div className="blocks-idea-input-wrap">
-                <textarea
-                  value={ideaInput}
-                  onChange={(event) => setIdeaInput(event.target.value)}
-                  placeholder="例如：做一个能自动抓网页、整理资料、进入知识库并持续回答问题的研究助手"
-                />
-                <div className="blocks-idea-examples">
-                  {IDEA_EXAMPLES.map((example) => (
-                    <button key={example} type="button" onClick={() => setIdeaInput(example)}>
-                      {example}
+                <section className="blocks-filter-card blocks-filter-card-muted">
+                  <div className="blocks-filter-head">
+                    <span>Status</span>
+                  </div>
+                  <div className="blocks-chip-group">
+                    <button
+                      type="button"
+                      className={`blocks-chip ${activeStatus === ALL_STATUS ? "active" : ""}`}
+                      onClick={() => setActiveStatus(ALL_STATUS)}
+                    >
+                      All
                     </button>
-                  ))}
-                </div>
+                    {blockStatuses.map((status) => (
+                      <button
+                        key={status}
+                        type="button"
+                        className={`blocks-chip ${activeStatus === status ? "active" : ""}`}
+                        onClick={() => setActiveStatus(status)}
+                      >
+                        {status}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="blocks-filter-card blocks-filter-card-muted">
+                  <div className="blocks-filter-head">
+                    <span>Tags</span>
+                  </div>
+                  <div className="blocks-tag-cloud">
+                    {tags.map((tag) => (
+                      <button key={tag} type="button" className="blocks-mini-tag" onClick={() => setQuery(tag)}>
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </section>
               </div>
 
-              {ideaInput.trim() ? (
-                <div className="blocks-idea-results">
-                  <div className="blocks-idea-column">
-                    <div className="blocks-section-head">
-                      <span>推荐积木</span>
-                      <strong>{ideaRecommendations.length}</strong>
+              <div className="blocks-result-list">
+                {filteredBlocks.map((block) => {
+                  const status = blockState[block.id]?.status ?? defaultStatus;
+                  return (
+                    <button
+                      key={block.id}
+                      type="button"
+                      className={`blocks-result-item ${selectedBlock?.id === block.id ? "active" : ""}`}
+                      onClick={() => setSelectedId(block.id)}
+                    >
+                      <div className="blocks-card-top">
+                        <span className="blocks-card-category">{blockCategoryLabels[block.category] ?? block.category}</span>
+                        <span className="blocks-card-status">{status}</span>
+                      </div>
+                      <h4>{block.name}</h4>
+                      <p>{block.summary}</p>
+                      <div className="blocks-card-tags">
+                        {block.tags.slice(0, 3).map((tag) => (
+                          <span key={tag}>{tag}</span>
+                        ))}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </aside>
+
+            <section className="blocks-focus scroll-surface">
+              {selectedBlock ? (
+                <>
+                  <div className="blocks-focus-hero">
+                    <div className="blocks-focus-copy">
+                      <p className="blocks-panel-kicker">Focus Project</p>
+                      <div className="blocks-detail-top">
+                        <div>
+                          <h3>{selectedBlock.name}</h3>
+                          <p className="blocks-detail-summary">{selectedBlock.summary}</p>
+                        </div>
+                        <span className="blocks-detail-category">{blockCategoryLabels[selectedBlock.category] ?? selectedBlock.category}</span>
+                      </div>
                     </div>
-                    <div className="blocks-pill-row">
-                      {ideaRecommendations.map((block) => (
-                        <button
-                          key={block.id}
-                          type="button"
-                          className="blocks-pill blocks-pill-strong"
-                          onClick={() => setSelectedId(block.id)}
-                        >
-                          {block.name}
-                        </button>
-                      ))}
+
+                    <div className="blocks-focus-actions">
+                      <a href={selectedBlock.github} target="_blank" rel="noreferrer" className="blocks-link-row">
+                        <span>GitHub</span>
+                        <code>{selectedBlock.github}</code>
+                      </a>
+                      <a href={selectedBlock.website} target="_blank" rel="noreferrer" className="blocks-link-row">
+                        <span>Website / Docs</span>
+                        <code>{selectedBlock.website}</code>
+                      </a>
                     </div>
                   </div>
 
-                  <div className="blocks-idea-column">
+                  <div className="blocks-focus-grid">
+                    <section className="blocks-focus-main">
+                      <section className="blocks-detail-section">
+                        <span>What problem does it solve</span>
+                        <p>{selectedBlock.solves}</p>
+                      </section>
+
+                      <section className="blocks-detail-section">
+                        <span>What can it compose with</span>
+                        <div className="blocks-pill-row">
+                          {selectedBlock.composeWith.map((item) => (
+                            <button key={item} type="button" className="blocks-pill" onClick={() => setQuery(item)}>
+                              {item}
+                            </button>
+                          ))}
+                        </div>
+                      </section>
+
+                      <section className="blocks-detail-section">
+                        <span>Typical outputs</span>
+                        <div className="blocks-pill-row">
+                          {selectedBlock.outputs.map((item) => (
+                            <span key={item} className="blocks-pill blocks-pill-static">
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                      </section>
+
+                      <section className="blocks-detail-section">
+                        <span>Related concepts</span>
+                        <div className="blocks-pill-row">
+                          {(selectedBlock.relatedConcepts ?? []).map((item) => (
+                            <button key={item} type="button" className="blocks-pill" onClick={() => jumpToConcept(item)}>
+                              {item}
+                            </button>
+                          ))}
+                        </div>
+                      </section>
+
+                      <section className="blocks-detail-section">
+                        <span>Tags</span>
+                        <div className="blocks-pill-row">
+                          {selectedBlock.tags.map((item) => (
+                            <button key={item} type="button" className="blocks-pill" onClick={() => setQuery(item)}>
+                              {item}
+                            </button>
+                          ))}
+                        </div>
+                      </section>
+                    </section>
+
+                    <aside className="blocks-focus-side">
+                      <section className="blocks-detail-section blocks-side-card">
+                        <span>Research status</span>
+                        <select value={selectedStatus} onChange={(event) => updateSelectedBlock({ status: event.target.value })}>
+                          {blockStatuses.map((status) => (
+                            <option key={status} value={status}>
+                              {status}
+                            </option>
+                          ))}
+                        </select>
+                      </section>
+
+                      <section className="blocks-detail-section blocks-side-card">
+                        <div className="blocks-section-head">
+                          <span>Research notes</span>
+                          <strong>{selectedRecords.length}</strong>
+                        </div>
+                        <div className="blocks-record-composer">
+                          <textarea
+                            value={recordDraft}
+                            onChange={(event) => setRecordDraft(event.target.value)}
+                            placeholder="Add a judgement, test result, composition idea, or open question."
+                          />
+                          <button type="button" className="primary-button blocks-record-submit" onClick={appendRecord}>
+                            Add note
+                          </button>
+                        </div>
+                        <div className="blocks-record-list">
+                          {selectedRecords.length ? (
+                            selectedRecords.map((record) => (
+                              <article key={record.id} className="blocks-record-item">
+                                <div className="blocks-record-meta">
+                                  <span>{record.status}</span>
+                                  <time dateTime={record.createdAt}>{formatRecordDate(record.createdAt)}</time>
+                                </div>
+                                <p>{record.content}</p>
+                              </article>
+                            ))
+                          ) : (
+                            <div className="blocks-record-empty">No notes yet. Capture your first reaction here.</div>
+                          )}
+                        </div>
+                      </section>
+                    </aside>
+                  </div>
+                </>
+              ) : (
+                <div className="blocks-empty">
+                  <h3>No matching results</h3>
+                  <p>Try another keyword, category, or status.</p>
+                </div>
+              )}
+            </section>
+          </div>
+        ) : (
+          <div className="blocks-idea-layout">
+            <section className="blocks-idea-workspace scroll-surface">
+              <section className="blocks-idea-hero">
+                <div className="blocks-idea-copy">
+                  <p className="blocks-panel-kicker">Idea Workspace</p>
+                  <h3>Write one goal, then fan out combinations</h3>
+                  <p>This view is for composition first. It keeps the project catalog out of the way until you need it.</p>
+                </div>
+
+                <div className="blocks-idea-input-wrap">
+                  <textarea
+                    value={ideaInput}
+                    onChange={(event) => setIdeaInput(event.target.value)}
+                    placeholder="Example: an assistant that crawls websites, organizes sources, builds a knowledge base, and keeps answering follow-up questions."
+                  />
+                  <div className="blocks-idea-examples">
+                    {IDEA_EXAMPLES.map((example) => (
+                      <button key={example} type="button" onClick={() => setIdeaInput(example)}>
+                        {example}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              {ideaInput.trim() ? (
+                <div className="blocks-idea-stage">
+                  <section className="blocks-idea-main">
                     <div className="blocks-section-head">
-                      <span>组合方案</span>
+                      <span>Suggested combinations</span>
+                      <strong>{ideaPlans.length}</strong>
                     </div>
-                    <div className="blocks-plan-list">
+                    <div className="blocks-plan-grid">
                       {ideaPlans.map((plan) => (
-                        <article key={plan.title} className="blocks-plan-card">
+                        <article key={plan.title} className="blocks-plan-card blocks-plan-card-featured">
                           <strong>{plan.title}</strong>
                           <p>{plan.summary}</p>
                           <div className="blocks-plan-stack">
@@ -534,170 +725,65 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                         </article>
                       ))}
                     </div>
-                  </div>
-                </div>
-              ) : null}
-            </section>
+                  </section>
 
-            <div className="blocks-grid-copy">
-              <div>
-                <p className="blocks-panel-kicker">精选项目</p>
-                <h3>像整理能力积木一样整理开源项目</h3>
-              </div>
-              <p>这里不追热度榜单，只收那些值得你反复理解、未来能与其他能力发生化学反应的模块。</p>
-            </div>
+                  <aside className="blocks-idea-side">
+                    <section className="blocks-idea-column blocks-side-card">
+                      <div className="blocks-section-head">
+                        <span>Recommended blocks</span>
+                        <strong>{ideaRecommendations.length}</strong>
+                      </div>
+                      <div className="blocks-recommendation-list">
+                        {ideaRecommendations.map((block) => (
+                          <button
+                            key={block.id}
+                            type="button"
+                            className={`blocks-recommendation-item ${selectedBlock?.id === block.id ? "active" : ""}`}
+                            onClick={() => setSelectedId(block.id)}
+                          >
+                            <strong>{block.name}</strong>
+                            <span>{block.summary}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </section>
 
-            <div className="blocks-grid">
-              {filteredBlocks.map((block) => {
-                const status = blockState[block.id]?.status ?? "未开始";
-                return (
-                  <button
-                    key={block.id}
-                    type="button"
-                    className={`blocks-card ${selectedBlock?.id === block.id ? "active" : ""}`}
-                    onClick={() => setSelectedId(block.id)}
-                  >
-                    <div className="blocks-card-top">
-                      <span className="blocks-card-category">{blockCategoryLabels[block.category] ?? block.category}</span>
-                      <span className="blocks-card-status">{status}</span>
-                    </div>
-                    <h4>{block.name}</h4>
-                    <p>{block.summary}</p>
-                    <div className="blocks-card-tags">
-                      {block.tags.slice(0, 2).map((tag) => (
-                        <span key={tag}>{tag}</span>
-                      ))}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-
-          <aside className="blocks-detail scroll-surface">
-            {selectedBlock ? (
-              <>
-                <div className="blocks-detail-top">
-                  <div>
-                    <p className="blocks-panel-kicker">当前积木</p>
-                    <h3>{selectedBlock.name}</h3>
-                  </div>
-                  <span className="blocks-detail-category">{blockCategoryLabels[selectedBlock.category] ?? selectedBlock.category}</span>
-                </div>
-
-                <p className="blocks-detail-summary">{selectedBlock.summary}</p>
-
-                <div className="blocks-link-list">
-                  <a href={selectedBlock.github} target="_blank" rel="noreferrer" className="blocks-link-row">
-                    <span>GitHub 地址</span>
-                    <code>{selectedBlock.github}</code>
-                  </a>
-                  <a href={selectedBlock.website} target="_blank" rel="noreferrer" className="blocks-link-row">
-                    <span>官网 / 文档</span>
-                    <code>{selectedBlock.website}</code>
-                  </a>
-                </div>
-
-                <section className="blocks-detail-section">
-                  <span>它解决什么问题</span>
-                  <p>{selectedBlock.solves}</p>
-                </section>
-
-                <section className="blocks-detail-section">
-                  <span>可以和谁组合</span>
-                  <div className="blocks-pill-row">
-                    {selectedBlock.composeWith.map((item) => (
-                      <button key={item} type="button" className="blocks-pill" onClick={() => setQuery(item)}>
-                        {item}
-                      </button>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="blocks-detail-section">
-                  <span>适合产出什么</span>
-                  <div className="blocks-pill-row">
-                    {selectedBlock.outputs.map((item) => (
-                      <span key={item} className="blocks-pill blocks-pill-static">
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="blocks-detail-section">
-                  <span>相关概念</span>
-                  <div className="blocks-pill-row">
-                    {(selectedBlock.relatedConcepts ?? []).map((item) => (
-                      <button key={item} type="button" className="blocks-pill" onClick={() => jumpToConcept(item)}>
-                        {item}
-                      </button>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="blocks-detail-section">
-                  <span>能力标签</span>
-                  <div className="blocks-pill-row">
-                    {selectedBlock.tags.map((item) => (
-                      <button key={item} type="button" className="blocks-pill" onClick={() => setQuery(item)}>
-                        {item}
-                      </button>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="blocks-detail-section">
-                  <span>研究状态</span>
-                  <select value={selectedStatus} onChange={(event) => updateSelectedBlock({ status: event.target.value })}>
-                    {blockStatuses.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
-                      </option>
-                    ))}
-                  </select>
-                </section>
-
-                <section className="blocks-detail-section">
-                  <div className="blocks-section-head">
-                    <span>研究记录</span>
-                    <strong>{selectedRecords.length}</strong>
-                  </div>
-                  <div className="blocks-record-composer">
-                    <textarea
-                      value={recordDraft}
-                      onChange={(event) => setRecordDraft(event.target.value)}
-                      placeholder="追加一条新的判断、试用结论、组合灵感或待验证问题。"
-                    />
-                    <button type="button" className="primary-button blocks-record-submit" onClick={appendRecord}>
-                      追加记录
-                    </button>
-                  </div>
-                  <div className="blocks-record-list">
-                    {selectedRecords.length ? (
-                      selectedRecords.map((record) => (
-                        <article key={record.id} className="blocks-record-item">
-                          <div className="blocks-record-meta">
-                            <span>{record.status}</span>
-                            <time dateTime={record.createdAt}>{formatRecordDate(record.createdAt)}</time>
+                    {selectedBlock ? (
+                      <section className="blocks-idea-column blocks-side-card">
+                        <div className="blocks-section-head">
+                          <span>Focused block</span>
+                          <button type="button" className="blocks-inline-action" onClick={() => focusBlock(selectedBlock.id)}>
+                            Open deep read
+                          </button>
+                        </div>
+                        <div className="blocks-spotlight-card">
+                          <div className="blocks-card-top">
+                            <span className="blocks-card-category">{blockCategoryLabels[selectedBlock.category] ?? selectedBlock.category}</span>
+                            <span className="blocks-card-status">{selectedStatus}</span>
                           </div>
-                          <p>{record.content}</p>
-                        </article>
-                      ))
-                    ) : (
-                      <div className="blocks-record-empty">还没有记录，先记下你对它的第一印象。</div>
-                    )}
-                  </div>
+                          <h4>{selectedBlock.name}</h4>
+                          <p>{selectedBlock.summary}</p>
+                          <div className="blocks-pill-row">
+                            {selectedBlock.composeWith.slice(0, 4).map((item) => (
+                              <span key={item} className="blocks-pill blocks-pill-static">
+                                {item}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </section>
+                    ) : null}
+                  </aside>
+                </div>
+              ) : (
+                <section className="blocks-idea-empty">
+                  <h3>Put the idea on the table first</h3>
+                  <p>Once you type a goal, this view will prioritize combinations and recommended blocks instead of the full project list.</p>
                 </section>
-              </>
-            ) : (
-              <div className="blocks-empty">
-                <h3>没有匹配结果</h3>
-                <p>换一个关键词、分类或状态试试。</p>
-              </div>
-            )}
-          </aside>
-        </div>
+              )}
+            </section>
+          </div>
+        )}
       </div>
     </div>
   );
