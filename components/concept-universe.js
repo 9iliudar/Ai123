@@ -148,7 +148,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   const [isHudPinned, setIsHudPinned] = useState(false);
   const [masteryMap, setMasteryMap] = useState({});
   const [activeClusterId, setActiveClusterId] = useState(conceptUniverse.clusters[0]?.id ?? null);
-  const [activeFreshness, setActiveFreshness] = useState(RECENT_FRESHNESS);
+  const [activeFreshness, setActiveFreshness] = useState(ALL_FRESHNESS);
   const [isClusterMenuOpen, setIsClusterMenuOpen] = useState(false);
   const [isPointerDown, setIsPointerDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -861,18 +861,18 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
           <div className="universe-filter-row">
             <button
               type="button"
+              className={`universe-filter-chip ${activeFreshness === ALL_FRESHNESS ? "active" : ""}`}
+              onClick={() => setActiveFreshness(ALL_FRESHNESS)}
+            >
+              全部概念
+            </button>
+            <button
+              type="button"
               className={`universe-filter-chip ${activeFreshness === RECENT_FRESHNESS ? "active" : ""}`}
               onClick={() => setActiveFreshness(RECENT_FRESHNESS)}
             >
               最近添加
               <span>{recentConceptCount}</span>
-            </button>
-            <button
-              type="button"
-              className={`universe-filter-chip ${activeFreshness === ALL_FRESHNESS ? "active" : ""}`}
-              onClick={() => setActiveFreshness(ALL_FRESHNESS)}
-            >
-              全部概念
             </button>
           </div>
 
@@ -894,6 +894,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
                     type="button"
                     className={cluster.id === activeClusterId ? "is-active" : ""}
                     onClick={() => {
+                      setActiveFreshness(ALL_FRESHNESS);
                       setActiveClusterId(cluster.id);
                       setIsClusterMenuOpen(false);
                     }}
