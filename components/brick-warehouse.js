@@ -17,6 +17,7 @@ const LAST_SELECTED_BLOCK_KEY = "ai123_last_selected_block";
 const ALL_STATUS = "ALL_STATUS";
 const ALL_FRESHNESS = "ALL_FRESHNESS";
 const RECENT_FRESHNESS = "RECENT_FRESHNESS";
+const REMOVED_TEST_BLOCK_NAMES = new Set(["积木本地测试", "积木入库测试", "这是一条积木新增测试"]);
 const REMOVED_TEST_BLOCK_IDS = new Set([
   "custom-block-绉湪鍏ュ簱娴嬭瘯-1775478163643",
   "custom-block-杩欐槸涓€鏉＄Ｎ鏈ㄦ柊澧炴祴璇?1775469920381",
@@ -27,7 +28,12 @@ function sanitizeCustomBlocks(items) {
     return [];
   }
 
-  return items.filter((item) => item?.id && !REMOVED_TEST_BLOCK_IDS.has(item.id));
+  return items.filter(
+    (item) =>
+      item?.id &&
+      !REMOVED_TEST_BLOCK_IDS.has(item.id) &&
+      !REMOVED_TEST_BLOCK_NAMES.has(item.name?.trim())
+  );
 }
 
 function mergeUniqueById(items) {
