@@ -354,7 +354,7 @@ export default function Dashboard() {
             概念宇宙
           </button>
           <button className="primary-button topbar-add-button" type="button" aria-label="添加内容" title="添加内容" onClick={() => setIsModalOpen(true)}>
-            + 添加网站
+            +
           </button>
         </div>
       </nav>

@@ -193,18 +193,9 @@ select {
   width: 42px;
   min-width: 42px;
   padding: 10px 0;
-  font-size: 1.3rem;
+  font-size: 1.15rem;
+  font-weight: 700;
   line-height: 1;
-  color: transparent;
-  position: relative;
-}
-
-.topbar-add-button::before {
-  content: "+";
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
   color: #fff;
 }
 
