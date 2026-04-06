@@ -8,9 +8,11 @@ import {
   buildingBlocks,
 } from "@/data/building-blocks";
 import repoCustomBlocks from "@/data/custom-blocks.json";
+import repoBlockState from "@/data/block-state.json";
 
 const BLOCK_STATE_KEY = "ai123_building_blocks_state";
 const CUSTOM_BLOCKS_KEY = "ai123_custom_blocks";
+const SYNC_CODE_KEY = "ai123_sync_code";
 const ALL_STATUS = "ALL_STATUS";
 const ALL_FRESHNESS = "ALL_FRESHNESS";
 const RECENT_FRESHNESS = "RECENT_FRESHNESS";
@@ -75,6 +77,14 @@ const IDEA_SIGNAL_MAP = [
 
 function getInitialBlockState() {
   return {};
+}
+
+function getStoredSyncCode() {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  return window.localStorage.getItem(SYNC_CODE_KEY) ?? "";
 }
 
 function normalizeStoredState(rawState) {
@@ -296,14 +306,23 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   const [activeFreshness, setActiveFreshness] = useState(ALL_FRESHNESS);
   const [customBlocks, setCustomBlocks] = useState([]);
   const [selectedId, setSelectedId] = useState(buildingBlocks[0]?.id ?? null);
-  const [blockState, setBlockState] = useState(getInitialBlockState);
+  const [blockState, setBlockState] = useState(() => normalizeStoredState(repoBlockState));
   const [recordDraft, setRecordDraft] = useState("");
+  const [syncCode, setSyncCode] = useState("");
 
   useEffect(() => {
     const storedState = window.localStorage.getItem(BLOCK_STATE_KEY);
+    const storedSyncCode = getStoredSyncCode();
     if (storedState) {
-      setBlockState(normalizeStoredState(JSON.parse(storedState)));
+      setBlockState((current) =>
+        normalizeStoredState({
+          ...current,
+          ...JSON.parse(storedState),
+        })
+      );
     }
+
+    setSyncCode(storedSyncCode);
   }, []);
 
   useEffect(() => {
@@ -329,6 +348,19 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   useEffect(() => {
     window.localStorage.setItem(BLOCK_STATE_KEY, JSON.stringify(blockState));
   }, [blockState]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (!syncCode.trim()) {
+      window.localStorage.removeItem(SYNC_CODE_KEY);
+      return;
+    }
+
+    window.localStorage.setItem(SYNC_CODE_KEY, syncCode.trim());
+  }, [syncCode]);
 
   useEffect(() => {
     if (!open) {
@@ -428,20 +460,48 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   const selectedStatus = selectedBlock ? blockState[selectedBlock.id]?.status ?? defaultStatus : defaultStatus;
   const selectedRecords = selectedBlock ? [...(blockState[selectedBlock.id]?.records ?? [])].reverse() : [];
 
+  async function persistBlockState(nextState) {
+    try {
+      const response = await fetch("/api/save-block-state", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          state: nextState,
+          syncCode,
+        }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.message || "保存研究状态失败");
+      }
+    } catch (error) {
+      window.alert(error.message || "保存研究状态失败，请稍后重试。");
+    }
+  }
+
   function updateSelectedBlock(nextPatch) {
     if (!selectedBlock) {
       return;
     }
 
-    setBlockState((current) => ({
-      ...current,
-      [selectedBlock.id]: {
-        status: current[selectedBlock.id]?.status ?? defaultStatus,
-        records: current[selectedBlock.id]?.records ?? [],
-        ...current[selectedBlock.id],
-        ...nextPatch,
-      },
-    }));
+    setBlockState((current) => {
+      const nextState = {
+        ...current,
+        [selectedBlock.id]: {
+          status: current[selectedBlock.id]?.status ?? defaultStatus,
+          records: current[selectedBlock.id]?.records ?? [],
+          ...current[selectedBlock.id],
+          ...nextPatch,
+        },
+      };
+
+      void persistBlockState(nextState);
+      return nextState;
+    });
   }
 
   function appendRecord() {
@@ -721,6 +781,13 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                             </option>
                           ))}
                         </select>
+                        <input
+                          className="blocks-status-sync"
+                          type="text"
+                          value={syncCode}
+                          onChange={(event) => setSyncCode(event.target.value)}
+                          placeholder="入库校验码，可选填"
+                        />
                       </section>
 
                       <section className="blocks-detail-section blocks-side-card">

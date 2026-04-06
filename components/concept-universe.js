@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { conceptUniverse } from "@/data/concept-graph";
 import repoCustomConcepts from "@/data/custom-concepts.json";
+import repoConceptMastery from "@/data/concept-mastery.json";
 
 const themeMap = {
   violet: ["#c4b5fd", "rgba(124, 58, 237, 0.18)", "rgba(124, 58, 237, 0.32)"],
@@ -154,7 +155,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   const [warpGhost, setWarpGhost] = useState(null);
   const [arrivalOrigin, setArrivalOrigin] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [isHudPinned, setIsHudPinned] = useState(false);
-  const [masteryMap, setMasteryMap] = useState({});
+  const [masteryMap, setMasteryMap] = useState(repoConceptMastery);
   const [activeClusterId, setActiveClusterId] = useState(conceptUniverse.clusters[0]?.id ?? null);
   const [activeFreshness, setActiveFreshness] = useState(ALL_FRESHNESS);
   const [isClusterMenuOpen, setIsClusterMenuOpen] = useState(false);
@@ -310,7 +311,10 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
 
       const parsed = JSON.parse(stored);
       if (parsed && typeof parsed === "object") {
-        setMasteryMap(parsed);
+        setMasteryMap((current) => ({
+          ...current,
+          ...parsed,
+        }));
       }
     } catch {}
   }, []);
@@ -566,11 +570,38 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     stopInertia();
   }
 
+  async function persistMastery(nextMasteryMap) {
+    try {
+      const response = await fetch("/api/save-concept-mastery", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          mastery: nextMasteryMap,
+        }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.message || "保存掌握程度失败");
+      }
+    } catch (error) {
+      window.alert(error.message || "保存掌握程度失败，请稍后重试。");
+    }
+  }
+
   function updateMastery(nodeId, value) {
-    setMasteryMap((current) => ({
-      ...current,
-      [nodeId]: current[nodeId] === value ? 0 : value,
-    }));
+    setMasteryMap((current) => {
+      const nextMasteryMap = {
+        ...current,
+        [nodeId]: current[nodeId] === value ? 0 : value,
+      };
+
+      void persistMastery(nextMasteryMap);
+      return nextMasteryMap;
+    });
   }
 
   async function copyConceptName(name) {

@@ -1558,6 +1558,22 @@ select {
   background-repeat: no-repeat;
 }
 
+.blocks-status-sync {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(63, 63, 70, 0.9);
+  background: rgba(16, 17, 24, 0.9);
+  color: #f5f3ff;
+}
+
+.blocks-status-sync:focus {
+  outline: none;
+  border-color: rgba(124, 58, 237, 0.7);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+}
+
 .blocks-detail textarea {
   min-height: 148px;
   padding: 14px;
