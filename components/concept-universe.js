@@ -19,6 +19,7 @@ const themeMap = {
 const MAX_VISIBLE_NODES = 18;
 const PERSPECTIVE = 940;
 const CLOUD_RADIUS = 280;
+const MASTERY_STORAGE_KEY = "ai123_concept_mastery";
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
@@ -129,6 +130,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   const [warpGhost, setWarpGhost] = useState(null);
   const [arrivalOrigin, setArrivalOrigin] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [isHudPinned, setIsHudPinned] = useState(false);
+  const [masteryMap, setMasteryMap] = useState({});
   const [isPointerDown, setIsPointerDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isSettling, setIsSettling] = useState(false);
@@ -172,6 +174,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
       .sort((left, right) => scoreNode(right) - scoreNode(left))
       .slice(0, 8);
   }, [nodeMap, selectedNode]);
+  const selectedMastery = selectedNode ? masteryMap[selectedNode.id] ?? 0 : 0;
 
   const searchResults = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -246,6 +249,34 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   useEffect(() => {
     rotationRef.current = rotation;
   }, [rotation]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    try {
+      const stored = window.localStorage.getItem(MASTERY_STORAGE_KEY);
+      if (!stored) {
+        return;
+      }
+
+      const parsed = JSON.parse(stored);
+      if (parsed && typeof parsed === "object") {
+        setMasteryMap(parsed);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(MASTERY_STORAGE_KEY, JSON.stringify(masteryMap));
+    } catch {}
+  }, [masteryMap]);
 
   useEffect(() => {
     if (!open) {
@@ -424,6 +455,13 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     setIsHudPinned(false);
     setRotation({ x: -0.24, y: 0.42 });
     stopInertia();
+  }
+
+  function updateMastery(nodeId, value) {
+    setMasteryMap((current) => ({
+      ...current,
+      [nodeId]: current[nodeId] === value ? 0 : value,
+    }));
   }
 
   function scheduleDragRotation() {
@@ -716,6 +754,36 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
           {selectedNode ? (
             <aside className="universe-hud">
               <div className="universe-hud-top">
+                <div className="universe-hud-top-meta">
+                  <div className="universe-hud-topline">
+                    <span className="universe-hud-label">重要度</span>
+                    <div className="universe-importance universe-importance-compact" aria-label={`重要度 ${selectedNode.importance} / 5`}>
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <span key={index} className={index < selectedNode.importance ? "filled" : ""}>
+                          ●
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="universe-mastery">
+                    <span className="universe-hud-label">掌握程度</span>
+                    <div className="universe-mastery-dots" aria-label={`掌握程度 ${selectedMastery} / 5`}>
+                      {Array.from({ length: 5 }).map((_, index) => {
+                        const value = index + 1;
+                        return (
+                          <button
+                            key={value}
+                            type="button"
+                            className={`universe-mastery-dot ${value <= selectedMastery ? "is-active" : ""}`}
+                            aria-label={`掌握程度 ${value} / 5`}
+                            title={`掌握程度 ${value} / 5`}
+                            onClick={() => updateMastery(selectedNode.id, value)}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
                 <p className="universe-hud-label">当前术语</p>
                 <button
                   type="button"
