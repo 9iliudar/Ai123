@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { conceptUniverse } from "@/data/concept-graph";
+import repoCustomConcepts from "@/data/custom-concepts.json";
 
 const themeMap = {
   violet: ["#c4b5fd", "rgba(124, 58, 237, 0.18)", "rgba(124, 58, 237, 0.32)"],
@@ -23,6 +24,10 @@ const MASTERY_STORAGE_KEY = "ai123_concept_mastery";
 const CUSTOM_CONCEPTS_KEY = "ai123_custom_concepts";
 const ALL_FRESHNESS = "ALL_FRESHNESS";
 const RECENT_FRESHNESS = "RECENT_FRESHNESS";
+
+function mergeUniqueById(items) {
+  return [...new Map(items.map((item) => [item.id, item])).values()];
+}
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
@@ -133,7 +138,10 @@ function isRecentAdded(value) {
 
 export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   const [customConcepts, setCustomConcepts] = useState([]);
-  const mergedNodes = useMemo(() => [...customConcepts, ...conceptUniverse.nodes], [customConcepts]);
+  const mergedNodes = useMemo(
+    () => mergeUniqueById([...customConcepts, ...repoCustomConcepts, ...conceptUniverse.nodes]),
+    [customConcepts]
+  );
   const nodeMap = useMemo(() => buildNodeMap(mergedNodes), [mergedNodes]);
   const clusters = conceptUniverse.clusters;
   const [centerId, setCenterId] = useState(conceptUniverse.entryId);

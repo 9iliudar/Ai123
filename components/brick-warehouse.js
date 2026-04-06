@@ -7,12 +7,17 @@ import {
   blockStatuses,
   buildingBlocks,
 } from "@/data/building-blocks";
+import repoCustomBlocks from "@/data/custom-blocks.json";
 
 const BLOCK_STATE_KEY = "ai123_building_blocks_state";
 const CUSTOM_BLOCKS_KEY = "ai123_custom_blocks";
 const ALL_STATUS = "ALL_STATUS";
 const ALL_FRESHNESS = "ALL_FRESHNESS";
 const RECENT_FRESHNESS = "RECENT_FRESHNESS";
+
+function mergeUniqueById(items) {
+  return [...new Map(items.map((item) => [item.id, item])).values()];
+}
 
 const IDEA_EXAMPLES = [
   "做一个自动抓网页并进入知识库的研究助手",
@@ -366,7 +371,10 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     setRecordDraft("");
   }, [selectedId]);
 
-  const mergedBlocks = useMemo(() => [...customBlocks, ...buildingBlocks], [customBlocks]);
+  const mergedBlocks = useMemo(
+    () => mergeUniqueById([...customBlocks, ...repoCustomBlocks, ...buildingBlocks]),
+    [customBlocks]
+  );
 
   const tags = useMemo(() => {
     return [...new Set(mergedBlocks.flatMap((block) => block.tags))].sort((left, right) => left.localeCompare(right));

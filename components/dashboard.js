@@ -6,6 +6,7 @@ import ConceptUniverse from "@/components/concept-universe";
 import { categories, categoryLabels, defaultTools } from "@/data/default-tools";
 import { blockCategories, blockCategoryLabels } from "@/data/building-blocks";
 import { conceptUniverse } from "@/data/concept-graph";
+import repoCustomTools from "@/data/custom-tools.json";
 
 const CUSTOM_TOOLS_KEY = "ai123_custom_tools";
 const CUSTOM_BLOCKS_KEY = "ai123_custom_blocks";
@@ -68,10 +69,21 @@ function ToolIcon({ tool }) {
 
 function sortTools(tools, order) {
   const rankMap = new Map(order.map((id, index) => [id, index]));
-  return [...tools].sort((left, right) => {
+  const dedupedTools = [...new Map(tools.map((tool) => [tool.id, tool])).values()];
+  return dedupedTools.sort((left, right) => {
     const leftRank = rankMap.has(left.id) ? rankMap.get(left.id) : Number.MAX_SAFE_INTEGER;
     const rightRank = rankMap.has(right.id) ? rankMap.get(right.id) : Number.MAX_SAFE_INTEGER;
-    return leftRank - rightRank;
+    if (leftRank !== rightRank) {
+      return leftRank - rightRank;
+    }
+
+    const leftTime = left.addedAt ? new Date(left.addedAt).getTime() : 0;
+    const rightTime = right.addedAt ? new Date(right.addedAt).getTime() : 0;
+    if (leftTime !== rightTime) {
+      return rightTime - leftTime;
+    }
+
+    return left.name.localeCompare(right.name);
   });
 }
 
@@ -135,6 +147,7 @@ export default function Dashboard() {
   const [draggedId, setDraggedId] = useState(null);
   const [dragArmedId, setDragArmedId] = useState(null);
   const [dropTargetId, setDropTargetId] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const storedTools = window.localStorage.getItem(CUSTOM_TOOLS_KEY);
@@ -170,7 +183,7 @@ export default function Dashboard() {
   }, [isModalOpen]);
 
   const tools = useMemo(() => {
-    const mergedTools = sortTools([...defaultTools, ...customTools], order);
+    const mergedTools = sortTools([...repoCustomTools, ...defaultTools, ...customTools], order);
     return mergedTools.filter((tool) => {
       const matchCategory = activeCategory === "All" || tool.cat === activeCategory;
       const content = `${tool.name} ${tool.desc}`.toLowerCase();
@@ -222,6 +235,13 @@ export default function Dashboard() {
       `ai123-concepts-${exportTime}.json`,
       JSON.parse(window.localStorage.getItem(CUSTOM_CONCEPTS_KEY) ?? "[]")
     );
+  }
+
+  function mergeStoredItems(key, item) {
+    const current = JSON.parse(window.localStorage.getItem(key) ?? "[]");
+    const next = [item, ...current.filter((entry) => entry.id !== item.id)];
+    window.localStorage.setItem(key, JSON.stringify(next));
+    return next;
   }
 
   function handleAddTool(event) {
@@ -329,83 +349,58 @@ export default function Dashboard() {
     setOrder((current) => current.filter((item) => item !== id));
   }
 
-  function handleAddItemSubmit(event) {
+  async function handleAddItemSubmit(event) {
     event.preventDefault();
 
     if (!draft.name.trim()) {
       return;
     }
 
-    const timestamp = new Date().toISOString();
+    if (draftType === "tool" && !draft.link.trim()) {
+      return;
+    }
 
-    if (draftType === "tool") {
-      if (!draft.link.trim()) {
-        return;
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/submit-item", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: draftType,
+          ...draft,
+        }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.message || "提交失败");
       }
 
-      const nextTool = {
-        id: `custom_${Date.now()}`,
-        name: draft.name.trim(),
-        link: normalizeUrl(draft.link),
-        desc: draft.desc.trim() || "自定义快捷入口",
-        cat: draft.cat,
-        isCustom: true,
-        addedAt: timestamp,
-      };
+      const item = payload.item;
 
-      setCustomTools((current) => [nextTool, ...current]);
-      setOrder((current) => [nextTool.id, ...current]);
-      resetDraft("tool");
+      if (draftType === "tool") {
+        setCustomTools((current) => {
+          const next = [item, ...current.filter((entry) => entry.id !== item.id)];
+          return next;
+        });
+        setOrder((current) => [item.id, ...current.filter((id) => id !== item.id)]);
+      } else if (draftType === "block") {
+        mergeStoredItems(CUSTOM_BLOCKS_KEY, item);
+      } else {
+        mergeStoredItems(CUSTOM_CONCEPTS_KEY, item);
+      }
+
+      resetDraft(draftType);
       setIsModalOpen(false);
-      return;
+    } catch (error) {
+      window.alert(error.message || "提交失败，请稍后重试。");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    if (draftType === "block") {
-      const nextBlocks = JSON.parse(window.localStorage.getItem(CUSTOM_BLOCKS_KEY) ?? "[]");
-      const nextBlock = {
-        id: `custom-block-${Date.now()}`,
-        name: draft.name.trim(),
-        category: draft.cat,
-        github: "",
-        website: "",
-        summary: draft.desc.trim() || `${draft.name.trim()} 的自定义积木条目`,
-        tags: [],
-        solves: draft.desc.trim() || `${draft.name.trim()} 的能力说明`,
-        composeWith: [],
-        outputs: [],
-        relatedConcepts: [],
-        isCustom: true,
-        addedAt: timestamp,
-      };
-
-      window.localStorage.setItem(CUSTOM_BLOCKS_KEY, JSON.stringify([nextBlock, ...nextBlocks]));
-      resetDraft("block");
-      setIsModalOpen(false);
-      return;
-    }
-
-    const cluster =
-      conceptUniverse.clusters.find((item) => item.id === draft.clusterId) ??
-      conceptUniverse.clusters[0];
-    const nextConcepts = JSON.parse(window.localStorage.getItem(CUSTOM_CONCEPTS_KEY) ?? "[]");
-    const nextConcept = {
-      id: `custom-concept-${slugify(draft.name)}-${Date.now()}`,
-      name: draft.name.trim(),
-      summary: draft.desc.trim() || `${draft.name.trim()} 的概念摘要`,
-      detail: draft.desc.trim() || `${draft.name.trim()} 的概念说明`,
-      importance: 3,
-      english: "",
-      chinese: "",
-      domain: cluster?.label ?? conceptUniverse.clusters[0]?.label ?? "",
-      theme: cluster?.theme ?? "violet",
-      related: [],
-      isCustom: true,
-      addedAt: timestamp,
-    };
-
-    window.localStorage.setItem(CUSTOM_CONCEPTS_KEY, JSON.stringify([nextConcept, ...nextConcepts]));
-    resetDraft("concept");
-    setIsModalOpen(false);
   }
 
   function handleReset() {
@@ -622,7 +617,13 @@ export default function Dashboard() {
               </div>
               <label>
                 名称
-                <input name="name" type="text" value={draft.name} onChange={handleDraftChange} placeholder="例如：飞书后台" />
+                <input
+                  name="name"
+                  type="text"
+                  value={draft.name}
+                  onChange={handleDraftChange}
+                  placeholder={draftType === "tool" ? "例如：飞书后台" : draftType === "block" ? "例如：Browser Use" : "例如：RAG"}
+                />
               </label>
               {draftType === "tool" ? (
                 <label>
@@ -631,7 +632,7 @@ export default function Dashboard() {
                 </label>
               ) : null}
               <label>
-                分类
+                {draftType === "concept" ? "类别" : "分类"}
                 <select name={draftType === "concept" ? "clusterId" : "cat"} value={draftType === "concept" ? draft.clusterId : draft.cat} onChange={handleDraftChange}>
                   {(draftType === "tool"
                     ? categories.filter((category) => category !== "All").map((category) => ({ value: category, label: categoryLabels[category] ?? category }))
@@ -645,19 +646,28 @@ export default function Dashboard() {
                 </select>
               </label>
               <label>
-                备注
-                <input name="desc" type="text" value={draft.desc} onChange={handleDraftChange} placeholder="一句话说明用途" />
+                梗概
+                <input
+                  name="desc"
+                  type="text"
+                  value={draft.desc}
+                  onChange={handleDraftChange}
+                  placeholder={draftType === "tool" ? "一句话说明用途" : "先记下关键描述，可留空"}
+                />
               </label>
-              <p className="modal-hint">新增内容先保存在浏览器本地，可直接导出为 JSON，后续再统一补齐和网络化。</p>
+              <p className="modal-hint">提交后会写入仓库 JSON。网站可直接使用，积木和概念后续再由你本地拉取做补全、关联和网络化。</p>
               <div className="modal-actions">
                 <button className="secondary-button" type="button" onClick={() => setIsModalOpen(false)}>
                   取消
                 </button>
-                <button className="secondary-button" type="button" onClick={handleExportDraftType}>
-                  导出本地新增
-                </button>
-                <button className="primary-button" type="submit">
-                  {draftType === "tool" ? "保存网站" : draftType === "block" ? "保存积木" : "保存概念"}
+                <button className="primary-button" type="submit" disabled={isSubmitting}>
+                  {isSubmitting
+                    ? "提交中..."
+                    : draftType === "tool"
+                      ? "保存网站"
+                      : draftType === "block"
+                        ? "保存积木"
+                        : "保存概念"}
                 </button>
               </div>
             </form>
