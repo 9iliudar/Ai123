@@ -731,23 +731,6 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
           </div>
         </div>
 
-        <div className="universe-filter-row">
-          <button
-            type="button"
-            className={`universe-filter-chip ${activeFreshness === RECENT_FRESHNESS ? "active" : ""}`}
-            onClick={() => setActiveFreshness(RECENT_FRESHNESS)}
-          >
-            最近添加 · {recentConceptCount}
-          </button>
-          <button
-            type="button"
-            className={`universe-filter-chip ${activeFreshness === ALL_FRESHNESS ? "active" : ""}`}
-            onClick={() => setActiveFreshness(ALL_FRESHNESS)}
-          >
-            全部概念
-          </button>
-        </div>
-
         {searchResults.length ? (
           <div className="universe-search-panel">
             {searchResults.map((node) => (
@@ -861,6 +844,24 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
           <div className="universe-stats">
             <span>总词条：{conceptUniverse.nodes.length}</span>
             <span>当前节点：{centerNode.name}</span>
+          </div>
+
+          <div className="universe-filter-row">
+            <button
+              type="button"
+              className={`universe-filter-chip ${activeFreshness === RECENT_FRESHNESS ? "active" : ""}`}
+              onClick={() => setActiveFreshness(RECENT_FRESHNESS)}
+            >
+              最近添加
+              <span>{recentConceptCount}</span>
+            </button>
+            <button
+              type="button"
+              className={`universe-filter-chip ${activeFreshness === ALL_FRESHNESS ? "active" : ""}`}
+              onClick={() => setActiveFreshness(ALL_FRESHNESS)}
+            >
+              全部概念
+            </button>
           </div>
 
           <div className="universe-category-panel" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>

@@ -2475,12 +2475,49 @@ select {
 
 .universe-filter-row {
   position: absolute;
-  top: 92px;
   left: 28px;
+  bottom: 72px;
   z-index: 4;
   display: flex;
   gap: 8px;
   pointer-events: auto;
+}
+
+.universe-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 999px;
+  background: rgba(8, 11, 19, 0.5);
+  color: #aeb9c8;
+  font-size: 0.76rem;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    opacity 180ms ease;
+}
+
+.universe-filter-chip span {
+  color: #f8fafc;
+  opacity: 0.72;
+  font-size: 0.72rem;
+}
+
+.universe-filter-chip.active {
+  border-color: color-mix(in srgb, var(--universe-accent, #c4b5fd) 28%, rgba(255, 255, 255, 0.08));
+  background: color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 42%, rgba(8, 11, 19, 0.56));
+  color: #f8fafc;
+}
+
+.universe-filter-chip:hover {
+  border-color: color-mix(in srgb, var(--universe-accent, #c4b5fd) 18%, rgba(255, 255, 255, 0.1));
+  color: #f8fafc;
 }
 
 .universe-search {
@@ -3422,6 +3459,17 @@ select {
     bottom: 78px;
     left: 12px;
     right: 12px;
+  }
+
+  .universe-filter-row {
+    left: 12px;
+    bottom: 114px;
+    gap: 6px;
+  }
+
+  .universe-filter-chip {
+    padding: 7px 10px;
+    font-size: 0.72rem;
   }
 
   .universe-controls {
