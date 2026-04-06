@@ -462,6 +462,481 @@ const BLOCK_OVERRIDES = {
   },
 };
 
+const OFFICIAL_DESCRIPTION_OVERRIDES = {
+  crewai: {
+    summary:
+      "crewAI 官方把自己定义成面向多智能体自动化的轻量高性能 Python 框架，强调从零构建、独立于 LangChain，并同时提供 Crews 与 Flows 两套组织方式。",
+    solves:
+      "它主要解决多角色 agent 的协作组织问题，不只是让几个模型轮流说话，而是把角色、任务委派、事件流和生产级流程控制放进同一框架。",
+    bestFor:
+      "最适合先拿来做角色分工明确的多智能体流程，比如调研团队、内容生产链、分析协作流，或者需要把 autonomous crews 和 event-driven flows 结合起来的任务。",
+  },
+  openmanus: {
+    summary:
+      "OpenManus 官方定位很克制，核心就是开源版 Manus 路线探索，强调开放实现与通用任务执行能力，而不是一个已经完全产品化的现成系统。",
+    solves:
+      "它尝试解决通用代理如何把规划、工具使用、网页/环境操作和长任务推进整合成一个开放可研究框架的问题。",
+    bestFor:
+      "最适合先拿来研究通用执行型 agent 的系统结构，尤其是任务拆解、环境交互和多步推进这条链路，而不是期待它像成熟 SaaS 一样开箱即用。",
+  },
+  stagehand: {
+    summary:
+      "Stagehand 官方直接把自己定义为 AI Browser Automation Framework，目标是让浏览器自动化以 AI 原生方式进入开发者工作流。",
+    solves:
+      "它解决的是浏览器控制过于底层、脚本脆弱的问题，把页面理解、动作执行和自动化接口包装成更适合工程团队复用的框架层。",
+    bestFor:
+      "最适合先拿来做开发者可控的浏览器自动化底座，比如把 Playwright 式自动化升级成带语义理解的网页执行层，或给产品里的 browser agent 提供工程接口。",
+  },
+  crawl4ai: {
+    summary:
+      "Crawl4AI 官方定位是开源、LLM-friendly 的 Web Crawler & Scraper，核心不是传统爬虫规模，而是让网页内容更适合后续 Agent 与 RAG 消费。",
+    solves:
+      "它解决的是原始网页抓下来后并不适合模型使用的问题，把抓取、清洗、结构化和面向 LLM 的输出组织到同一采集链路里。",
+    bestFor:
+      "最适合先拿来做知识采集前置层，把网站、文档站和内容页转成更适合切片、索引和检索的材料，再接 RAG 或 agent 系统。",
+  },
+  firecrawl: {
+    summary:
+      "Firecrawl 官方定位是给 AI 提供干净网页数据的 Web Data API，支持 search、scrape、interact，并强调大规模、实时、LLM-ready 输出。",
+    solves:
+      "它解决的是网页数据采集又脏又碎的问题，把 JS 重页面、代理、限流、结构化输出和网页交互都封成统一 API，让 agent 直接拿到可用网页数据。",
+    bestFor:
+      "最适合先拿来做网站到知识库的采集层、实时网页搜索/抓取服务，或者给 agent 提供稳定的网页数据与页面动作能力。",
+  },
+  "ui-tars": {
+    summary:
+      "UI-TARS 官方定位是原生 GUI Agent 模型路线，重点在于用统一代理模型处理图形界面理解、操作，甚至延展到游戏、代码和工具使用。",
+    solves:
+      "它解决的是模型如何真正读懂屏幕、定位控件并执行图形界面动作，而不是只在文本接口里调用 API。",
+    bestFor:
+      "最适合先拿来研究 GUI Agent 的原生模型能力边界，比如桌面操作、复杂界面控制、跨应用任务，以及视觉 grounding 的可靠性。",
+  },
+  "ui-tars-desktop": {
+    summary:
+      "UI-TARS Desktop 官方把自己定义成开源多模态 AI Agent 栈，目标是把前沿模型能力、Agent infra 与本地设备执行体验连接起来。",
+    solves:
+      "它解决的是 GUI Agent 只停留在论文或脚本层的问题，进一步提供面向本地个人设备的桌面化运行栈和更完整的代理执行环境。",
+    bestFor:
+      "最适合先拿来验证本地桌面 agent 体验，尤其是个人设备上的操作链路、模型接入、代理运行框架和实际可用性。",
+  },
+  "open-interpreter": {
+    summary:
+      "Open Interpreter 官方定义非常清楚，就是给电脑提供自然语言接口，让 LLM 能在本地运行 Python、JavaScript、Shell 等代码。",
+    solves:
+      "它解决的是模型只能停在文本建议层的问题，把代码执行权接到本地计算环境，让代理能真正操作文件、数据、浏览器和系统能力。",
+    bestFor:
+      "最适合先拿来做个人电脑上的执行型助手，比如数据分析、批量处理、文件转换、脚本自动化和本地研究任务。",
+  },
+  flowise: {
+    summary:
+      "Flowise 官方定位很直接，就是可视化构建 AI Agents 的平台，强调用图形方式搭建 agent 与 LLM 应用。",
+    solves:
+      "它解决的是 AI 工作流原型搭建门槛偏高的问题，让节点式编排、调试和组装 agent 逻辑变得更直接。",
+    bestFor:
+      "最适合先拿来做 AI agent 原型、演示流和快速验证链路，尤其适合需要让非深度工程化用户也能看懂和参与搭建的场景。",
+  },
+  langflow: {
+    summary:
+      "Langflow 官方把自己定义成构建与部署 AI-powered agents and workflows 的强力工具，重点是可视化、可部署，而不只是画流程图。",
+    solves:
+      "它解决的是复杂 agent/workflow 难以表达和调试的问题，把组件连接、运行结果和部署出口统一在一个可视化开发环境里。",
+    bestFor:
+      "最适合先拿来做需要边搭边调的 agent 流程、教学演示、团队沟通原型，或者把 LangChain 生态链路可视化落地。",
+  },
+  haystack: {
+    summary:
+      "Haystack 官方现在的定位是开源 AI orchestration framework，强调构建 context-engineered、production-ready 的 LLM 应用，覆盖 RAG、agents、multimodal 与 search。",
+    solves:
+      "它解决的是生产级 LLM 应用需要显式控制检索、路由、记忆和生成的问题，而不是把这些步骤混在一条黑盒链里。",
+    bestFor:
+      "最适合先拿来做生产级 RAG、搜索问答、模块化 agent pipeline，或者需要对 retrieval 和 routing 保持明确控制的系统。",
+  },
+  "llama-index": {
+    summary:
+      "LlamaIndex 官方现在把自己同时定义成开源 agentic application framework，以及面向 OCR、parsing、extraction、indexing 的企业平台入口。",
+    solves:
+      "它解决的是非结构化数据如何进入 agent 系统的问题，把解析、抽取、索引和后续代理访问衔接成一整套文档到 agent 的链路。",
+    bestFor:
+      "最适合先拿来做文档 agent、知识系统和数据接入中间层，尤其适合文档解析与 agent 检索需要一起设计的场景。",
+  },
+  hayhooks: {
+    summary:
+      "Mem0 官方直接把自己定位成 AI Agents 的 universal memory layer，并强调长时记忆的准确率、速度和 token 效率。",
+    solves:
+      "它解决的是 agent 无法在长期交互里稳定记住用户、偏好和历史决策的问题，把记忆抽取、存储和召回独立成一层。",
+    bestFor:
+      "最适合先拿来给个性化助手、长期研究代理和多轮协作系统补长期记忆，而不是把所有历史都硬塞进上下文窗口。",
+  },
+  "anything-llm": {
+    summary:
+      "AnythingLLM 官方定位是 all-in-one AI productivity accelerator，强调本地优先、隐私优先、多用户、Agent 与文档问答的一体化体验。",
+    solves:
+      "它解决的是团队或个人想要一套现成 AI 工作台时，需要自己拼知识库、模型接入、代理和权限体验的问题。",
+    bestFor:
+      "最适合先拿来搭内部 AI 工作台、文档问答空间和本地隐私优先的知识助手，而不是从底层框架慢慢拼。",
+  },
+  graphrag: {
+    summary:
+      "GraphRAG 官方定位是 modular、graph-based 的 RAG 系统，本质上是一套从非结构化文本提取结构化图信息的数据管线与转换框架。",
+    solves:
+      "它解决的是普通向量检索难处理复杂实体关系和全局总结的问题，让私有数据先被整理成图式结构，再服务后续推理。",
+    bestFor:
+      "最适合先拿来做复杂关系型知识库、多实体多跳问答和需要全局主题归纳的私有数据检索场景。",
+  },
+  mcpo: {
+    summary:
+      "mcpo 官方定位是 simple、secure 的 MCP-to-OpenAPI proxy server，作用就是把任意 MCP 工具瞬间暴露成 OpenAPI 兼容 HTTP 服务。",
+    solves:
+      "它解决的是 MCP 工具天然跑在 stdio/raw protocol 上，不方便和现有 OpenAPI 工具链、鉴权、文档和 HTTP 系统集成的问题。",
+    bestFor:
+      "最适合先拿来把 MCP 工具接入现有 REST/OpenAPI 世界，比如给 agent 平台、网关、内部服务或前端系统提供标准 HTTP 入口。",
+  },
+  ollama: {
+    summary:
+      "Ollama 官方定位始终很实用，就是让你在本地快速跑起各类开源模型，并提供统一的模型下载、运行和 API 访问体验。",
+    solves:
+      "它解决的是本地模型运行门槛高、环境碎片化的问题，把模型获取、推理服务和本地调用统一成非常低门槛的一层。",
+    bestFor:
+      "最适合先拿来做本地模型实验、隐私优先原型、边缘演示和个人工作台的模型运行入口。",
+  },
+  vllm: {
+    summary:
+      "vLLM 官方定位是高吞吐、内存高效的 LLM inference and serving engine，核心价值是把大模型服务性能做上去。",
+    solves:
+      "它解决的是 LLM 推理服务在吞吐、显存利用和并发场景下成本过高的问题，为生产部署提供更强的 serving 底座。",
+    bestFor:
+      "最适合先拿来做高并发模型服务、统一推理集群和面向生产的开源模型部署，而不是单机试玩。",
+  },
+  sglang: {
+    summary:
+      "SGLang 官方定位是面向大模型与多模态模型的高性能 serving framework，强调推理性能、模型支持与程序化生成控制。",
+    solves:
+      "它解决的是高性能推理和可控生成逻辑往往分离的问题，把 serving、调度和更程序化的生成表达整合在一套框架里。",
+    bestFor:
+      "最适合先拿来做对推理吞吐和输出控制都要求高的服务，比如结构化生成、多模态推理服务和高性能在线推理。",
+  },
+  chroma: {
+    summary:
+      "Chroma 官方给自己的定位很基础但准确，就是面向 AI 的数据基础设施，用来承接向量检索和语义记忆这类核心数据能力。",
+    solves:
+      "它解决的是早期 AI 应用需要一个上手快、接口简单、能直接接 embeddings 与检索链路的数据底座的问题。",
+    bestFor:
+      "最适合先拿来做语义检索原型、轻量知识库和本地 RAG 验证，尤其适合先把检索链路跑通。",
+  },
+  markitdown: {
+    summary:
+      "MarkItDown 官方定位是把文件和 Office 文档转换成 Markdown 的 Python 工具，现在还提供 MCP server 形态供 LLM 应用直接接入。",
+    solves:
+      "它解决的是各类文档格式在进入模型前难以统一清洗的问题，把文档先尽量标准化为 Markdown，便于后续切片、索引和引用。",
+    bestFor:
+      "最适合先拿来做文档预处理和格式归一化，把 PDF、Office、网页附件等先转成 AI 友好的中间文本层。",
+  },
+  aider: {
+    summary:
+      "Aider 官方定位非常明确，就是终端里的 AI pair programming 工具，既能从零起项目，也能直接在现有代码库里协作改代码。",
+    solves:
+      "它解决的是开发者想在终端里直接让模型改真实仓库代码的问题，尤其强调代码库映射、文件修改和与 git 工作流配合。",
+    bestFor:
+      "最适合先拿来做个人高频编码协作，在真实仓库里做多文件修改、重构和快速迭代，而不是只拿它聊天。",
+  },
+  continue: {
+    summary:
+      "Continue 当前官方定位已经转向 source-controlled AI checks，可在 CI 中强制执行，核心不再只是 IDE 聊天补全，而是代码库级 AI 检查。",
+    solves:
+      "它解决的是团队如何把 AI 检查规则固化进仓库和 CI，让 AI 能力变成可审查、可复现、可执行的工程约束，而不是每个人各自临时提问。",
+    bestFor:
+      "最适合先拿来做仓库级 AI 审查、规范检查和 CI 里的 AI 验证流程，特别适合重视团队一致性的代码库。",
+  },
+  "bolt-diy": {
+    summary:
+      "bolt.diy 官方定位是用任意 LLM 去 prompt、run、edit、deploy 全栈 Web 应用的开源环境，主轴是生成式建站/造应用。",
+    solves:
+      "它解决的是从一句需求到可运行全栈应用之间链路太长的问题，把生成、运行、编辑和部署都收进一个交互式开发面板。",
+    bestFor:
+      "最适合先拿来做生成式网页和全栈原型，尤其适合验证『一句话到应用』这种交互路线是否足够顺手。",
+  },
+  cline: {
+    summary:
+      "Cline 官方定位是 IDE 里的 autonomous coding agent，在你授权下能创建/编辑文件、执行命令、用浏览器并持续推进任务。",
+    solves:
+      "它解决的是 IDE 内代码助手只能说建议、很难真推进任务的问题，把文件、终端、浏览器和审批式执行闭环串起来。",
+    bestFor:
+      "最适合先拿来做 IDE 内的执行型开发任务，比如修 bug、改多文件、跑命令和浏览器辅助调试。",
+  },
+  comfyui: {
+    summary:
+      "ComfyUI 官方定位是最强大、最模块化的 diffusion model GUI / API / backend，核心是图节点式工作流而不是单一界面。",
+    solves:
+      "它解决的是图像生成链路复杂、参数多、流程难复用的问题，把扩散模型的推理过程拆成可组合、可保存、可复用的节点图。",
+    bestFor:
+      "最适合先拿来做图像/视频生成工作流、复杂提示链和多模型组合实验，尤其适合需要重复复用生成流程的场景。",
+  },
+  llava: {
+    summary:
+      "LLaVA 官方定位是 Large Language and Vision Assistant，核心贡献是 visual instruction tuning，把视觉理解推进到更接近 GPT-4V 风格的交互能力。",
+    solves:
+      "它解决的是开源模型在图文联合理解上的能力构建问题，为视觉问答、图像理解和多模态 agent 提供代表性基础模型路线。",
+    bestFor:
+      "最适合先拿来研究开源视觉语言模型能力边界，或给多模态问答、GUI 感知与视觉代理提供底层模型参考。",
+  },
+  lerobot: {
+    summary:
+      "LeRobot 官方定位是让机器人 AI 更易进入的开源库，提供真实世界机器人所需的模型、数据集与工具，并强调硬件无关接口。",
+    solves:
+      "它解决的是机器人学习缺少统一数据、控制接口和可复用工具的问题，把数据集、预训练模型、控制接口和训练工具组织成一套库。",
+    bestFor:
+      "最适合先拿来做机器人学习实验底座，尤其是数据集组织、策略训练与跨硬件控制接口标准化。",
+  },
+  openvla: {
+    summary:
+      "OpenVLA 官方定位是开源 vision-language-action 模型与训练/微调代码库，目标是服务通用机器人操作任务。",
+    solves:
+      "它解决的是机器人从视觉与语言输入直接映射到动作输出的统一建模问题，并给出可扩展训练与微调代码路径。",
+    bestFor:
+      "最适合先拿来研究 VLA 路线在通用机器人操作中的可行性，或做面向 manipulation 的训练与微调实验。",
+  },
+  langchain: {
+    summary:
+      "LangChain 官方目前的定位是 agent engineering platform 的核心框架层，用来构建 agents 与 LLM-powered applications，并强调可互操作组件。",
+    solves:
+      "它解决的是 AI 应用开发时模型、工具、检索与外部集成碎片化的问题，把常用抽象与生态连接器统一到一个框架里。",
+    bestFor:
+      "最适合先拿来做需要大量第三方集成和组件拼装的 LLM 应用，尤其是 Python 生态里的 agent 与工具链原型。",
+  },
+  deepagents: {
+    summary:
+      "Deep Agents 官方定位是 batteries-included agent harness，主打开箱即用的 planning、filesystem、shell access、sub-agents 和上下文管理。",
+    solves:
+      "它解决的是自己从零拼执行型 agent 太繁琐的问题，直接给出一个 ready-to-run 的深执行代理骨架。",
+    bestFor:
+      "最适合先拿来做复杂任务代理原型，尤其是需要规划、读写文件、跑命令和拆分子代理的场景。",
+  },
+  "pydantic-ai": {
+    summary:
+      "PydanticAI 官方定位是 Pydantic 风格的 GenAI Agent Framework，强调类型、安全感和生产级工作流，而不是随意脚本式 agent。",
+    solves:
+      "它解决的是生成式 AI 应用在结构化输入输出、验证、可维护性和生产化上的工程问题。",
+    bestFor:
+      "最适合先拿来做对类型约束、结构化结果和生产级稳定性有要求的 Python agent 与 workflow 系统。",
+  },
+  mastra: {
+    summary:
+      "Mastra 官方定位是面向现代 TypeScript 栈的 AI-powered applications and agents framework，而且不止 agents，还内置 model routing、workflows、memory、MCP、evals 和 observability。",
+    solves:
+      "它解决的是 TS 团队搭 AI 应用时要在 agents、workflow、memory、MCP 与生产治理间自己拼装的问题，提供更完整的一体化框架。",
+    bestFor:
+      "最适合先拿来做 TypeScript/Next.js 团队的 agent 应用底座，尤其适合既要 agents 又要 workflow、观测和 MCP 的项目。",
+  },
+  activepieces: {
+    summary:
+      "Activepieces 官方现在强调 AI Agents、MCPs 与 AI Workflow Automation，正在把连接器、MCP 服务和自动化流程收进一个开源平台。",
+    solves:
+      "它解决的是业务自动化平台和 agent 工具体系割裂的问题，把连接器、AI 步骤与 MCP 工具统一进自动化平台。",
+    bestFor:
+      "最适合先拿来做面向业务方的自动化平台，尤其是需要连接器、MCP 和 AI 流程一起出现的场景。",
+  },
+  "trigger-dev": {
+    summary:
+      "Trigger.dev 官方定位已非常明确，就是 build and deploy fully-managed AI agents and workflows，底层强调可管理的后台执行系统。",
+    solves:
+      "它解决的是长任务、重试、排队、恢复和后台可观测性这些生产执行问题，让 AI workflow 不必靠脆弱脚本硬撑。",
+    bestFor:
+      "最适合先拿来做需要后台持久执行的 agent/workflow，比如异步处理、批量任务、长链路自动化与可重试任务系统。",
+  },
+  "lobe-chat": {
+    summary:
+      "LobeHub 官方最新定位已经不只是聊天前端，而是围绕 agent teammates 的工作与生活空间，强调多 agent 协作、Agent Builder 与把 agent 作为工作单元。",
+    solves:
+      "它解决的是今天很多 AI 工具彼此割裂、上下文分散的问题，试图把模型、技能、知识、协作与多 agent 工作空间统一起来。",
+    bestFor:
+      "最适合先拿来研究高完成度 AI 工作台和 agent 协作界面，尤其适合多模型、多技能、多 agent 的长期使用入口。",
+  },
+  ragflow: {
+    summary:
+      "RAGFlow 官方定位是融合前沿 RAG 与 Agent 能力的开源 RAG engine，目标是给 LLM 提供更强的 context layer。",
+    solves:
+      "它解决的是企业 RAG 不只是检索，还要文档解析、索引、上下文编排和代理能力协同的问题。",
+    bestFor:
+      "最适合先拿来做企业级知识问答和上下文引擎，尤其适合对文档解析与 RAG 整体闭环要求较高的场景。",
+  },
+  "mcp-servers": {
+    summary:
+      "MCP Servers 官方仓库定位很清楚，就是 MCP 的参考实现集合，而不是生产服务市场本身。",
+    solves:
+      "它解决的是开发者学习 MCP 时缺少权威样板的问题，提供由 steering group 维护的 reference servers 和相关资源入口。",
+    bestFor:
+      "最适合先拿来学习 MCP 协议落地方式、对照官方参考实现，或作为自建 MCP server 的起点样板。",
+  },
+  "mcp-typescript-sdk": {
+    summary:
+      "MCP TypeScript SDK 官方定位是 Model Context Protocol 的官方 TypeScript SDK，用于编写 MCP clients 和 servers。",
+    solves:
+      "它解决的是 TS 开发者实现 MCP 协议需要从规范层自己抠细节的问题，提供官方支持的协议实现与开发接口。",
+    bestFor:
+      "最适合先拿来做自定义 MCP server/client、协议接入层和 TypeScript 生态下的 MCP 工具开发。",
+  },
+  "firecrawl-mcp": {
+    summary:
+      "Firecrawl MCP 官方定位是 Firecrawl 的 MCP server，把网页抓取、搜索、研究和浏览器能力直接暴露给 Claude、Cursor 等 LLM 客户端。",
+    solves:
+      "它解决的是 Firecrawl 网页能力难以直接进入 MCP 工具链的问题，让 agent 通过标准 MCP 协议获得网页抓取与搜索能力。",
+    bestFor:
+      "最适合先拿来给 Claude Desktop、Cursor 或自建 MCP agent 增加网页抓取、深度研究和批量采集能力。",
+  },
+  langchainjs: {
+    summary:
+      "LangChain.js 官方与 Python 版一致，定位仍是 agent engineering platform 的 JS/TS 框架层，用统一组件构建 LLM 应用。",
+    solves:
+      "它解决的是 JS/TS 团队在模型、工具、检索与集成方面缺少统一抽象的问题，让 Web 技术栈也能顺手搭 agent 应用。",
+    bestFor:
+      "最适合先拿来做 Node/TypeScript 侧的 agent、RAG 与工具链应用，尤其是前后端统一技术栈的项目。",
+  },
+  maxun: {
+    summary:
+      "Maxun 官方定位是开源 no-code 平台，可把任意网站快速转成结构化 API，强调 scraping、crawling、search 与 AI data extraction。",
+    solves:
+      "它解决的是网页数据采集和结构化提取过于工程化的问题，把网站转 API 这件事降到更配置化、更产品化的层级。",
+    bestFor:
+      "最适合先拿来做无代码网页数据采集、网站到 API 转换和业务侧可操作的数据提取平台。",
+  },
+  composio: {
+    summary:
+      "Composio 官方定位是 agent action layer，提供 1000+ toolkits、tool search、context management、auth 与 sandboxed workbench，让 agent 真正把意图变成动作。",
+    solves:
+      "它解决的是 agent 接第三方工具时认证、上下文和执行环境过于分散的问题，把大量 SaaS/API 集成收束成统一动作层。",
+    bestFor:
+      "最适合先拿来做需要大量第三方工具接入的 agent 系统，尤其是要统一鉴权、工具发现和执行环境的时候。",
+  },
+  "simular-ai-agent-s": {
+    summary:
+      "Agent S 官方定位是 open agentic framework that uses computers like a human，并持续围绕 OSWorld 这类基准推进 GUI/computer-use 能力。",
+    solves:
+      "它解决的是代理如何像人一样在真实计算机环境中感知并操作界面的难题，重点是 computer-use 路线的系统化实现。",
+    bestFor:
+      "最适合先拿来研究 computer-use agent 的通用桌面操作能力，以及对 GUI Agent 路线做横向对比。",
+  },
+  "open-evolve": {
+    summary:
+      "OpenEvolve 官方直接把自己定义成最先进的开源 evolutionary coding agent，目标是把 LLM 变成 autonomous code optimizer。",
+    solves:
+      "它解决的是代码优化往往依赖人工试错的问题，让模型围绕目标指标持续生成、评估和演化候选方案。",
+    bestFor:
+      "最适合先拿来做算法优化、性能优化和研究型代码搜索，尤其适合有明确评价函数的任务。",
+  },
+  docling: {
+    summary:
+      "Docling 官方定位是让文档为 GenAI 做好准备，重点在于多格式解析、先进 PDF 理解和统一文档表示。",
+    solves:
+      "它解决的是复杂文档进入 AI 系统前解析质量不足的问题，尤其擅长版面、阅读顺序、表格、公式和代码结构理解。",
+    bestFor:
+      "最适合先拿来做高质量文档解析和知识接入前处理，特别适合 PDF、报告和复杂版面材料。",
+  },
+  mineru: {
+    summary:
+      "MinerU 官方定位是高精度文档解析引擎，面向 LLM、RAG 与 Agent 工作流，把 PDF、Word、PPT、图片、网页等转成结构化 Markdown/JSON。",
+    solves:
+      "它解决的是复杂文档难以高质量进入 RAG/Agent 系统的问题，尤其强调 VLM+OCR 双引擎、多语言和面向工作流集成。",
+    bestFor:
+      "最适合先拿来做复杂文档解析、学术资料清洗和需要高精度结构化输出的知识接入任务。",
+  },
+  supervision: {
+    summary:
+      "Supervision 官方定位很实在，就是一套可复用 computer vision tools，用来做数据集加载、检测结果可视化、区域计数等视觉后处理。",
+    solves:
+      "它解决的是视觉项目里大量重复但必要的工程工具问题，把标注后处理、可视化、评估和视频/图像操作做成统一工具层。",
+    bestFor:
+      "最适合先拿来做 CV 项目的工程辅助层，比如检测结果可视化、区域统计、数据集处理和评估管线。",
+  },
+  smolagents: {
+    summary:
+      "smolagents 官方定位是 barebones library for agents that think in code，主打极简抽象、少量代码和一等公民的 Code Agents。",
+    solves:
+      "它解决的是很多 agent 框架过重的问题，用最轻的抽象先把工具型 agent 跑起来，并支持安全沙箱执行代码动作。",
+    bestFor:
+      "最适合先拿来做轻量 agent 原型、教学实验和代码型代理验证，尤其适合想低心智负担上手 agent 的场景。",
+  },
+  "openai-agents-python": {
+    summary:
+      "OpenAI Agents SDK Python 官方定位是轻量但强大的 multi-agent workflow 框架，支持 provider-agnostic 模型接入，并明确提供 agents、handoffs、tools、guardrails 与 tracing。",
+    solves:
+      "它解决的是多代理工作流从对话脚本走向工程系统时，缺少清晰 handoff、guardrails 和 tracing 结构的问题。",
+    bestFor:
+      "最适合先拿来做需要多代理协作、工具调用、安全护栏和追踪能力的 Python agent 系统。",
+  },
+  "openai-agents-js": {
+    summary:
+      "OpenAI Agents SDK JS 官方定位是面向 JavaScript/TypeScript 的轻量多代理工作流框架，并进一步覆盖 voice agents 场景。",
+    solves:
+      "它解决的是 JS/TS 团队在多代理、工具调用和实时语音代理方面缺少统一框架的问题。",
+    bestFor:
+      "最适合先拿来做 Web/Node 里的多代理应用和语音代理，尤其适合前后端统一用 TypeScript 的项目。",
+  },
+  "livekit-agents": {
+    summary:
+      "LiveKit Agents 官方定位是用于构建 realtime voice AI agents 的框架，强调服务器端可编程参与者、WebRTC 生态和多模态实时交互。",
+    solves:
+      "它解决的是实时语音 agent 需要把 STT、LLM、TTS、调度和终端接入统一起来的问题。",
+    bestFor:
+      "最适合先拿来做电话/语音助手、实时多模态客服和需要低延迟音视频交互的 agent 产品。",
+  },
+  pipecat: {
+    summary:
+      "Pipecat 官方定位是实时语音与多模态对话 AI 的开源框架，强调把音视频、AI 服务、传输层和 conversation pipelines 编排起来。",
+    solves:
+      "它解决的是实时会话系统中语音、视频、STT、TTS、LLM 与 transport 难以顺畅编成一个低延迟管线的问题。",
+    bestFor:
+      "最适合先拿来做实时语音代理、多模态会话系统和需要灵活替换音视频/模型组件的产品原型。",
+  },
+  moshi: {
+    summary:
+      "Moshi 官方定位是面向实时对话的 speech-text foundation model 与全双工 spoken dialogue framework，并提供研究、端侧与生产三套推理栈。",
+    solves:
+      "它解决的是实时语音对话需要可打断、低延迟、自然双向交流的问题，目标不是语音转文本，而是更接近真人对话的语音模型体验。",
+    bestFor:
+      "最适合先拿来研究全双工语音对话和实时 spoken dialogue 的体验边界，或为语音 agent 提供底层模型路线参考。",
+  },
+  inngest: {
+    summary:
+      "Inngest 官方定位是 workflow orchestration platform，可在 serverless、servers 或 edge 上运行有状态 step functions 与 AI workflows。",
+    solves:
+      "它解决的是后台长任务、状态恢复、调度与 AI workflow 执行缺少统一编排的问题。",
+    bestFor:
+      "最适合先拿来做耐久任务系统、后端 AI workflow 和需要可重试可恢复的生产执行引擎。",
+  },
+  "agent-kit": {
+    summary:
+      "AgentKit 官方定位是用 TypeScript 构建 multi-agent networks 的工具，强调 deterministic routing、typed state、MCP 与 Inngest 编排结合。",
+    solves:
+      "它解决的是 TS 多代理系统难以在可控路由、共享状态和容错执行之间兼得的问题。",
+    bestFor:
+      "最适合先拿来做需要确定性路由和工作流编排的 TS 多代理系统，尤其适合和 Inngest 一起落地。",
+  },
+  "llama-factory": {
+    summary:
+      "LLaMA-Factory 官方定位是统一、高效微调 100+ LLM 与 VLM 的训练平台，覆盖 LoRA、QLoRA、DPO 等主流路线。",
+    solves:
+      "它解决的是开源模型训练与微调流程过于分散的问题，把数据、方法、训练、对齐和实验管理统一进一套平台。",
+    bestFor:
+      "最适合先拿来做开源模型微调、对齐实验和训练工作流标准化，尤其适合多模型多方法并行验证。",
+  },
+  "openvino-genai": {
+    summary:
+      "OpenVINO GenAI 官方定位是运行主流生成式 AI 模型的库，提供简单 C++/Python API，并在 OpenVINO Runtime 上做 PC/端侧资源优化。",
+    solves:
+      "它解决的是生成式模型在 PC、CPU、GPU、NPU 等端侧环境运行复杂且资源开销高的问题。",
+    bestFor:
+      "最适合先拿来做本地 PC、边缘设备和资源受限环境下的生成式 AI 推理与应用部署。",
+  },
+  "roboflow-inference": {
+    summary:
+      "Roboflow Inference 官方定位是把任意电脑或边缘设备变成 CV 项目指挥中心的部署/运行框架，强调边缘与实时视觉工作流。",
+    solves:
+      "它解决的是视觉模型从训练结果到实际摄像头、设备和工作流部署之间的工程落地问题。",
+    bestFor:
+      "最适合先拿来做边缘视觉部署、摄像头接入和实时 CV workflow，把模型真正接进设备侧场景。",
+  },
+};
+
 function joinList(items) {
   return items.filter(Boolean).join("、");
 }
@@ -477,7 +952,10 @@ function deriveBestFor(block) {
 
 function enrichBlock(block) {
   const lens = CATEGORY_LENS[block.category] ?? CATEGORY_LENS.Agent;
-  const override = BLOCK_OVERRIDES[block.id] ?? {};
+  const override = {
+    ...(BLOCK_OVERRIDES[block.id] ?? {}),
+    ...(OFFICIAL_DESCRIPTION_OVERRIDES[block.id] ?? {}),
+  };
 
   return {
     ...block,
