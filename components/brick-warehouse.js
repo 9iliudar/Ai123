@@ -461,6 +461,12 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   const selectedRecords = selectedBlock ? [...(blockState[selectedBlock.id]?.records ?? [])].reverse() : [];
 
   async function persistBlockState(nextState) {
+    const normalizedSyncCode = syncCode.trim();
+
+    if (!normalizedSyncCode) {
+      return false;
+    }
+
     try {
       const response = await fetch("/api/save-block-state", {
         method: "POST",
@@ -469,11 +475,15 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
         },
         body: JSON.stringify({
           state: nextState,
-          syncCode,
+          syncCode: normalizedSyncCode,
         }),
       });
 
-      const payload = await response.json();
+      if (!response.ok) {
+        return false;
+      }
+
+      return true;
 
       if (!response.ok) {
         throw new Error(payload.message || "保存研究状态失败");
@@ -483,10 +493,12 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     }
   }
 
-  function updateSelectedBlock(nextPatch) {
+  function updateSelectedBlock(nextPatch, options = {}) {
     if (!selectedBlock) {
       return;
     }
+
+    const { persist = false } = options;
 
     setBlockState((current) => {
       const nextState = {
@@ -499,7 +511,10 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
         },
       };
 
-      void persistBlockState(nextState);
+      if (persist) {
+        void persistBlockState(nextState);
+      }
+
       return nextState;
     });
   }
@@ -516,9 +531,12 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
       createdAt: new Date().toISOString(),
     };
 
-    updateSelectedBlock({
-      records: [...(blockState[selectedBlock.id]?.records ?? []), nextRecord],
-    });
+    updateSelectedBlock(
+      {
+        records: [...(blockState[selectedBlock.id]?.records ?? []), nextRecord],
+      },
+      { persist: true }
+    );
     setRecordDraft("");
   }
 
