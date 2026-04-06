@@ -438,14 +438,30 @@ select {
   background: rgba(124, 58, 237, 0.12);
 }
 
-.delete-button {
+.card-actions {
   position: absolute;
   right: 16px;
   bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 1;
+}
+
+.card-action-button {
   border: 0;
+  padding: 0;
   background: transparent;
-  color: rgba(239, 68, 68, 0.92);
+  color: rgba(228, 228, 231, 0.88);
   cursor: pointer;
+}
+
+.card-action-button:hover {
+  color: #fff;
+}
+
+.delete-button {
+  color: rgba(239, 68, 68, 0.92);
 }
 
 .card-top {
@@ -2206,6 +2222,11 @@ select {
   border-color: rgba(124, 58, 237, 0.46);
   background: rgba(124, 58, 237, 0.16);
   color: #fff;
+}
+
+.modal-type-chip:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
 .modal form {

@@ -45,10 +45,10 @@ function buildToolItem(payload, timestamp) {
   }
 
   return {
-    id: `custom_${Date.now()}`,
+    id: payload.id || `custom_${Date.now()}`,
     name: payload.name.trim(),
     link: normalizeUrl(payload.link),
-    desc: payload.desc?.trim() || "自定义快捷入口",
+    desc: payload.desc?.trim() || "自定义站点入口",
     cat: categories.includes(payload.cat) ? payload.cat : "Other",
     isCustom: true,
     addedAt: timestamp,
@@ -184,7 +184,7 @@ async function writeGithubFile(relativePath, item, owner, repo, branch, token) {
       "User-Agent": "Ai123 Submit API",
     },
     body: JSON.stringify({
-      message: `Add ${item.name}`,
+      message: `${current.content.some((entry) => entry.id === item.id) ? "Update" : "Add"} ${item.name}`,
       content: Buffer.from(`${JSON.stringify(next, null, 2)}\n`, "utf8").toString("base64"),
       sha: current.sha ?? undefined,
       branch,
@@ -222,7 +222,7 @@ export async function POST(request) {
       );
     }
 
-    return jsonResponse({ ok: true, item, path: relativePath });
+    return jsonResponse({ ok: true, item, path: relativePath, mode: payload?.id ? "update" : "create" });
   } catch (error) {
     const status =
       error.message === "unsupported_type" || error.message === "missing_required_fields" ? 400 : 500;
@@ -230,8 +230,7 @@ export async function POST(request) {
     return jsonResponse(
       {
         error: error.message,
-        message:
-          status === 400 ? "提交内容不完整或类型无效。" : "写入仓库失败，请检查 GitHub Token 或稍后重试。",
+        message: status === 400 ? "提交内容不完整或类型无效。" : "写入仓库失败，请检查 GitHub Token 或稍后重试。",
       },
       { status }
     );

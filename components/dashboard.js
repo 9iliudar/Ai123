@@ -148,6 +148,7 @@ export default function Dashboard() {
   const [dragArmedId, setDragArmedId] = useState(null);
   const [dropTargetId, setDropTargetId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingToolId, setEditingToolId] = useState(null);
 
   useEffect(() => {
     const storedTools = window.localStorage.getItem(CUSTOM_TOOLS_KEY);
@@ -206,6 +207,27 @@ export default function Dashboard() {
   function handleDraftTypeChange(type) {
     setDraftType(type);
     resetDraft(type);
+    setEditingToolId(null);
+  }
+
+  function openAddModal(type = "tool") {
+    setEditingToolId(null);
+    setDraftType(type);
+    resetDraft(type);
+    setIsModalOpen(true);
+  }
+
+  function handleEditTool(tool) {
+    setEditingToolId(tool.id);
+    setDraftType("tool");
+    setDraft({
+      ...getEmptyDraft(),
+      name: tool.name ?? "",
+      link: tool.link ?? "",
+      cat: tool.cat ?? "Other",
+      desc: tool.desc ?? "",
+    });
+    setIsModalOpen(true);
   }
 
   function handleExportDraftType() {
@@ -244,106 +266,6 @@ export default function Dashboard() {
     return next;
   }
 
-  function handleAddTool(event) {
-    event.preventDefault();
-
-    if (!draft.name.trim()) {
-      return;
-    }
-
-    const timestamp = new Date().toISOString();
-
-    if (draftType === "tool") {
-      if (!draft.link.trim()) {
-        return;
-      }
-
-      const nextTool = {
-        id: `custom_${Date.now()}`,
-        name: draft.name.trim(),
-        link: normalizeUrl(draft.link),
-        desc: draft.desc.trim() || "自定义快捷入口",
-        cat: draft.cat,
-        isCustom: true,
-        addedAt: timestamp,
-      };
-
-      setCustomTools((current) => [nextTool, ...current]);
-      setOrder((current) => [nextTool.id, ...current]);
-      setDraft({ name: "", link: "", cat: "Other", desc: "", website: "", tags: "", detail: "", relatedConcepts: "", clusterId: conceptUniverse.clusters[0]?.id ?? "" });
-      setDraftType("tool");
-      setIsModalOpen(false);
-      return;
-    }
-
-    if (draftType === "block") {
-      const nextBlocks = JSON.parse(window.localStorage.getItem(CUSTOM_BLOCKS_KEY) ?? "[]");
-      const nextBlock = {
-        id: `custom-block-${Date.now()}`,
-        name: draft.name.trim(),
-        category: draft.cat,
-        github: normalizeUrl(draft.link || draft.website),
-        website: normalizeUrl(draft.website || draft.link),
-        summary: draft.desc.trim() || `${draft.name.trim()} 的自定义积木条目`,
-        tags: splitDraftList(draft.tags),
-        solves: draft.detail.trim() || draft.desc.trim() || `${draft.name.trim()} 的能力说明`,
-        composeWith: [],
-        outputs: [],
-        relatedConcepts: splitDraftList(draft.relatedConcepts),
-        isCustom: true,
-        addedAt: timestamp,
-      };
-
-      window.localStorage.setItem(CUSTOM_BLOCKS_KEY, JSON.stringify([nextBlock, ...nextBlocks]));
-      setDraft({ name: "", link: "", cat: "Agent", desc: "", website: "", tags: "", detail: "", relatedConcepts: "", clusterId: conceptUniverse.clusters[0]?.id ?? "" });
-      setDraftType("tool");
-      setIsModalOpen(false);
-      return;
-    }
-
-    const cluster = conceptUniverse.clusters.find((item) => item.id === draft.clusterId) ?? conceptUniverse.clusters[0];
-    const nextConcepts = JSON.parse(window.localStorage.getItem(CUSTOM_CONCEPTS_KEY) ?? "[]");
-    const nextConcept = {
-      id: `custom-concept-${slugify(draft.name)}-${Date.now()}`,
-      name: draft.name.trim(),
-      summary: draft.desc.trim() || `${draft.name.trim()} 的概念摘要`,
-      detail: draft.detail.trim() || draft.desc.trim() || `${draft.name.trim()} 的概念说明`,
-      importance: 3,
-      english: "",
-      chinese: "",
-      domain: cluster?.label ?? conceptUniverse.clusters[0]?.label ?? "",
-      theme: cluster?.theme ?? "violet",
-      related: [],
-      isCustom: true,
-      addedAt: timestamp,
-    };
-
-    window.localStorage.setItem(CUSTOM_CONCEPTS_KEY, JSON.stringify([nextConcept, ...nextConcepts]));
-    setDraft({ name: "", link: "", cat: "Other", desc: "", website: "", tags: "", detail: "", relatedConcepts: "", clusterId: conceptUniverse.clusters[0]?.id ?? "" });
-    setDraftType("tool");
-    setIsModalOpen(false);
-    return;
-
-    if (!draft.name.trim() || !draft.link.trim()) {
-      return;
-    }
-
-    const nextLink = draft.link.startsWith("http") ? draft.link : `https://${draft.link}`;
-    const nextTool = {
-      id: `custom_${Date.now()}`,
-      name: draft.name.trim(),
-      link: nextLink,
-      desc: draft.desc.trim() || "自定义快捷入口",
-      cat: draft.cat,
-      isCustom: true,
-    };
-
-    setCustomTools((current) => [nextTool, ...current]);
-    setOrder((current) => [nextTool.id, ...current]);
-    setDraft({ name: "", link: "", cat: "Other", desc: "" });
-    setIsModalOpen(false);
-  }
-
   function handleDeleteTool(id) {
     setCustomTools((current) => current.filter((tool) => tool.id !== id));
     setOrder((current) => current.filter((item) => item !== id));
@@ -370,6 +292,7 @@ export default function Dashboard() {
         },
         body: JSON.stringify({
           type: draftType,
+          ...(editingToolId ? { id: editingToolId } : {}),
           ...draft,
         }),
       });
@@ -387,7 +310,9 @@ export default function Dashboard() {
           const next = [item, ...current.filter((entry) => entry.id !== item.id)];
           return next;
         });
-        setOrder((current) => [item.id, ...current.filter((id) => id !== item.id)]);
+        setOrder((current) =>
+          editingToolId ? current : [item.id, ...current.filter((id) => id !== item.id)]
+        );
       } else if (draftType === "block") {
         mergeStoredItems(CUSTOM_BLOCKS_KEY, item);
       } else {
@@ -395,6 +320,7 @@ export default function Dashboard() {
       }
 
       resetDraft(draftType);
+      setEditingToolId(null);
       setIsModalOpen(false);
     } catch (error) {
       window.alert(error.message || "提交失败，请稍后重试。");
@@ -480,7 +406,7 @@ export default function Dashboard() {
           <button className="ghost-button" type="button" onClick={() => openConceptUniverse()}>
             概念宇宙
           </button>
-          <button className="primary-button topbar-add-button" type="button" aria-label="添加内容" title="添加内容" onClick={() => setIsModalOpen(true)}>
+          <button className="primary-button topbar-add-button" type="button" aria-label="添加内容" title="添加内容" onClick={() => openAddModal("tool")}>
             +
           </button>
         </div>
@@ -555,9 +481,14 @@ export default function Dashboard() {
             onDragEnd={handleDragEnd}
           >
             {tool.isCustom ? (
-              <button className="delete-button" type="button" onClick={() => handleDeleteTool(tool.id)}>
-                删除
-              </button>
+              <div className="card-actions">
+                <button className="card-action-button" type="button" onClick={() => handleEditTool(tool)}>
+                  编辑
+                </button>
+                <button className="card-action-button delete-button" type="button" onClick={() => handleDeleteTool(tool.id)}>
+                  删除
+                </button>
+              </div>
             ) : null}
 
             <a className="card-link" href={tool.link} target="_blank" rel="noreferrer">
@@ -604,13 +535,27 @@ export default function Dashboard() {
       </footer>
 
       {isModalOpen ? (
-        <div className="modal-overlay" role="presentation" onClick={() => setIsModalOpen(false)}>
+        <div
+          className="modal-overlay"
+          role="presentation"
+          onClick={() => {
+            setIsModalOpen(false);
+            setEditingToolId(null);
+            resetDraft(draftType);
+          }}
+        >
           <div className="modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
-            <h3>追加信息项</h3>
+            <h3>{editingToolId ? "编辑网站信息" : "追加信息项"}</h3>
             <form onSubmit={handleAddItemSubmit}>
               <div className="modal-type-row">
                 {ADDABLE_TYPES.map((type) => (
-                  <button key={type} type="button" className={`modal-type-chip ${draftType === type ? "active" : ""}`} onClick={() => handleDraftTypeChange(type)}>
+                  <button
+                    key={type}
+                    type="button"
+                    disabled={Boolean(editingToolId) && type !== "tool"}
+                    className={`modal-type-chip ${draftType === type ? "active" : ""}`}
+                    onClick={() => handleDraftTypeChange(type)}
+                  >
                     {type === "tool" ? "网站" : type === "block" ? "积木" : "概念"}
                   </button>
                 ))}
@@ -657,17 +602,27 @@ export default function Dashboard() {
               </label>
               <p className="modal-hint">提交后会写入仓库 JSON。网站可直接使用，积木和概念后续再由你本地拉取做补全、关联和网络化。</p>
               <div className="modal-actions">
-                <button className="secondary-button" type="button" onClick={() => setIsModalOpen(false)}>
+                <button
+                  className="secondary-button"
+                  type="button"
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setEditingToolId(null);
+                    resetDraft(draftType);
+                  }}
+                >
                   取消
                 </button>
                 <button className="primary-button" type="submit" disabled={isSubmitting}>
                   {isSubmitting
                     ? "提交中..."
-                    : draftType === "tool"
-                      ? "保存网站"
-                      : draftType === "block"
-                        ? "保存积木"
-                        : "保存概念"}
+                    : editingToolId
+                      ? "保存修改"
+                      : draftType === "tool"
+                        ? "保存网站"
+                        : draftType === "block"
+                          ? "保存积木"
+                          : "保存概念"}
                 </button>
               </div>
             </form>
@@ -690,3 +645,4 @@ export default function Dashboard() {
     </main>
   );
 }
+
