@@ -1,5 +1,21 @@
 [
   {
+    "id": "custom-block-积木入库测试-1775478163643",
+    "name": "积木入库测试",
+    "category": "Agent",
+    "github": "",
+    "website": "",
+    "summary": "巴拉巴拉",
+    "tags": [],
+    "solves": "巴拉巴拉",
+    "composeWith": [],
+    "outputs": [],
+    "relatedConcepts": [],
+    "isCustom": true,
+    "needsEnrichment": true,
+    "addedAt": "2026-04-06T12:22:43.643Z"
+  },
+  {
     "id": "custom-block-这是一条积木新增测试-1775469920381",
     "name": "这是一条积木新增测试",
     "category": "Agent",
