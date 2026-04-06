@@ -93,24 +93,48 @@ const CATEGORY_LENS = {
 
 const BLOCK_OVERRIDES = {
   openhands: {
+    summary:
+      "OpenHands 已经不是单一形态的代码助手，而是一套 AI-driven development 产品族，覆盖 SDK、CLI、本地 GUI、云端与企业自托管形态。",
     positioning:
-      "OpenHands 更像“面向真实代码仓库的执行型工程代理”，不是单纯聊天式代码助手。它的价值在于把读仓库、改文件、跑命令和迭代修复串成了一个统一执行面。",
+      "OpenHands 更接近“面向真实软件任务的工程执行层”。官方把它定义成 AI-driven development：核心不是补全代码，而是把读仓库、改文件、跑命令、持续修复和多轮推进串成统一执行面。",
+    solves:
+      "它解决的不是“回答一个编程问题”，而是把真实开发任务往前推进的问题。包括读代码库、理解上下文、执行命令、修复错误、持续迭代，以及在本地或云端运行代理。",
+    bestFor:
+      "最适合先拿来做中小型真实仓库任务，比如修 bug、补功能、改多文件、跑命令和验证结果。这样最能看出它是不是工程代理，而不只是会说代码的聊天工具。",
     entryPath:
       "最适合用一个真实但边界清楚的小仓库验证：看它如何读上下文、提出计划、修改多文件、运行命令并根据报错继续推进。",
     evaluationFocus:
       "重点看它在真实仓库里的稳定性，而不是 benchmark。尤其要看命令执行、文件修改范围控制、失败恢复和上下文管理。",
   },
   autogen: {
+    summary:
+      "AutoGen 是微软的 agentic AI 编程框架，重点是多智能体工作流，而不是单个助手体验。",
     positioning:
-      "AutoGen 更适合作为多智能体协作框架去理解，而不是拿来当现成产品。它的重要性在于把 agent 之间的消息、角色和协作模式抽象出来了。",
+      "AutoGen 更适合作为多智能体编程框架来理解。官方强调它提供框架、开发者工具和应用生态，并采用分层、可扩展设计，支持从高层 API 到底层组件的不同抽象层级。",
+    solves:
+      "它主要解决多角色 agent 的消息传递、任务分工、工具接入和工作流编排问题，让你不必从零搭一个多智能体运行框架。",
+    bestFor:
+      "最适合先拿来做多智能体实验和工作流原型，比如专家代理协作、MCP 工具调用、浏览器辅助代理，或者需要多人分工式 agent 的任务链路。",
   },
   "semantic-kernel": {
+    summary:
+      "Semantic Kernel 是微软面向应用集成的 AI orchestration SDK，主轴是把模型、插件、流程、记忆和企业系统接到一起。",
     positioning:
-      "Semantic Kernel 更像企业应用接入层，适合把模型能力嵌进既有业务系统，而不是从零做一个纯研究型 agent。",
+      "Semantic Kernel 更像企业应用接入层。官方强调插件生态、向量数据库支持、多模态、本地部署、流程框架和企业级可观测性/稳定 API，明显是面向应用和业务流程接入。",
+    solves:
+      "它解决的是“如何把模型能力真正接入现有应用和业务系统”这个问题，包括插件调用、结构化流程、记忆、向量检索以及企业级部署与运维要求。",
+    bestFor:
+      "最适合先拿来做企业 Copilot、业务助手、插件化 Agent 或需要把模型能力嵌进现有系统的场景，而不是纯研究型聊天演示。",
   },
   "qwen-agent": {
+    summary:
+      "Qwen-Agent 是建立在 Qwen 模型之上的 Agent 框架与应用集合，官方重点放在 Function Calling、MCP、Code Interpreter、RAG 和可快速部署的 GUI。",
     positioning:
-      "Qwen-Agent 更像偏中文生态和任务型代理的实用框架，重点不是炫技，而是把工具调用、规划和代理式执行做成可接业务的结构。",
+      "Qwen-Agent 更像面向任务执行的实用框架。它不是只做聊天，而是围绕工具调用、文件读取、代码解释器、MCP 和 WebUI，搭建可运行的 Agent 应用骨架。",
+    solves:
+      "它解决的是如何更快搭出“会调工具、会读文件、会执行代码、还能接 MCP/RAG”的任务型 Agent，而不必自己拼底层能力。",
+    bestFor:
+      "最适合先拿来做中文任务代理、带工具的问答助手、文件处理 Agent，或需要快速验证 MCP 与代码执行链路的原型。",
   },
   crewai: {
     positioning:
@@ -123,14 +147,26 @@ const BLOCK_OVERRIDES = {
       "这类通用代理最容易让人期待过高。研究时要区分概念方向是否成立，和系统是否已经足够稳定可用，是两回事。",
   },
   "browser-use": {
+    summary:
+      "browser-use 的官方定位非常明确：让网站对 AI agents 可用，并把在线任务自动化做得更容易。",
     positioning:
-      "browser-use 是理解 Browser Agent 路线的核心代表。它把网页结构、动作和模型推理连在一起，适合拿来判断网页代理这条路线到底值不值得深挖。",
+      "browser-use 是典型 Browser Agent 积木。官方把它做成开源库、CLI 和 Cloud 组合，核心是让代理直接驱动浏览器完成真实网页任务，而不是只返回网页文本。",
+    solves:
+      "它解决的是“代理如何真正操作网站”这个问题，包括浏览器控制、表单填写、跨页面操作、在线购物、网页助理等真实任务，而不只是网页抓取。",
+    bestFor:
+      "最适合先拿来做表单填写、网页办事、网页助理、账号内流程自动化这类真实在线任务，尤其适合验证 Browser Agent 是否真能替代部分手工网页操作。",
     entryPath:
       "建议直接用真实网页任务试，不要只看视频。比如登录、检索、跳转、填表、抓结果，才能看出它是实验玩具还是可复用积木。",
   },
   skyvern: {
+    summary:
+      "Skyvern 官方把自己定义为用 LLM 和计算机视觉自动化浏览器工作流的平台，同时提供 Playwright 兼容 SDK 和 no-code 工作流构建器。",
     positioning:
-      "Skyvern 更偏产品化网页执行平台，而不是单纯研究性质的 browser agent。它更强调可靠执行、流程化和面向业务动作的稳定度。",
+      "Skyvern 更偏产品化网页执行平台。它的切入点不是单个动作，而是“浏览器工作流自动化”，并明确对比传统依赖 DOM/XPath 的脆弱自动化方案。",
+    solves:
+      "它解决的是网页自动化在页面变化后容易失效的问题。Skyvern 用视觉理解替代固定 XPath，目标是在没见过的网站上也能执行工作流，并更抗页面改版。",
+    bestFor:
+      "最适合先拿来做跨页面流程、重复运营动作、复杂网站任务和需要 no-code/低代码交付给业务方的浏览器自动化场景。",
   },
   stagehand: {
     positioning:
@@ -157,8 +193,14 @@ const BLOCK_OVERRIDES = {
       "Open Interpreter 更像‘把模型直接接到本地系统能力’的个人代理路线。它强调的是执行权下放，而不是完整的流程编排。",
   },
   dify: {
+    summary:
+      "Dify 官方定位是 production-ready 的开源 LLM 应用开发平台，把 AI workflow、RAG pipeline、agent、model management 和 observability 放在同一界面里。",
     positioning:
-      "Dify 更像 AI 应用平台，而不是单一积木。它适合放在“团队怎样把模型、知识库、工作流和发布纳入同一套系统”这个角度去研究。",
+      "Dify 更像 AI 应用平台，而不是单一能力库。官方强调从 prototype 到 production，说明它的重点不是 demo，而是把 AI 应用真正组织成可上线、可观察、可管理的平台。",
+    solves:
+      "它解决的是团队搭建 LLM 应用时能力分散的问题，把工作流、RAG、Agent、模型支持、日志与性能分析，以及 API 接入统一到一个平台。",
+    bestFor:
+      "最适合先拿来做内部 AI 平台、知识问答应用、流程型 Agent 应用，或者需要让产品、运营、开发在同一平台协作的场景。",
     entryPath:
       "研究时不要只盯着 workflow 编辑器，最好同时看知识库、工具接入、应用发布和运营面板，因为它的价值在于整个平台闭环。",
   },
@@ -171,12 +213,24 @@ const BLOCK_OVERRIDES = {
       "Langflow 更适合当教学、演示和快速解释复杂链路的积木。它的优势在于可视化表达，而不是比所有工作流平台都更适合生产。",
   },
   n8n: {
+    summary:
+      "n8n 官方定位是面向技术团队的安全工作流自动化平台，强调 400+ 集成、原生 AI 能力、可视化搭建和必要时写代码。",
     positioning:
-      "n8n 更像把 AI 接进既有 SaaS 和业务动作的大号连接器底座。它的价值在于连接和执行，而不是模型本身。",
+      "n8n 更像连接器和执行底座。它不是以模型为中心，而是以业务流程为中心，把可视化搭建、JavaScript/Python、自托管和 AI 工作流放在同一套系统里。",
+    solves:
+      "它解决的是跨系统自动化的问题，包括把 SaaS、数据库、消息系统和 AI 能力接进一条工作流，同时保留技术团队对代码、数据和部署的控制权。",
+    bestFor:
+      "最适合先拿来做跨系统流程自动化、通知流、内部运营流，以及需要把 AI 步骤嵌进既有业务工作流的场景。",
   },
   langgraph: {
+    summary:
+      "LangGraph 官方定位是为构建、管理和部署长时运行、有状态 agent 的低层编排框架。",
     positioning:
-      "LangGraph 更像复杂 agent 流程的控制骨架。它适合解决‘流程很长、状态很多、需要可恢复’这类问题，而不是简单串几个节点。",
+      "LangGraph 更像复杂 agent 的控制骨架。官方重点是 durable execution、human-in-the-loop、comprehensive memory 和 production-ready deployment，明显针对长流程和状态管理。",
+    solves:
+      "它解决的是长时运行、有状态、可中断、可恢复的 agent 工作流问题，让复杂代理不只是线性步骤，而是能在失败后恢复、插入人工干预并保持记忆。",
+    bestFor:
+      "最适合先拿来做长任务代理、复杂审批/人工介入流程、需要状态恢复的研究代理，或者任何比普通链路复杂得多的 agent 系统。",
   },
   haystack: {
     positioning:
@@ -201,8 +255,14 @@ const BLOCK_OVERRIDES = {
       "GraphRAG 的研究成本和建模成本都更高。只有当普通检索确实解释不了复杂关系时，它的投入才更值得。",
   },
   "open-webui": {
+    summary:
+      "Open WebUI 官方定位是可扩展、功能完整、用户友好的自托管 AI 平台，可完全离线运行，支持 Ollama、OpenAI 兼容 API，并内置 RAG 推理引擎。",
     positioning:
-      "Open WebUI 更像多模型工作台和统一入口层。它不是模型能力本身，但常常决定团队实际会不会长期使用这些能力。",
+      "Open WebUI 更像多模型工作台和统一入口层。它的重点不是模型本身，而是把模型接入、角色/权限、文档知识、网页接入、图像生成、语音视频和可观测性整合成一个可用前端。",
+    solves:
+      "它解决的是团队或个人缺少统一 AI 门户的问题，让本地模型、远程 API、RAG、工具、角色和权限能在一个界面里长期使用，而不是散落在多个小工具里。",
+    bestFor:
+      "最适合先拿来做私有 AI 门户、多模型工作台、团队内部知识问答入口，或者需要自托管且可扩展的统一交互层。",
   },
   mcpo: {
     positioning:
@@ -221,16 +281,28 @@ const BLOCK_OVERRIDES = {
       "SGLang 更像把推理性能和程序化生成控制结合起来的引擎层积木，适合对输出结构和服务性能都有要求的场景。",
   },
   litellm: {
+    summary:
+      "LiteLLM 官方把自己定义为开源 AI Gateway，可用 OpenAI 格式统一调用 100+ LLM，并提供成本跟踪、guardrails、负载均衡和日志能力。",
     positioning:
-      "LiteLLM 更像模型路由与统一网关层。它的重要性通常不是“生成更聪明”，而是让多模型系统更好接、更好管、更好降级。",
+      "LiteLLM 更像模型路由与统一网关层。官方强调 Python SDK 和 Proxy Server 两种形态，说明它的核心价值是统一入口、统一协议和统一治理，而不是某个单模型能力。",
+    solves:
+      "它解决的是多模型系统接入分散、接口不统一、成本和日志难管理的问题，让你能用一套 OpenAI 风格接口去接多家模型与代理服务。",
+    bestFor:
+      "最适合先拿来做模型网关、多模型路由层、统一代理出口，或者需要成本统计、权限控制、回退与负载均衡的生产环境。",
   },
   chroma: {
     positioning:
       "Chroma 更适合轻量原型和早期验证，价值在于简单直观，适合快速试知识检索链路。",
   },
   qdrant: {
+    summary:
+      "Qdrant 官方定位是高性能、大规模向量数据库与向量搜索引擎，服务下一代 AI 场景。",
     positioning:
-      "Qdrant 更偏生产级检索底座，适合把语义检索从“能跑”推进到“能长期稳定服务”。",
+      "Qdrant 更偏生产级检索底座。官方重点放在 payload filtering、hybrid search、量化、分布式部署、gRPC 和硬件优化，明显面向长期运行和大规模检索。",
+    solves:
+      "它解决的是语义检索从原型走向生产的问题，不只是存向量，还包括过滤、混合检索、成本优化、扩缩容和生产级查询性能。",
+    bestFor:
+      "最适合先拿来做企业知识检索底座、语义搜索服务、推荐/相似搜索，或者需要把 RAG 检索做成长期稳定服务的场景。",
   },
   markitdown: {
     positioning:
@@ -409,6 +481,8 @@ function enrichBlock(block) {
 
   return {
     ...block,
+    summary: override.summary ?? block.summary,
+    solves: override.solves ?? block.solves,
     positioning: override.positioning ?? lens.positioning,
     bestFor: override.bestFor ?? deriveBestFor(block),
     entryPath: override.entryPath ?? lens.entryPath,
