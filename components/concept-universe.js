@@ -171,12 +171,12 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   }, [activeFreshness, mergedNodes]);
   const recentConceptCount = useMemo(() => mergedNodes.filter((node) => isRecentAdded(node.addedAt)).length, [mergedNodes]);
   const activeClusterNodes = useMemo(() => {
-    if (!activeCluster) {
+    if (activeFreshness === RECENT_FRESHNESS || !activeCluster) {
       return filteredNodePool;
     }
 
     return filteredNodePool.filter((node) => node.domain === activeCluster.label);
-  }, [activeCluster, filteredNodePool]);
+  }, [activeCluster, activeFreshness, filteredNodePool]);
   const [accent, accentSoft, accentStrong] = themeMap[themeNode.theme] ?? themeMap.violet;
 
   const visibleNodes = useMemo(() => {
@@ -376,10 +376,9 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     }
 
     const nextCenter =
-      activeClusterNodes[0] ??
-      (activeFreshness === ALL_FRESHNESS
-        ? mergedNodes.find((node) => node.domain === activeCluster.label)
-        : null);
+      activeFreshness === RECENT_FRESHNESS
+        ? null
+        : activeClusterNodes[0] ?? mergedNodes.find((node) => node.domain === activeCluster.label);
     if (!nextCenter) {
       return;
     }
