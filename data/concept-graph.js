@@ -1291,6 +1291,33 @@ const bilingualMeta = {
   "speculative-decoding": { english: "Speculative Decoding", chinese: "推测解码" },
 };
 
+const RECENT_CONCEPT_ADDED_AT = {
+  "large-language-model": "2026-03-27T09:00:00.000Z",
+  tokenizer: "2026-03-19T09:00:00.000Z",
+  "context-window": "2026-03-11T09:00:00.000Z",
+  transformer: "2026-03-02T09:00:00.000Z",
+  "prompt-engineering": "2026-03-25T09:00:00.000Z",
+  "system-prompt": "2026-03-16T09:00:00.000Z",
+  "structured-output": "2026-03-07T09:00:00.000Z",
+  "function-calling": "2026-02-26T09:00:00.000Z",
+  rag: "2026-03-23T09:00:00.000Z",
+  embedding: "2026-03-13T09:00:00.000Z",
+  chunking: "2026-03-01T09:00:00.000Z",
+  reranking: "2026-02-20T09:00:00.000Z",
+  agent: "2026-03-21T09:00:00.000Z",
+  "agentic-ai": "2026-03-09T09:00:00.000Z",
+  "planner-executor": "2026-02-24T09:00:00.000Z",
+  "multi-agent": "2026-02-12T09:00:00.000Z",
+  "computer-use": "2026-03-18T09:00:00.000Z",
+  "browser-use": "2026-03-06T09:00:00.000Z",
+  "voice-agent": "2026-02-25T09:00:00.000Z",
+  "realtime-interaction": "2026-01-30T09:00:00.000Z",
+  quantization: "2026-03-15T09:00:00.000Z",
+  "kv-cache": "2026-03-04T09:00:00.000Z",
+  "speculative-decoding": "2026-02-19T09:00:00.000Z",
+  "on-device-inference": "2026-01-28T09:00:00.000Z",
+};
+
 function unique(values) {
   return [...new Set(values)];
 }
@@ -1326,6 +1353,7 @@ function makeNodes() {
     ...node,
     english: node.english ?? bilingualMeta[node.id]?.english ?? "",
     chinese: node.chinese ?? bilingualMeta[node.id]?.chinese ?? "",
+    addedAt: RECENT_CONCEPT_ADDED_AT[node.id] ?? null,
     related: unique((relationSeed[node.id] ?? []).filter((target) => target !== node.id)),
   }));
 }

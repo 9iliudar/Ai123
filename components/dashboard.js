@@ -4,10 +4,15 @@ import { useEffect, useMemo, useState } from "react";
 import BrickWarehouse from "@/components/brick-warehouse";
 import ConceptUniverse from "@/components/concept-universe";
 import { categories, categoryLabels, defaultTools } from "@/data/default-tools";
+import { blockCategories, blockCategoryLabels } from "@/data/building-blocks";
+import { conceptUniverse } from "@/data/concept-graph";
 
 const CUSTOM_TOOLS_KEY = "ai123_custom_tools";
+const CUSTOM_BLOCKS_KEY = "ai123_custom_blocks";
+const CUSTOM_CONCEPTS_KEY = "ai123_custom_concepts";
 const TOOLS_ORDER_KEY = "ai123_tools_order";
 const ICON_VERSION = "2";
+const ADDABLE_TYPES = ["tool", "block", "concept"];
 
 function getInitialOrder() {
   return defaultTools.map((tool) => tool.id);
@@ -70,12 +75,36 @@ function sortTools(tools, order) {
   });
 }
 
+function normalizeUrl(value) {
+  if (!value.trim()) {
+    return "";
+  }
+
+  return value.startsWith("http") ? value : `https://${value}`;
+}
+
+function slugify(value) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function splitDraftList(value) {
+  return value
+    .split(/[,，、\n]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 export default function Dashboard() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [customTools, setCustomTools] = useState([]);
   const [order, setOrder] = useState(getInitialOrder);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [draftType, setDraftType] = useState("tool");
   const [isConceptOpen, setIsConceptOpen] = useState(false);
   const [isWarehouseOpen, setIsWarehouseOpen] = useState(false);
   const [requestedConcept, setRequestedConcept] = useState("");
@@ -85,6 +114,11 @@ export default function Dashboard() {
     link: "",
     cat: "Other",
     desc: "",
+    website: "",
+    tags: "",
+    detail: "",
+    relatedConcepts: "",
+    clusterId: conceptUniverse.clusters[0]?.id ?? "",
   });
   const [draggedId, setDraggedId] = useState(null);
   const [dragArmedId, setDragArmedId] = useState(null);
@@ -140,6 +174,83 @@ export default function Dashboard() {
   function handleAddTool(event) {
     event.preventDefault();
 
+    if (!draft.name.trim()) {
+      return;
+    }
+
+    const timestamp = new Date().toISOString();
+
+    if (draftType === "tool") {
+      if (!draft.link.trim()) {
+        return;
+      }
+
+      const nextTool = {
+        id: `custom_${Date.now()}`,
+        name: draft.name.trim(),
+        link: normalizeUrl(draft.link),
+        desc: draft.desc.trim() || "自定义快捷入口",
+        cat: draft.cat,
+        isCustom: true,
+        addedAt: timestamp,
+      };
+
+      setCustomTools((current) => [nextTool, ...current]);
+      setOrder((current) => [nextTool.id, ...current]);
+      setDraft({ name: "", link: "", cat: "Other", desc: "", website: "", tags: "", detail: "", relatedConcepts: "", clusterId: conceptUniverse.clusters[0]?.id ?? "" });
+      setDraftType("tool");
+      setIsModalOpen(false);
+      return;
+    }
+
+    if (draftType === "block") {
+      const nextBlocks = JSON.parse(window.localStorage.getItem(CUSTOM_BLOCKS_KEY) ?? "[]");
+      const nextBlock = {
+        id: `custom-block-${Date.now()}`,
+        name: draft.name.trim(),
+        category: draft.cat,
+        github: normalizeUrl(draft.link || draft.website),
+        website: normalizeUrl(draft.website || draft.link),
+        summary: draft.desc.trim() || `${draft.name.trim()} 的自定义积木条目`,
+        tags: splitDraftList(draft.tags),
+        solves: draft.detail.trim() || draft.desc.trim() || `${draft.name.trim()} 的能力说明`,
+        composeWith: [],
+        outputs: [],
+        relatedConcepts: splitDraftList(draft.relatedConcepts),
+        isCustom: true,
+        addedAt: timestamp,
+      };
+
+      window.localStorage.setItem(CUSTOM_BLOCKS_KEY, JSON.stringify([nextBlock, ...nextBlocks]));
+      setDraft({ name: "", link: "", cat: "Agent", desc: "", website: "", tags: "", detail: "", relatedConcepts: "", clusterId: conceptUniverse.clusters[0]?.id ?? "" });
+      setDraftType("tool");
+      setIsModalOpen(false);
+      return;
+    }
+
+    const cluster = conceptUniverse.clusters.find((item) => item.id === draft.clusterId) ?? conceptUniverse.clusters[0];
+    const nextConcepts = JSON.parse(window.localStorage.getItem(CUSTOM_CONCEPTS_KEY) ?? "[]");
+    const nextConcept = {
+      id: `custom-concept-${slugify(draft.name)}-${Date.now()}`,
+      name: draft.name.trim(),
+      summary: draft.desc.trim() || `${draft.name.trim()} 的概念摘要`,
+      detail: draft.detail.trim() || draft.desc.trim() || `${draft.name.trim()} 的概念说明`,
+      importance: 3,
+      english: "",
+      chinese: "",
+      domain: cluster?.label ?? conceptUniverse.clusters[0]?.label ?? "",
+      theme: cluster?.theme ?? "violet",
+      related: [],
+      isCustom: true,
+      addedAt: timestamp,
+    };
+
+    window.localStorage.setItem(CUSTOM_CONCEPTS_KEY, JSON.stringify([nextConcept, ...nextConcepts]));
+    setDraft({ name: "", link: "", cat: "Other", desc: "", website: "", tags: "", detail: "", relatedConcepts: "", clusterId: conceptUniverse.clusters[0]?.id ?? "" });
+    setDraftType("tool");
+    setIsModalOpen(false);
+    return;
+
     if (!draft.name.trim() || !draft.link.trim()) {
       return;
     }
@@ -167,6 +278,8 @@ export default function Dashboard() {
 
   function handleReset() {
     window.localStorage.removeItem(CUSTOM_TOOLS_KEY);
+    window.localStorage.removeItem(CUSTOM_BLOCKS_KEY);
+    window.localStorage.removeItem(CUSTOM_CONCEPTS_KEY);
     window.localStorage.removeItem(TOOLS_ORDER_KEY);
     setCustomTools([]);
     setOrder(getInitialOrder());
@@ -240,7 +353,7 @@ export default function Dashboard() {
           <button className="ghost-button" type="button" onClick={() => openConceptUniverse()}>
             概念宇宙
           </button>
-          <button className="primary-button" type="button" onClick={() => setIsModalOpen(true)}>
+          <button className="primary-button topbar-add-button" type="button" aria-label="添加内容" title="添加内容" onClick={() => setIsModalOpen(true)}>
             + 添加网站
           </button>
         </div>
@@ -368,6 +481,13 @@ export default function Dashboard() {
           <div className="modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
             <h3>添加自定义网站</h3>
             <form onSubmit={handleAddTool}>
+              <div className="modal-type-row">
+                {ADDABLE_TYPES.map((type) => (
+                  <button key={type} type="button" className={`modal-type-chip ${draftType === type ? "active" : ""}`} onClick={() => setDraftType(type)}>
+                    {type === "tool" ? "网站" : type === "block" ? "积木" : "概念"}
+                  </button>
+                ))}
+              </div>
               <label>
                 名称
                 <input name="name" type="text" value={draft.name} onChange={handleDraftChange} placeholder="例如：飞书后台" />
@@ -378,20 +498,48 @@ export default function Dashboard() {
               </label>
               <label>
                 分类
-                <select name="cat" value={draft.cat} onChange={handleDraftChange}>
-                  {categories
-                    .filter((category) => category !== "All")
-                    .map((category) => (
-                      <option key={category} value={category}>
-                        {categoryLabels[category] ?? category}
-                      </option>
-                    ))}
+                <select name={draftType === "concept" ? "clusterId" : "cat"} value={draftType === "concept" ? draft.clusterId : draft.cat} onChange={handleDraftChange}>
+                  {(draftType === "tool"
+                    ? categories.filter((category) => category !== "All").map((category) => ({ value: category, label: categoryLabels[category] ?? category }))
+                    : draftType === "block"
+                      ? blockCategories.filter((category) => category !== "All").map((category) => ({ value: category, label: blockCategoryLabels[category] ?? category }))
+                      : conceptUniverse.clusters.map((cluster) => ({ value: cluster.id, label: cluster.label }))).map((item) => (
+                    <option key={item.value} value={item.value}>
+                      {item.label}
+                    </option>
+                  ))}
                 </select>
               </label>
               <label>
                 备注
                 <input name="desc" type="text" value={draft.desc} onChange={handleDraftChange} placeholder="一句话说明用途" />
               </label>
+              {draftType === "block" ? (
+                <>
+                  <label>
+                    文档 / 官网
+                    <input name="website" type="text" value={draft.website} onChange={handleDraftChange} placeholder="https://..." />
+                  </label>
+                  <label>
+                    标签
+                    <input name="tags" type="text" value={draft.tags} onChange={handleDraftChange} placeholder="用逗号分隔" />
+                  </label>
+                  <label>
+                    详细说明
+                    <input name="detail" type="text" value={draft.detail} onChange={handleDraftChange} placeholder="它解决什么问题，适合如何组合" />
+                  </label>
+                  <label>
+                    关联概念
+                    <input name="relatedConcepts" type="text" value={draft.relatedConcepts} onChange={handleDraftChange} placeholder="用逗号分隔" />
+                  </label>
+                </>
+              ) : null}
+              {draftType === "concept" ? (
+                <label>
+                  详细说明
+                  <input name="detail" type="text" value={draft.detail} onChange={handleDraftChange} placeholder="补充概念解释、使用场景或理解要点" />
+                </label>
+              ) : null}
               <div className="modal-actions">
                 <button className="secondary-button" type="button" onClick={() => setIsModalOpen(false)}>
                   取消

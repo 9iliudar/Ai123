@@ -20,6 +20,9 @@ const MAX_VISIBLE_NODES = 18;
 const PERSPECTIVE = 940;
 const CLOUD_RADIUS = 280;
 const MASTERY_STORAGE_KEY = "ai123_concept_mastery";
+const CUSTOM_CONCEPTS_KEY = "ai123_custom_concepts";
+const ALL_FRESHNESS = "ALL_FRESHNESS";
+const RECENT_FRESHNESS = "RECENT_FRESHNESS";
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
@@ -118,8 +121,20 @@ function getHudAvoidance(projection, depth, hasHud) {
   };
 }
 
+function isRecentAdded(value) {
+  if (!value) {
+    return false;
+  }
+
+  const addedAt = new Date(value).getTime();
+  const ninetyDaysAgo = Date.now() - 90 * 24 * 60 * 60 * 1000;
+  return Number.isFinite(addedAt) && addedAt >= ninetyDaysAgo;
+}
+
 export default function ConceptUniverse({ open, onClose, requestedConcept }) {
-  const nodeMap = useMemo(() => buildNodeMap(conceptUniverse.nodes), []);
+  const [customConcepts, setCustomConcepts] = useState([]);
+  const mergedNodes = useMemo(() => [...customConcepts, ...conceptUniverse.nodes], [customConcepts]);
+  const nodeMap = useMemo(() => buildNodeMap(mergedNodes), [mergedNodes]);
   const clusters = conceptUniverse.clusters;
   const [centerId, setCenterId] = useState(conceptUniverse.entryId);
   const [selectedId, setSelectedId] = useState(null);
@@ -133,6 +148,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   const [isHudPinned, setIsHudPinned] = useState(false);
   const [masteryMap, setMasteryMap] = useState({});
   const [activeClusterId, setActiveClusterId] = useState(conceptUniverse.clusters[0]?.id ?? null);
+  const [activeFreshness, setActiveFreshness] = useState(RECENT_FRESHNESS);
   const [isClusterMenuOpen, setIsClusterMenuOpen] = useState(false);
   const [isPointerDown, setIsPointerDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -145,11 +161,15 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   const rotationRef = useRef(rotation);
   const suppressClickUntilRef = useRef(0);
 
-  const centerNode = nodeMap.get(centerId) ?? conceptUniverse.nodes[0];
+  const centerNode = nodeMap.get(centerId) ?? mergedNodes[0];
   const selectedNode = selectedId ? nodeMap.get(selectedId) ?? null : null;
   const themeNode = selectedNode ?? centerNode;
   const activeCluster = clusters.find((cluster) => cluster.id === activeClusterId) ?? null;
-  const activeClusterCount = activeCluster ? conceptUniverse.nodes.filter((node) => node.domain === activeCluster.label).length : 0;
+  const activeClusterCount = activeCluster ? mergedNodes.filter((node) => node.domain === activeCluster.label).length : 0;
+  const filteredNodePool = useMemo(() => {
+    return mergedNodes.filter((node) => activeFreshness === ALL_FRESHNESS || isRecentAdded(node.addedAt));
+  }, [activeFreshness, mergedNodes]);
+  const recentConceptCount = useMemo(() => mergedNodes.filter((node) => isRecentAdded(node.addedAt)).length, [mergedNodes]);
   const [accent, accentSoft, accentStrong] = themeMap[themeNode.theme] ?? themeMap.violet;
 
   const visibleNodes = useMemo(() => {
@@ -164,9 +184,10 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     return dedupe([...firstRing, ...secondRing].map((node) => node.id))
       .map((id) => nodeMap.get(id))
       .filter(Boolean)
+      .filter((node) => activeFreshness === ALL_FRESHNESS || isRecentAdded(node.addedAt))
       .sort((left, right) => scoreNode(right) - scoreNode(left))
       .slice(0, MAX_VISIBLE_NODES);
-  }, [centerNode, nodeMap]);
+  }, [activeFreshness, centerNode, nodeMap]);
 
   const quickLinks = useMemo(() => {
     if (!selectedNode) {
@@ -176,9 +197,10 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     return selectedNode.related
       .map((id) => nodeMap.get(id))
       .filter(Boolean)
+      .filter((node) => activeFreshness === ALL_FRESHNESS || isRecentAdded(node.addedAt))
       .sort((left, right) => scoreNode(right) - scoreNode(left))
       .slice(0, 8);
-  }, [nodeMap, selectedNode]);
+  }, [activeFreshness, nodeMap, selectedNode]);
   const selectedMastery = selectedNode ? masteryMap[selectedNode.id] ?? 2 : 2;
 
   const searchResults = useMemo(() => {
@@ -187,14 +209,14 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
       return [];
     }
 
-    return conceptUniverse.nodes
+    return mergedNodes
       .filter((node) => {
         const corpus = `${node.name} ${node.domain} ${node.summary} ${node.detail} ${node.english} ${node.chinese}`.toLowerCase();
-        return corpus.includes(keyword);
+        return corpus.includes(keyword) && (activeFreshness === ALL_FRESHNESS || isRecentAdded(node.addedAt));
       })
       .sort((left, right) => scoreNode(right) - scoreNode(left))
       .slice(0, 12);
-  }, [query]);
+  }, [activeFreshness, mergedNodes, query]);
 
   const projectedNodes = useMemo(() => {
     const spherePoints = fibonacciSphere(Math.max(visibleNodes.length, 1));
@@ -260,6 +282,11 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
       return;
     }
 
+    const storedConcepts = window.localStorage.getItem(CUSTOM_CONCEPTS_KEY);
+    if (storedConcepts) {
+      setCustomConcepts(JSON.parse(storedConcepts));
+    }
+
     try {
       const stored = window.localStorage.getItem(MASTERY_STORAGE_KEY);
       if (!stored) {
@@ -272,6 +299,15 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
       }
     } catch {}
   }, []);
+
+  useEffect(() => {
+    if (!open || typeof window === "undefined") {
+      return;
+    }
+
+    const storedConcepts = window.localStorage.getItem(CUSTOM_CONCEPTS_KEY);
+    setCustomConcepts(storedConcepts ? JSON.parse(storedConcepts) : []);
+  }, [open]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -302,7 +338,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     }
 
     const keyword = requestedConcept.trim().toLowerCase();
-    const match = conceptUniverse.nodes.find((node) => {
+    const match = mergedNodes.find((node) => {
       const corpus = `${node.name} ${node.english ?? ""} ${node.chinese ?? ""}`.toLowerCase();
       return corpus.includes(keyword);
     });
@@ -321,7 +357,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     });
     setRotation({ x: -0.24, y: 0.42 });
     setIsHudPinned(false);
-  }, [clusters, open, requestedConcept]);
+  }, [clusters, mergedNodes, open, requestedConcept]);
 
   useEffect(() => {
     if (!open || !activeCluster) {
@@ -332,7 +368,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
       return;
     }
 
-    const nextCenter = conceptUniverse.nodes.find((node) => node.domain === activeCluster.label);
+    const nextCenter = filteredNodePool.find((node) => node.domain === activeCluster.label) ?? mergedNodes.find((node) => node.domain === activeCluster.label);
     if (!nextCenter) {
       return;
     }
@@ -342,7 +378,26 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     setHistory([nextCenter.id]);
     setRotation({ x: -0.24, y: 0.42 });
     setIsHudPinned(false);
-  }, [activeCluster, centerNode.domain, open]);
+  }, [activeCluster, centerNode.domain, filteredNodePool, mergedNodes, open]);
+
+  useEffect(() => {
+    if (!open || activeFreshness !== RECENT_FRESHNESS || !centerNode) {
+      return;
+    }
+
+    if (isRecentAdded(centerNode.addedAt)) {
+      return;
+    }
+
+    const nextCenter = filteredNodePool.find((node) => node.domain === centerNode.domain) ?? filteredNodePool[0];
+    if (!nextCenter) {
+      return;
+    }
+
+    setCenterId(nextCenter.id);
+    setSelectedId(null);
+    setHistory([nextCenter.id]);
+  }, [activeFreshness, centerNode, filteredNodePool, open]);
 
   useEffect(() => {
     if (!open) {
@@ -549,7 +604,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   }
 
   function handlePointerDown(event) {
-    if (event.target.closest(".universe-node, .universe-hud, .universe-controls, .universe-search-panel, .universe-topbar, .universe-category-panel, input")) {
+    if (event.target.closest(".universe-node, .universe-hud, .universe-controls, .universe-search-panel, .universe-topbar, .universe-filter-row, .universe-category-panel, input")) {
       return;
     }
 
@@ -674,6 +729,23 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
               ✕
             </button>
           </div>
+        </div>
+
+        <div className="universe-filter-row">
+          <button
+            type="button"
+            className={`universe-filter-chip ${activeFreshness === RECENT_FRESHNESS ? "active" : ""}`}
+            onClick={() => setActiveFreshness(RECENT_FRESHNESS)}
+          >
+            最近添加 · {recentConceptCount}
+          </button>
+          <button
+            type="button"
+            className={`universe-filter-chip ${activeFreshness === ALL_FRESHNESS ? "active" : ""}`}
+            onClick={() => setActiveFreshness(ALL_FRESHNESS)}
+          >
+            全部概念
+          </button>
         </div>
 
         {searchResults.length ? (

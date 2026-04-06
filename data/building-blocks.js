@@ -26,6 +26,27 @@ export const blockCategoryLabels = {
 
 export const blockStatuses = ["未开始", "已浏览", "已试用", "已理解", "可复用"];
 
+const RECENT_BLOCK_ADDED_AT = {
+  openhands: "2026-03-28T09:00:00.000Z",
+  autogen: "2026-03-20T09:00:00.000Z",
+  "semantic-kernel": "2026-03-12T09:00:00.000Z",
+  "qwen-agent": "2026-03-03T09:00:00.000Z",
+  "browser-use": "2026-03-26T09:00:00.000Z",
+  skyvern: "2026-03-17T09:00:00.000Z",
+  stagehand: "2026-03-08T09:00:00.000Z",
+  crawl4ai: "2026-02-27T09:00:00.000Z",
+  "ui-tars": "2026-03-22T09:00:00.000Z",
+  "ui-tars-desktop": "2026-03-14T09:00:00.000Z",
+  dify: "2026-03-10T09:00:00.000Z",
+  flowise: "2026-02-18T09:00:00.000Z",
+  n8n: "2026-02-11T09:00:00.000Z",
+  qdrant: "2026-03-24T09:00:00.000Z",
+  "open-webui": "2026-03-05T09:00:00.000Z",
+  "llama-factory": "2026-02-22T09:00:00.000Z",
+  "openvino-genai": "2026-02-05T09:00:00.000Z",
+  "roboflow-inference": "2026-01-23T09:00:00.000Z",
+};
+
 export const buildingBlocks = [
   {
     id: "openhands",
@@ -950,4 +971,7 @@ export const buildingBlocks = [
     outputs: ["视觉推理服务", "AI 摄像头系统", "CV 工作流平台"],
     relatedConcepts: ["视觉理解", "多模态模型", "推理", "评测"],
   },
-];
+].map((block) => ({
+  ...block,
+  addedAt: RECENT_BLOCK_ADDED_AT[block.id] ?? null,
+}));

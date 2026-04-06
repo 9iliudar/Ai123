@@ -189,6 +189,25 @@ select {
   border-color: rgba(167, 139, 250, 0.25);
 }
 
+.topbar-add-button {
+  width: 42px;
+  min-width: 42px;
+  padding: 10px 0;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: transparent;
+  position: relative;
+}
+
+.topbar-add-button::before {
+  content: "+";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+}
+
 .primary-button:hover,
 .secondary-button:hover,
 .reset-button:hover {
@@ -2149,6 +2168,27 @@ select {
   font-size: 1.4rem;
 }
 
+.modal-type-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.modal-type-chip {
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #d4d4d8;
+}
+
+.modal-type-chip.active {
+  border-color: rgba(124, 58, 237, 0.46);
+  background: rgba(124, 58, 237, 0.16);
+  color: #fff;
+}
+
 .modal form {
   display: grid;
   gap: 14px;
@@ -2440,6 +2480,16 @@ select {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.universe-filter-row {
+  position: absolute;
+  top: 92px;
+  left: 28px;
+  z-index: 4;
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
 }
 
 .universe-search {

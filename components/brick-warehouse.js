@@ -9,7 +9,10 @@ import {
 } from "@/data/building-blocks";
 
 const BLOCK_STATE_KEY = "ai123_building_blocks_state";
+const CUSTOM_BLOCKS_KEY = "ai123_custom_blocks";
 const ALL_STATUS = "ALL_STATUS";
+const ALL_FRESHNESS = "ALL_FRESHNESS";
+const RECENT_FRESHNESS = "RECENT_FRESHNESS";
 
 const IDEA_EXAMPLES = [
   "做一个自动抓网页并进入知识库的研究助手",
@@ -268,6 +271,16 @@ function formatRecordDate(value) {
   }).format(date);
 }
 
+function isRecentAdded(value) {
+  if (!value) {
+    return false;
+  }
+
+  const addedAt = new Date(value).getTime();
+  const ninetyDaysAgo = Date.now() - 90 * 24 * 60 * 60 * 1000;
+  return Number.isFinite(addedAt) && addedAt >= ninetyDaysAgo;
+}
+
 export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSelectedId }) {
   const defaultStatus = blockStatuses[0] ?? "";
   const [activeWorkspace, setActiveWorkspace] = useState("digest");
@@ -275,6 +288,8 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   const [ideaInput, setIdeaInput] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeStatus, setActiveStatus] = useState(ALL_STATUS);
+  const [activeFreshness, setActiveFreshness] = useState(RECENT_FRESHNESS);
+  const [customBlocks, setCustomBlocks] = useState([]);
   const [selectedId, setSelectedId] = useState(buildingBlocks[0]?.id ?? null);
   const [blockState, setBlockState] = useState(getInitialBlockState);
   const [recordDraft, setRecordDraft] = useState("");
@@ -285,6 +300,26 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
       setBlockState(normalizeStoredState(JSON.parse(storedState)));
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const storedBlocks = window.localStorage.getItem(CUSTOM_BLOCKS_KEY);
+    if (storedBlocks) {
+      setCustomBlocks(JSON.parse(storedBlocks));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!open || typeof window === "undefined") {
+      return;
+    }
+
+    const storedBlocks = window.localStorage.getItem(CUSTOM_BLOCKS_KEY);
+    setCustomBlocks(storedBlocks ? JSON.parse(storedBlocks) : []);
+  }, [open]);
 
   useEffect(() => {
     window.localStorage.setItem(BLOCK_STATE_KEY, JSON.stringify(blockState));
@@ -321,33 +356,38 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
       return;
     }
 
-    const exists = buildingBlocks.some((block) => block.id === initialSelectedId);
+    const exists = [...customBlocks, ...buildingBlocks].some((block) => block.id === initialSelectedId);
     if (exists) {
       setSelectedId(initialSelectedId);
     }
-  }, [initialSelectedId, open]);
+  }, [customBlocks, initialSelectedId, open]);
 
   useEffect(() => {
     setRecordDraft("");
   }, [selectedId]);
 
+  const mergedBlocks = useMemo(() => [...customBlocks, ...buildingBlocks], [customBlocks]);
+
   const tags = useMemo(() => {
-    return [...new Set(buildingBlocks.flatMap((block) => block.tags))].sort((left, right) => left.localeCompare(right));
-  }, []);
+    return [...new Set(mergedBlocks.flatMap((block) => block.tags))].sort((left, right) => left.localeCompare(right));
+  }, [mergedBlocks]);
+
+  const recentBlocksCount = useMemo(() => mergedBlocks.filter((block) => isRecentAdded(block.addedAt)).length, [mergedBlocks]);
 
   const filteredBlocks = useMemo(() => {
     const keyword = query.trim().toLowerCase();
 
-    return buildingBlocks.filter((block) => {
+    return mergedBlocks.filter((block) => {
       const status = blockState[block.id]?.status ?? defaultStatus;
       const matchCategory = activeCategory === "All" || block.category === activeCategory;
       const matchStatus = activeStatus === ALL_STATUS || status === activeStatus;
-      return matchCategory && matchStatus && matchesText(block, keyword);
+      const matchFreshness = activeFreshness === ALL_FRESHNESS || isRecentAdded(block.addedAt);
+      return matchCategory && matchStatus && matchFreshness && matchesText(block, keyword);
     });
-  }, [activeCategory, activeStatus, blockState, defaultStatus, query]);
+  }, [activeCategory, activeFreshness, activeStatus, blockState, defaultStatus, mergedBlocks, query]);
 
   const ideaRecommendations = useMemo(() => {
-    const scored = buildingBlocks
+    const scored = mergedBlocks
       .map((block) => ({
         block,
         score: scoreBlockForIdea(block, ideaInput),
@@ -356,7 +396,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
       .sort((left, right) => right.score - left.score);
 
     return scored.slice(0, 6).map((item) => item.block);
-  }, [ideaInput]);
+  }, [ideaInput, mergedBlocks]);
 
   const ideaPlans = useMemo(() => buildIdeaPlans(ideaRecommendations), [ideaRecommendations]);
 
@@ -375,7 +415,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     return null;
   }
 
-  const selectedBlock = buildingBlocks.find((block) => block.id === selectedId) ?? null;
+  const selectedBlock = mergedBlocks.find((block) => block.id === selectedId) ?? null;
   const digestSelectedBlock = filteredBlocks.find((block) => block.id === selectedId) ?? null;
   const selectedStatus = selectedBlock ? blockState[selectedBlock.id]?.status ?? defaultStatus : defaultStatus;
   const selectedRecords = selectedBlock ? [...(blockState[selectedBlock.id]?.records ?? [])].reverse() : [];
@@ -488,6 +528,29 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
               </label>
 
               <div className="blocks-explorer-stack">
+                <section className="blocks-filter-card blocks-filter-card-muted">
+                  <div className="blocks-filter-head">
+                    <span>时间</span>
+                    <strong>{recentBlocksCount}</strong>
+                  </div>
+                  <div className="blocks-chip-group">
+                    <button
+                      type="button"
+                      className={`blocks-chip ${activeFreshness === RECENT_FRESHNESS ? "active" : ""}`}
+                      onClick={() => setActiveFreshness(RECENT_FRESHNESS)}
+                    >
+                      最近添加
+                    </button>
+                    <button
+                      type="button"
+                      className={`blocks-chip ${activeFreshness === ALL_FRESHNESS ? "active" : ""}`}
+                      onClick={() => setActiveFreshness(ALL_FRESHNESS)}
+                    >
+                      全部
+                    </button>
+                  </div>
+                </section>
+
                 <section className="blocks-filter-card blocks-filter-card-muted">
                   <div className="blocks-filter-head">
                     <span>分类</span>
