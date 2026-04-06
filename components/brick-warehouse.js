@@ -800,8 +800,18 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                   <div className="blocks-focus-grid">
                     <section className="blocks-focus-main">
                       <section className="blocks-detail-section">
+                        <span>它在体系里的位置</span>
+                        <p>{digestSelectedBlock.positioning ?? digestSelectedBlock.summary}</p>
+                      </section>
+
+                      <section className="blocks-detail-section">
                         <span>它解决什么问题</span>
                         <p>{digestSelectedBlock.solves}</p>
+                      </section>
+
+                      <section className="blocks-detail-section">
+                        <span>最适合先拿来做什么</span>
+                        <p>{digestSelectedBlock.bestFor}</p>
                       </section>
 
                       <section className="blocks-detail-section">
@@ -824,6 +834,21 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                             </span>
                           ))}
                         </div>
+                      </section>
+
+                      <section className="blocks-detail-section">
+                        <span>先怎么开始研究它</span>
+                        <p>{digestSelectedBlock.entryPath}</p>
+                      </section>
+
+                      <section className="blocks-detail-section">
+                        <span>研究时重点看什么</span>
+                        <p>{digestSelectedBlock.evaluationFocus}</p>
+                      </section>
+
+                      <section className="blocks-detail-section">
+                        <span>容易误判的点</span>
+                        <p>{digestSelectedBlock.watchouts}</p>
                       </section>
 
                       <section className="blocks-detail-section">

@@ -1,3 +1,5 @@
+import { enrichBlock } from "@/data/building-block-enrichment";
+
 export const blockCategories = [
   "All",
   "Agent",
@@ -972,6 +974,6 @@ export const buildingBlocks = [
     relatedConcepts: ["视觉理解", "多模态模型", "推理", "评测"],
   },
 ].map((block) => ({
-  ...block,
+  ...enrichBlock(block),
   addedAt: RECENT_BLOCK_ADDED_AT[block.id] ?? null,
 }));
