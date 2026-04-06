@@ -547,7 +547,7 @@ export default function Dashboard() {
         {tools.map((tool) => (
           <article
             key={tool.id}
-            className={`card ${draggedId === tool.id ? "is-dragging" : ""} ${dropTargetId === tool.id ? "is-drop-target" : ""}`}
+            className={`card ${draggedId === tool.id ? "is-dragging" : ""} ${dropTargetId === tool.id ? "is-drop-target" : ""} ${dragArmedId === tool.id ? "is-drag-ready" : ""}`}
             draggable={dragArmedId === tool.id}
             onDragStart={(event) => handleDragStart(event, tool.id)}
             onDragOver={(event) => {
@@ -586,7 +586,7 @@ export default function Dashboard() {
                 <div className="card-top-meta">
                   {tool.badge ? <span className={`badge ${tool.badgeClass}`}>{tool.badge}</span> : <span className="badge badge-placeholder" aria-hidden="true" />}
                   <button
-                    className="drag-handle"
+                    className={`drag-handle ${dragArmedId === tool.id ? "is-armed" : ""}`}
                     type="button"
                     aria-label={`拖动 ${tool.name}`}
                     onMouseDown={() => setDragArmedId(tool.id)}
