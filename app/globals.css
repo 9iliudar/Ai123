@@ -2531,7 +2531,7 @@ select {
     radial-gradient(circle at 16% 18%, color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 70%, transparent), transparent 30%),
     radial-gradient(circle at 84% 20%, rgba(59, 130, 246, 0.08), transparent 26%),
     radial-gradient(circle at 50% 85%, rgba(255, 255, 255, 0.03), transparent 32%),
-    rgba(5, 6, 11, 0.46);
+    rgba(5, 6, 11, 0.58);
   backdrop-filter: blur(6px) saturate(1.04);
   animation: universeOverlayIn 260ms ease-out;
 }

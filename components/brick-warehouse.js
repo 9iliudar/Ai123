@@ -593,6 +593,26 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     }
   }
 
+  function showResultsWithQuery(nextQuery) {
+    setQuery(nextQuery);
+    setSelectedId(null);
+  }
+
+  function showResultsWithFreshness(nextFreshness) {
+    setActiveFreshness(nextFreshness);
+    setSelectedId(null);
+  }
+
+  function showResultsWithCategory(nextCategory) {
+    setActiveCategory(nextCategory);
+    setSelectedId(null);
+  }
+
+  function showResultsWithStatus(nextStatus) {
+    setActiveStatus(nextStatus);
+    setSelectedId(null);
+  }
+
   function focusBlock(blockId) {
     setSelectedId(blockId);
     setActiveWorkspace("digest");
@@ -641,7 +661,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 <input
                   type="text"
                   value={query}
-                  onChange={(event) => setQuery(event.target.value)}
+                  onChange={(event) => showResultsWithQuery(event.target.value)}
                   placeholder="搜索项目、标签、概念..."
                 />
                 {query ? (
@@ -650,7 +670,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                     className="blocks-search-clear"
                     aria-label="清空搜索"
                     title="清空搜索"
-                    onClick={() => setQuery("")}
+                    onClick={() => showResultsWithQuery("")}
                   >
                     x
                   </button>
@@ -667,14 +687,14 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                     <button
                       type="button"
                       className={`blocks-chip ${activeFreshness === ALL_FRESHNESS ? "active" : ""}`}
-                      onClick={() => setActiveFreshness(ALL_FRESHNESS)}
+                      onClick={() => showResultsWithFreshness(ALL_FRESHNESS)}
                     >
                       全部
                     </button>
                     <button
                       type="button"
                       className={`blocks-chip ${activeFreshness === RECENT_FRESHNESS ? "active" : ""}`}
-                      onClick={() => setActiveFreshness(RECENT_FRESHNESS)}
+                      onClick={() => showResultsWithFreshness(RECENT_FRESHNESS)}
                     >
                       最近添加
                     </button>
@@ -692,7 +712,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                         key={category}
                         type="button"
                         className={`blocks-chip ${activeCategory === category ? "active" : ""}`}
-                        onClick={() => setActiveCategory(category)}
+                        onClick={() => showResultsWithCategory(category)}
                       >
                         {blockCategoryLabels[category] ?? category}
                       </button>
@@ -708,7 +728,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                     <button
                       type="button"
                       className={`blocks-chip ${activeStatus === ALL_STATUS ? "active" : ""}`}
-                      onClick={() => setActiveStatus(ALL_STATUS)}
+                      onClick={() => showResultsWithStatus(ALL_STATUS)}
                     >
                       全部
                     </button>
@@ -717,7 +737,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                         key={status}
                         type="button"
                         className={`blocks-chip ${activeStatus === status ? "active" : ""}`}
-                        onClick={() => setActiveStatus(status)}
+                        onClick={() => showResultsWithStatus(status)}
                       >
                         {status}
                       </button>
@@ -731,7 +751,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                   </div>
                   <div className="blocks-tag-cloud">
                     {tags.map((tag) => (
-                      <button key={tag} type="button" className="blocks-mini-tag" onClick={() => setQuery(tag)}>
+                      <button key={tag} type="button" className="blocks-mini-tag" onClick={() => showResultsWithQuery(tag)}>
                         {tag}
                       </button>
                     ))}
@@ -788,7 +808,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                         <span>可以和谁组合</span>
                         <div className="blocks-pill-row">
                           {digestSelectedBlock.composeWith.map((item) => (
-                            <button key={item} type="button" className="blocks-pill" onClick={() => setQuery(item)}>
+                            <button key={item} type="button" className="blocks-pill" onClick={() => showResultsWithQuery(item)}>
                               {item}
                             </button>
                           ))}
@@ -821,7 +841,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                         <span>标签</span>
                         <div className="blocks-pill-row">
                           {digestSelectedBlock.tags.map((item) => (
-                            <button key={item} type="button" className="blocks-pill" onClick={() => setQuery(item)}>
+                            <button key={item} type="button" className="blocks-pill" onClick={() => showResultsWithQuery(item)}>
                               {item}
                             </button>
                           ))}
