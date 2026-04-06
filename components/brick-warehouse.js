@@ -687,7 +687,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 <div className="blocks-results-stage">
                   <div className="blocks-results-head">
                     <div>
-                      <p className="blocks-panel-kicker">检索结果</p>
                       <h3>{filteredBlocks.length ? "结果列表" : "没有匹配结果"}</h3>
                     </div>
                     <p>{filteredBlocks.length ? `当前共有 ${filteredBlocks.length} 个结果` : "换一个关键词、分类或状态试试。"}</p>
