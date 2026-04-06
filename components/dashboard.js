@@ -7,16 +7,26 @@ import { categories, categoryLabels, defaultTools } from "@/data/default-tools";
 import { blockCategories, blockCategoryLabels } from "@/data/building-blocks";
 import { conceptUniverse } from "@/data/concept-graph";
 import repoCustomTools from "@/data/custom-tools.json";
+import repoToolOrder from "@/data/tool-order.json";
 
 const CUSTOM_TOOLS_KEY = "ai123_custom_tools";
 const CUSTOM_BLOCKS_KEY = "ai123_custom_blocks";
 const CUSTOM_CONCEPTS_KEY = "ai123_custom_concepts";
 const TOOLS_ORDER_KEY = "ai123_tools_order";
+const SYNC_CODE_KEY = "ai123_sync_code";
 const ICON_VERSION = "2";
 const ADDABLE_TYPES = ["tool", "block", "concept"];
 
+function mergeOrderIds(...groups) {
+  return [...new Set(groups.flat().filter(Boolean))];
+}
+
 function getInitialOrder() {
-  return defaultTools.map((tool) => tool.id);
+  return mergeOrderIds(
+    repoToolOrder,
+    defaultTools.map((tool) => tool.id),
+    repoCustomTools.map((tool) => tool.id)
+  );
 }
 
 function getIconSeed(value) {
@@ -36,6 +46,56 @@ function getIconPalette(value) {
   ];
 
   return palettes[getIconSeed(value) % palettes.length];
+}
+
+function normalizeUrl(value) {
+  if (!value.trim()) {
+    return "";
+  }
+
+  return value.startsWith("http") ? value : `https://${value}`;
+}
+
+function slugify(value) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function getEmptyDraft(syncCode = "") {
+  return {
+    name: "",
+    link: "",
+    cat: "Other",
+    desc: "",
+    syncCode,
+    clusterId: conceptUniverse.clusters[0]?.id ?? "",
+  };
+}
+
+function sortTools(tools, order) {
+  const rankMap = new Map(order.map((id, index) => [id, index]));
+  const dedupedTools = [...new Map(tools.map((tool) => [tool.id, tool])).values()];
+
+  return dedupedTools.sort((left, right) => {
+    const leftRank = rankMap.has(left.id) ? rankMap.get(left.id) : Number.MAX_SAFE_INTEGER;
+    const rightRank = rankMap.has(right.id) ? rankMap.get(right.id) : Number.MAX_SAFE_INTEGER;
+
+    if (leftRank !== rightRank) {
+      return leftRank - rightRank;
+    }
+
+    const leftTime = left.addedAt ? new Date(left.addedAt).getTime() : 0;
+    const rightTime = right.addedAt ? new Date(right.addedAt).getTime() : 0;
+
+    if (leftTime !== rightTime) {
+      return rightTime - leftTime;
+    }
+
+    return left.name.localeCompare(right.name);
+  });
 }
 
 function ToolIcon({ tool }) {
@@ -67,71 +127,6 @@ function ToolIcon({ tool }) {
   );
 }
 
-function sortTools(tools, order) {
-  const rankMap = new Map(order.map((id, index) => [id, index]));
-  const dedupedTools = [...new Map(tools.map((tool) => [tool.id, tool])).values()];
-  return dedupedTools.sort((left, right) => {
-    const leftRank = rankMap.has(left.id) ? rankMap.get(left.id) : Number.MAX_SAFE_INTEGER;
-    const rightRank = rankMap.has(right.id) ? rankMap.get(right.id) : Number.MAX_SAFE_INTEGER;
-    if (leftRank !== rightRank) {
-      return leftRank - rightRank;
-    }
-
-    const leftTime = left.addedAt ? new Date(left.addedAt).getTime() : 0;
-    const rightTime = right.addedAt ? new Date(right.addedAt).getTime() : 0;
-    if (leftTime !== rightTime) {
-      return rightTime - leftTime;
-    }
-
-    return left.name.localeCompare(right.name);
-  });
-}
-
-function normalizeUrl(value) {
-  if (!value.trim()) {
-    return "";
-  }
-
-  return value.startsWith("http") ? value : `https://${value}`;
-}
-
-function slugify(value) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-function splitDraftList(value) {
-  return value
-    .split(/[,，、\n]+/)
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-function getEmptyDraft() {
-  return {
-    name: "",
-    link: "",
-    cat: "Other",
-    desc: "",
-    clusterId: conceptUniverse.clusters[0]?.id ?? "",
-  };
-}
-
-function downloadJson(filename, payload) {
-  const blob = new Blob([JSON.stringify(payload, null, 2)], {
-    type: "application/json;charset=utf-8",
-  });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = filename;
-  anchor.click();
-  URL.revokeObjectURL(url);
-}
-
 export default function Dashboard() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
@@ -139,20 +134,22 @@ export default function Dashboard() {
   const [order, setOrder] = useState(getInitialOrder);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [draftType, setDraftType] = useState("tool");
+  const [draft, setDraft] = useState(getEmptyDraft());
+  const [editingToolId, setEditingToolId] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
   const [isConceptOpen, setIsConceptOpen] = useState(false);
   const [isWarehouseOpen, setIsWarehouseOpen] = useState(false);
   const [requestedConcept, setRequestedConcept] = useState("");
   const [requestedBlockId, setRequestedBlockId] = useState(null);
-  const [draft, setDraft] = useState(getEmptyDraft);
   const [draggedId, setDraggedId] = useState(null);
   const [dragArmedId, setDragArmedId] = useState(null);
   const [dropTargetId, setDropTargetId] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [editingToolId, setEditingToolId] = useState(null);
 
   useEffect(() => {
     const storedTools = window.localStorage.getItem(CUSTOM_TOOLS_KEY);
     const storedOrder = window.localStorage.getItem(TOOLS_ORDER_KEY);
+    const storedSyncCode = window.localStorage.getItem(SYNC_CODE_KEY) ?? "";
 
     if (storedTools) {
       setCustomTools(JSON.parse(storedTools));
@@ -161,6 +158,8 @@ export default function Dashboard() {
     if (storedOrder) {
       setOrder(JSON.parse(storedOrder));
     }
+
+    setDraft((current) => ({ ...current, syncCode: storedSyncCode }));
   }, []);
 
   useEffect(() => {
@@ -170,6 +169,17 @@ export default function Dashboard() {
   useEffect(() => {
     window.localStorage.setItem(TOOLS_ORDER_KEY, JSON.stringify(order));
   }, [order]);
+
+  useEffect(() => {
+    const syncCode = draft.syncCode.trim();
+
+    if (!syncCode) {
+      window.localStorage.removeItem(SYNC_CODE_KEY);
+      return;
+    }
+
+    window.localStorage.setItem(SYNC_CODE_KEY, syncCode);
+  }, [draft.syncCode]);
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -185,6 +195,7 @@ export default function Dashboard() {
 
   const tools = useMemo(() => {
     const mergedTools = sortTools([...repoCustomTools, ...defaultTools, ...customTools], order);
+
     return mergedTools.filter((tool) => {
       const matchCategory = activeCategory === "All" || tool.cat === activeCategory;
       const content = `${tool.name} ${tool.desc}`.toLowerCase();
@@ -192,71 +203,112 @@ export default function Dashboard() {
     });
   }, [activeCategory, customTools, order, search]);
 
+  function resetDraft(type = draftType) {
+    const syncCode = draft.syncCode.trim();
+    setDraft({
+      ...getEmptyDraft(syncCode),
+      cat: type === "block" ? "Agent" : "Other",
+    });
+  }
+
   function handleDraftChange(event) {
     const { name, value } = event.target;
     setDraft((current) => ({ ...current, [name]: value }));
   }
 
-  function resetDraft(type = "tool") {
-    setDraft({
-      ...getEmptyDraft(),
-      cat: type === "block" ? "Agent" : "Other",
-    });
-  }
-
   function handleDraftTypeChange(type) {
     setDraftType(type);
-    resetDraft(type);
     setEditingToolId(null);
+    setDraft((current) => ({
+      ...getEmptyDraft(current.syncCode),
+      cat: type === "block" ? "Agent" : "Other",
+    }));
   }
 
   function openAddModal(type = "tool") {
     setEditingToolId(null);
     setDraftType(type);
-    resetDraft(type);
+    setDraft((current) => ({
+      ...getEmptyDraft(current.syncCode),
+      cat: type === "block" ? "Agent" : "Other",
+    }));
+    setStatusMessage("");
     setIsModalOpen(true);
+  }
+
+  function closeModal() {
+    setIsModalOpen(false);
+    setEditingToolId(null);
+    resetDraft(draftType);
   }
 
   function handleEditTool(tool) {
     setEditingToolId(tool.id);
     setDraftType("tool");
-    setDraft({
-      ...getEmptyDraft(),
+    setDraft((current) => ({
+      ...getEmptyDraft(current.syncCode),
       name: tool.name ?? "",
       link: tool.link ?? "",
       cat: tool.cat ?? "Other",
       desc: tool.desc ?? "",
-    });
+    }));
+    setStatusMessage("");
     setIsModalOpen(true);
   }
 
-  function handleExportDraftType() {
-    if (typeof window === "undefined") {
-      return;
+  function buildLocalDraftItem(type) {
+    const timestamp = new Date().toISOString();
+
+    if (type === "tool") {
+      return {
+        id: editingToolId || `custom_${Date.now()}`,
+        name: draft.name.trim(),
+        link: normalizeUrl(draft.link),
+        desc: draft.desc.trim() || "自定义站点入口",
+        cat: draft.cat,
+        isCustom: true,
+        addedAt: timestamp,
+      };
     }
 
-    const exportTime = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-
-    if (draftType === "tool") {
-      downloadJson(
-        `ai123-tools-${exportTime}.json`,
-        customTools.filter((tool) => tool.isCustom)
-      );
-      return;
+    if (type === "block") {
+      return {
+        id: `custom-block-${slugify(draft.name)}-${Date.now()}`,
+        name: draft.name.trim(),
+        category: draft.cat,
+        github: "",
+        website: "",
+        summary: draft.desc.trim() || `${draft.name.trim()} 的自定义积木条目`,
+        tags: [],
+        solves: draft.desc.trim() || `${draft.name.trim()} 的能力说明`,
+        composeWith: [],
+        outputs: [],
+        relatedConcepts: [],
+        isCustom: true,
+        needsEnrichment: true,
+        addedAt: timestamp,
+      };
     }
 
-    if (draftType === "block") {
-      downloadJson(
-        `ai123-blocks-${exportTime}.json`,
-        JSON.parse(window.localStorage.getItem(CUSTOM_BLOCKS_KEY) ?? "[]")
-      );
-      return;
-    }
+    const cluster =
+      conceptUniverse.clusters.find((item) => item.id === draft.clusterId) ??
+      conceptUniverse.clusters[0];
 
-    downloadJson(
-      `ai123-concepts-${exportTime}.json`,
-      JSON.parse(window.localStorage.getItem(CUSTOM_CONCEPTS_KEY) ?? "[]")
-    );
+    return {
+      id: `custom-concept-${slugify(draft.name)}-${Date.now()}`,
+      name: draft.name.trim(),
+      summary: draft.desc.trim() || `${draft.name.trim()} 的概念摘要`,
+      detail: draft.desc.trim() || `${draft.name.trim()} 的概念说明`,
+      importance: 3,
+      english: "",
+      chinese: "",
+      domain: cluster?.label ?? "",
+      theme: cluster?.theme ?? "violet",
+      related: [],
+      isCustom: true,
+      needsLinking: true,
+      addedAt: timestamp,
+    };
   }
 
   function mergeStoredItems(key, item) {
@@ -266,9 +318,39 @@ export default function Dashboard() {
     return next;
   }
 
+  async function persistToolOrder(nextOrder, nextSyncCode = draft.syncCode.trim(), silent = false) {
+    try {
+      const response = await fetch("/api/save-tool-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          order: nextOrder,
+          syncCode: nextSyncCode,
+        }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.message || "保存排序失败");
+      }
+
+      if (!silent) {
+        setStatusMessage(payload.mode === "remote" ? "顺序已写入仓库" : "顺序仅保存到当前浏览器");
+      }
+    } catch (error) {
+      if (!silent) {
+        window.alert(error.message || "保存排序失败，请稍后重试。");
+      }
+    }
+  }
+
   function handleDeleteTool(id) {
     setCustomTools((current) => current.filter((tool) => tool.id !== id));
     setOrder((current) => current.filter((item) => item !== id));
+    setStatusMessage("已从当前浏览器移除");
   }
 
   async function handleAddItemSubmit(event) {
@@ -283,8 +365,10 @@ export default function Dashboard() {
     }
 
     setIsSubmitting(true);
+    setStatusMessage("");
 
     try {
+      const nextSyncCode = draft.syncCode.trim();
       const response = await fetch("/api/submit-item", {
         method: "POST",
         headers: {
@@ -294,6 +378,7 @@ export default function Dashboard() {
           type: draftType,
           ...(editingToolId ? { id: editingToolId } : {}),
           ...draft,
+          syncCode: nextSyncCode,
         }),
       });
 
@@ -303,25 +388,27 @@ export default function Dashboard() {
         throw new Error(payload.message || "提交失败");
       }
 
-      const item = payload.item;
+      const item = payload.item ?? buildLocalDraftItem(draftType);
 
       if (draftType === "tool") {
-        setCustomTools((current) => {
-          const next = [item, ...current.filter((entry) => entry.id !== item.id)];
-          return next;
-        });
-        setOrder((current) =>
-          editingToolId ? current : [item.id, ...current.filter((id) => id !== item.id)]
-        );
+        const nextOrder = editingToolId
+          ? order
+          : mergeOrderIds([item.id], order, defaultTools.map((tool) => tool.id), repoCustomTools.map((tool) => tool.id));
+
+        setCustomTools((current) => [item, ...current.filter((entry) => entry.id !== item.id)]);
+        setOrder(nextOrder);
+
+        if (payload.mode === "remote") {
+          await persistToolOrder(nextOrder, nextSyncCode, true);
+        }
       } else if (draftType === "block") {
         mergeStoredItems(CUSTOM_BLOCKS_KEY, item);
       } else {
         mergeStoredItems(CUSTOM_CONCEPTS_KEY, item);
       }
 
-      resetDraft(draftType);
-      setEditingToolId(null);
-      setIsModalOpen(false);
+      closeModal();
+      setStatusMessage(payload.mode === "remote" ? "已写入仓库" : "已保存到当前浏览器");
     } catch (error) {
       window.alert(error.message || "提交失败，请稍后重试。");
     } finally {
@@ -334,8 +421,11 @@ export default function Dashboard() {
     window.localStorage.removeItem(CUSTOM_BLOCKS_KEY);
     window.localStorage.removeItem(CUSTOM_CONCEPTS_KEY);
     window.localStorage.removeItem(TOOLS_ORDER_KEY);
+    window.localStorage.removeItem(SYNC_CODE_KEY);
     setCustomTools([]);
     setOrder(getInitialOrder());
+    setDraft(getEmptyDraft());
+    setStatusMessage("");
     setSearch("");
     setActiveCategory("All");
   }
@@ -358,12 +448,11 @@ export default function Dashboard() {
       return;
     }
 
-    setOrder((current) => {
-      const next = current.filter((id) => id !== draggedId);
-      const targetIndex = next.indexOf(targetId);
-      next.splice(targetIndex, 0, draggedId);
-      return next;
-    });
+    const nextOrder = order.filter((id) => id !== draggedId);
+    const targetIndex = nextOrder.indexOf(targetId);
+    nextOrder.splice(targetIndex, 0, draggedId);
+    setOrder(nextOrder);
+    void persistToolOrder(nextOrder);
     setDraggedId(null);
     setDropTargetId(null);
     setDragArmedId(null);
@@ -415,9 +504,7 @@ export default function Dashboard() {
       <section className="hero">
         <p className="hero-kicker">Personal Startpage</p>
         <h1>你的专属 AI 导航页</h1>
-        <p className="hero-copy">
-          常用站点负责效率，概念宇宙负责认知，积木仓库负责沉淀未来可以反复组合的开源能力。
-        </p>
+        <p className="hero-copy">常用站点负责效率，概念宇宙负责认知，积木仓库负责沉淀未来可以反复组合的开源能力。</p>
 
         <div className="search-wrap">
           <input
@@ -529,21 +616,14 @@ export default function Dashboard() {
 
       <footer className="footer">
         <p>Ai123 会先用浏览器本地存储保存你的自定义站点；概念宇宙与积木仓库则负责把认知地图和开源能力持续沉淀下来。</p>
+        {statusMessage ? <p className="footer-status">{statusMessage}</p> : null}
         <button className="reset-button" type="button" onClick={handleReset}>
           重置布局和自定义数据
         </button>
       </footer>
 
       {isModalOpen ? (
-        <div
-          className="modal-overlay"
-          role="presentation"
-          onClick={() => {
-            setIsModalOpen(false);
-            setEditingToolId(null);
-            resetDraft(draftType);
-          }}
-        >
+        <div className="modal-overlay" role="presentation" onClick={closeModal}>
           <div className="modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
             <h3>{editingToolId ? "编辑网站信息" : "追加信息项"}</h3>
             <form onSubmit={handleAddItemSubmit}>
@@ -560,6 +640,7 @@ export default function Dashboard() {
                   </button>
                 ))}
               </div>
+
               <label>
                 名称
                 <input
@@ -570,12 +651,14 @@ export default function Dashboard() {
                   placeholder={draftType === "tool" ? "例如：飞书后台" : draftType === "block" ? "例如：Browser Use" : "例如：RAG"}
                 />
               </label>
+
               {draftType === "tool" ? (
                 <label>
                   URL
                   <input name="link" type="text" value={draft.link} onChange={handleDraftChange} placeholder="https://..." />
                 </label>
               ) : null}
+
               <label>
                 {draftType === "concept" ? "类别" : "分类"}
                 <select name={draftType === "concept" ? "clusterId" : "cat"} value={draftType === "concept" ? draft.clusterId : draft.cat} onChange={handleDraftChange}>
@@ -590,6 +673,7 @@ export default function Dashboard() {
                   ))}
                 </select>
               </label>
+
               <label>
                 梗概
                 <input
@@ -600,19 +684,18 @@ export default function Dashboard() {
                   placeholder={draftType === "tool" ? "一句话说明用途" : "先记下关键描述，可留空"}
                 />
               </label>
-              <p className="modal-hint">提交后会写入仓库 JSON。网站可直接使用，积木和概念后续再由你本地拉取做补全、关联和网络化。</p>
+
+              <p className="modal-hint">留空时仅保存到当前浏览器；输入正确的入库校验码后，信息会直接写入仓库 JSON。</p>
+
               <div className="modal-actions">
-                <button
-                  className="secondary-button"
-                  type="button"
-                  onClick={() => {
-                    setIsModalOpen(false);
-                    setEditingToolId(null);
-                    resetDraft(draftType);
-                  }}
-                >
-                  取消
-                </button>
+                <input
+                  className="modal-code-input"
+                  name="syncCode"
+                  type="text"
+                  value={draft.syncCode}
+                  onChange={handleDraftChange}
+                  placeholder="入库校验码，可选填"
+                />
                 <button className="primary-button" type="submit" disabled={isSubmitting}>
                   {isSubmitting
                     ? "提交中..."
@@ -645,4 +728,3 @@ export default function Dashboard() {
     </main>
   );
 }
-

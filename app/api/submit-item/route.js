@@ -39,6 +39,26 @@ function assertType(type) {
   }
 }
 
+function resolveWriteMode(syncCode) {
+  const incomingCode = syncCode?.trim() || "";
+
+  if (!incomingCode) {
+    return "local";
+  }
+
+  const writeToken = process.env.WRITE_API_TOKEN?.trim();
+
+  if (!writeToken) {
+    throw new Error("missing_write_token");
+  }
+
+  if (incomingCode !== writeToken) {
+    throw new Error("invalid_sync_code");
+  }
+
+  return "remote";
+}
+
 function buildToolItem(payload, timestamp) {
   if (!payload.name?.trim() || !payload.link?.trim()) {
     throw new Error("missing_required_fields");
@@ -205,6 +225,11 @@ export async function POST(request) {
     const timestamp = new Date().toISOString();
     const item = buildItem(type, payload, timestamp);
     const relativePath = FILE_PATHS[type];
+    const writeMode = resolveWriteMode(payload?.syncCode);
+
+    if (writeMode === "local") {
+      return jsonResponse({ ok: true, item, path: relativePath, mode: "local" });
+    }
 
     const token = process.env.GITHUB_TOKEN;
     const owner = process.env.GITHUB_REPO_OWNER || "9iliudar";
@@ -222,15 +247,34 @@ export async function POST(request) {
       );
     }
 
-    return jsonResponse({ ok: true, item, path: relativePath, mode: payload?.id ? "update" : "create" });
+    return jsonResponse({
+      ok: true,
+      item,
+      path: relativePath,
+      mode: payload?.id ? "update" : "create",
+      storage: "repo",
+    });
   } catch (error) {
     const status =
-      error.message === "unsupported_type" || error.message === "missing_required_fields" ? 400 : 500;
+      error.message === "unsupported_type" || error.message === "missing_required_fields"
+        ? 400
+        : error.message === "invalid_sync_code"
+          ? 403
+          : 500;
+
+    const message =
+      status === 400
+        ? "提交内容不完整或类型无效。"
+        : status === 403
+          ? "入库校验码不正确。"
+          : error.message === "missing_write_token"
+            ? "服务端未配置入库校验码。"
+            : "写入仓库失败，请检查 GitHub Token 或稍后重试。";
 
     return jsonResponse(
       {
         error: error.message,
-        message: status === 400 ? "提交内容不完整或类型无效。" : "写入仓库失败，请检查 GitHub Token 或稍后重试。",
+        message,
       },
       { status }
     );

@@ -572,6 +572,10 @@ select {
   line-height: 1.7;
 }
 
+.footer-status {
+  color: #c4b5fd;
+}
+
 .blocks-overlay {
   position: fixed;
   inset: 0;
@@ -2257,6 +2261,10 @@ select {
 
 .modal-actions > * {
   flex: 1 1 132px;
+}
+
+.modal-code-input {
+  min-width: 180px;
 }
 
 @media (max-width: 720px) {
