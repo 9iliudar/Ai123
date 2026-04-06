@@ -400,7 +400,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
         <div className="blocks-topbar">
           <div className="blocks-brand">
             <h2>积木仓库</h2>
-            <p>把值得反复研究的开源能力模块沉淀下来，未来再拼成真正适合你的产品。</p>
           </div>
 
           <div className="blocks-top-actions">
@@ -430,9 +429,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
           <div className="blocks-browse-layout">
             <aside className="blocks-explorer scroll-surface">
               <div className="blocks-explorer-head">
-                <div>
-                  <p className="blocks-panel-kicker">项目探索</p>
-                </div>
                 <strong>{filteredBlocks.length}</strong>
               </div>
 
