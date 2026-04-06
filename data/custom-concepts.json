@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "id": "custom-concept-一条概念测试-1775469886785",
+    "name": "一条概念测试",
+    "summary": "巴拉巴拉",
+    "detail": "巴拉巴拉",
+    "importance": 3,
+    "english": "",
+    "chinese": "",
+    "domain": "核心原理",
+    "theme": "violet",
+    "related": [],
+    "isCustom": true,
+    "needsLinking": true,
+    "addedAt": "2026-04-06T10:04:46.784Z"
+  }
+]
