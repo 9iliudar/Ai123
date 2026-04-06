@@ -13,9 +13,22 @@ import repoBlockState from "@/data/block-state.json";
 const BLOCK_STATE_KEY = "ai123_building_blocks_state";
 const CUSTOM_BLOCKS_KEY = "ai123_custom_blocks";
 const SYNC_CODE_KEY = "ai123_sync_code";
+const LAST_SELECTED_BLOCK_KEY = "ai123_last_selected_block";
 const ALL_STATUS = "ALL_STATUS";
 const ALL_FRESHNESS = "ALL_FRESHNESS";
 const RECENT_FRESHNESS = "RECENT_FRESHNESS";
+const REMOVED_TEST_BLOCK_IDS = new Set([
+  "custom-block-绉湪鍏ュ簱娴嬭瘯-1775478163643",
+  "custom-block-杩欐槸涓€鏉＄Ｎ鏈ㄦ柊澧炴祴璇?1775469920381",
+]);
+
+function sanitizeCustomBlocks(items) {
+  if (!Array.isArray(items)) {
+    return [];
+  }
+
+  return items.filter((item) => item?.id && !REMOVED_TEST_BLOCK_IDS.has(item.id));
+}
 
 function mergeUniqueById(items) {
   return [...new Map(items.map((item) => [item.id, item])).values()];
@@ -305,7 +318,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   const [activeStatus, setActiveStatus] = useState(ALL_STATUS);
   const [activeFreshness, setActiveFreshness] = useState(ALL_FRESHNESS);
   const [customBlocks, setCustomBlocks] = useState([]);
-  const [selectedId, setSelectedId] = useState(buildingBlocks[0]?.id ?? null);
+  const [selectedId, setSelectedId] = useState(null);
   const [blockState, setBlockState] = useState(() => normalizeStoredState(repoBlockState));
   const [recordDraft, setRecordDraft] = useState("");
   const [syncCode, setSyncCode] = useState("");
@@ -332,7 +345,9 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
 
     const storedBlocks = window.localStorage.getItem(CUSTOM_BLOCKS_KEY);
     if (storedBlocks) {
-      setCustomBlocks(JSON.parse(storedBlocks));
+      const parsed = sanitizeCustomBlocks(JSON.parse(storedBlocks));
+      setCustomBlocks(parsed);
+      window.localStorage.setItem(CUSTOM_BLOCKS_KEY, JSON.stringify(parsed));
     }
   }, []);
 
@@ -342,7 +357,9 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     }
 
     const storedBlocks = window.localStorage.getItem(CUSTOM_BLOCKS_KEY);
-    setCustomBlocks(storedBlocks ? JSON.parse(storedBlocks) : []);
+    const parsed = sanitizeCustomBlocks(storedBlocks ? JSON.parse(storedBlocks) : []);
+    setCustomBlocks(parsed);
+    window.localStorage.setItem(CUSTOM_BLOCKS_KEY, JSON.stringify(parsed));
   }, [open]);
 
   useEffect(() => {
@@ -400,7 +417,34 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   }, [customBlocks, initialSelectedId, open]);
 
   useEffect(() => {
+    if (!open || initialSelectedId || typeof window === "undefined") {
+      return;
+    }
+
+    const storedSelectedId = window.localStorage.getItem(LAST_SELECTED_BLOCK_KEY);
+    if (!storedSelectedId) {
+      setSelectedId(null);
+      return;
+    }
+
+    const exists = [...customBlocks, ...repoCustomBlocks, ...buildingBlocks].some((block) => block.id === storedSelectedId);
+    setSelectedId(exists ? storedSelectedId : null);
+  }, [customBlocks, initialSelectedId, open]);
+
+  useEffect(() => {
     setRecordDraft("");
+  }, [selectedId]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (!selectedId) {
+      return;
+    }
+
+    window.localStorage.setItem(LAST_SELECTED_BLOCK_KEY, selectedId);
   }, [selectedId]);
 
   const mergedBlocks = useMemo(

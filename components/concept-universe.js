@@ -25,6 +25,10 @@ const MASTERY_STORAGE_KEY = "ai123_concept_mastery";
 const CUSTOM_CONCEPTS_KEY = "ai123_custom_concepts";
 const ALL_FRESHNESS = "ALL_FRESHNESS";
 const RECENT_FRESHNESS = "RECENT_FRESHNESS";
+const REMOVED_TEST_CONCEPT_IDS = new Set([
+  "custom-concept-姒傚康鍏ュ簱娴嬭瘯-1775478236882",
+  "custom-concept-涓€鏉℃蹇垫祴璇?1775469886785",
+]);
 
 function mergeUniqueById(items) {
   return [...new Map(items.map((item) => [item.id, item])).values()];
@@ -36,6 +40,22 @@ function clamp(value, min, max) {
 
 function dedupe(values) {
   return [...new Set(values)];
+}
+
+function sanitizeCustomConcepts(items) {
+  if (!Array.isArray(items)) {
+    return [];
+  }
+
+  return items.filter((item) => item?.id && !REMOVED_TEST_CONCEPT_IDS.has(item.id));
+}
+
+function sanitizeMasteryMap(rawMap) {
+  if (!rawMap || typeof rawMap !== "object") {
+    return {};
+  }
+
+  return Object.fromEntries(Object.entries(rawMap).filter(([key]) => !REMOVED_TEST_CONCEPT_IDS.has(key)));
 }
 
 function buildNodeMap(nodes) {
@@ -300,7 +320,9 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
 
     const storedConcepts = window.localStorage.getItem(CUSTOM_CONCEPTS_KEY);
     if (storedConcepts) {
-      setCustomConcepts(JSON.parse(storedConcepts));
+      const parsedConcepts = sanitizeCustomConcepts(JSON.parse(storedConcepts));
+      setCustomConcepts(parsedConcepts);
+      window.localStorage.setItem(CUSTOM_CONCEPTS_KEY, JSON.stringify(parsedConcepts));
     }
 
     try {
@@ -311,10 +333,12 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
 
       const parsed = JSON.parse(stored);
       if (parsed && typeof parsed === "object") {
+        const nextMastery = sanitizeMasteryMap(parsed);
         setMasteryMap((current) => ({
           ...current,
-          ...parsed,
+          ...nextMastery,
         }));
+        window.localStorage.setItem(MASTERY_STORAGE_KEY, JSON.stringify(nextMastery));
       }
     } catch {}
   }, []);
@@ -325,7 +349,9 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     }
 
     const storedConcepts = window.localStorage.getItem(CUSTOM_CONCEPTS_KEY);
-    setCustomConcepts(storedConcepts ? JSON.parse(storedConcepts) : []);
+    const parsedConcepts = sanitizeCustomConcepts(storedConcepts ? JSON.parse(storedConcepts) : []);
+    setCustomConcepts(parsedConcepts);
+    window.localStorage.setItem(CUSTOM_CONCEPTS_KEY, JSON.stringify(parsedConcepts));
   }, [open]);
 
   useEffect(() => {
