@@ -458,10 +458,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     [customBlocks]
   );
 
-  const tags = useMemo(() => {
-    return [...new Set(mergedBlocks.flatMap((block) => block.tags))].sort((left, right) => left.localeCompare(right));
-  }, [mergedBlocks]);
-
   const recentBlocksCount = useMemo(() => mergedBlocks.filter((block) => isRecentAdded(block.addedAt)).length, [mergedBlocks]);
 
   const filteredBlocks = useMemo(() => {
@@ -668,7 +664,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                   type="text"
                   value={query}
                   onChange={(event) => showResultsWithQuery(event.target.value)}
-                  placeholder="搜索项目、标签、概念..."
+                  placeholder="搜索项目、概念..."
                 />
                 {query ? (
                   <button
@@ -751,18 +747,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                   </div>
                 </section>
 
-                <section className="blocks-filter-card blocks-filter-card-muted">
-                  <div className="blocks-filter-head">
-                    <span>标签</span>
-                  </div>
-                  <div className="blocks-tag-cloud">
-                    {tags.map((tag) => (
-                      <button key={tag} type="button" className="blocks-mini-tag" onClick={() => showResultsWithQuery(tag)}>
-                        {tag}
-                      </button>
-                    ))}
-                  </div>
-                </section>
               </div>
 
             </aside>
@@ -849,16 +833,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                         </div>
                       </section>
 
-                      <section className="blocks-detail-section">
-                        <span>标签</span>
-                        <div className="blocks-pill-row">
-                          {digestSelectedBlock.tags.map((item) => (
-                            <button key={item} type="button" className="blocks-pill" onClick={() => showResultsWithQuery(item)}>
-                              {item}
-                            </button>
-                          ))}
-                        </div>
-                      </section>
                     </section>
 
                     <aside className="blocks-focus-side">
@@ -949,11 +923,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                             </div>
                             <h4>{block.name}</h4>
                             <p>{block.summary}</p>
-                            <div className="blocks-card-tags">
-                              {block.tags.slice(0, 3).map((tag) => (
-                                <span key={tag}>{tag}</span>
-                              ))}
-                            </div>
                           </button>
                         );
                       })}
