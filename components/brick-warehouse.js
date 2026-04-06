@@ -760,7 +760,9 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                     </button>
                   </div>
 
-                  <div className="blocks-focus-hero">
+                  <div className="blocks-focus-grid">
+                    <div className="blocks-focus-main-column">
+                      <div className="blocks-focus-hero">
                     <div className="blocks-focus-copy">
                       <p className="blocks-panel-kicker">当前聚焦项目</p>
                       <div className="blocks-detail-top">
@@ -788,8 +790,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                     </div>
                   </div>
 
-                  <div className="blocks-focus-grid">
-                    <section className="blocks-focus-main">
+                      <section className="blocks-focus-main">
                       <section className="blocks-detail-section">
                         <span>它解决什么问题</span>
                         <p>{digestSelectedBlock.solves}</p>
@@ -833,7 +834,8 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                         </div>
                       </section>
 
-                    </section>
+                      </section>
+                    </div>
 
                     <aside className="blocks-focus-side">
                       <section className="blocks-detail-section blocks-side-card">
