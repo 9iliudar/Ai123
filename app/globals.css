@@ -2914,7 +2914,7 @@ select {
   margin: 14px 0 0;
   font-size: 1.7rem;
   letter-spacing: -0.04em;
-  cursor: copy;
+  cursor: default;
 }
 
 .universe-hud-pin {
