@@ -624,6 +624,11 @@ select {
   width: min(420px, 42vw);
 }
 
+.blocks-digest-search {
+  width: 100%;
+  margin-top: 18px;
+}
+
 .blocks-search input,
 .blocks-detail select,
 .blocks-detail textarea {
@@ -850,8 +855,9 @@ select {
 
 .blocks-focus-actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: auto repeat(2, minmax(0, 1fr));
   gap: 12px;
+  align-items: start;
 }
 
 .blocks-focus-grid {
@@ -928,6 +934,11 @@ select {
   font-size: 0.8rem;
 }
 
+.blocks-back-action {
+  align-self: stretch;
+  padding-inline: 14px;
+}
+
 .blocks-inline-action:hover {
   border-color: rgba(124, 58, 237, 0.55);
   background: rgba(124, 58, 237, 0.14);
@@ -957,6 +968,43 @@ select {
   margin: 12px auto 0;
   max-width: 620px;
   line-height: 1.8;
+}
+
+.blocks-results-stage {
+  display: grid;
+  gap: 20px;
+}
+
+.blocks-results-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 8px 4px 0;
+}
+
+.blocks-results-head h3 {
+  margin: 8px 0 0;
+  font-size: 1.55rem;
+  letter-spacing: -0.04em;
+}
+
+.blocks-results-head p {
+  margin: 0;
+  max-width: 360px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  text-align: right;
+}
+
+.blocks-results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.blocks-results-card {
+  min-height: 220px;
 }
 
 .blocks-filter-card {
@@ -1302,6 +1350,54 @@ select {
 
 .blocks-detail select {
   padding: 12px 14px;
+}
+
+.blocks-status-select {
+  appearance: none;
+  padding: 13px 42px 13px 14px !important;
+  border-radius: 16px;
+  border-color: rgba(124, 58, 237, 0.26);
+  background:
+    linear-gradient(180deg, rgba(124, 58, 237, 0.1), rgba(255, 255, 255, 0.02)),
+    linear-gradient(45deg, transparent 50%, #c4b5fd 50%),
+    linear-gradient(135deg, #c4b5fd 50%, transparent 50%),
+    rgba(16, 17, 24, 0.9);
+  background-position:
+    0 0,
+    calc(100% - 18px) calc(50% - 2px),
+    calc(100% - 12px) calc(50% - 2px),
+    0 0;
+  background-size:
+    auto,
+    6px 6px,
+    6px 6px,
+    auto;
+  background-repeat: no-repeat;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 10px 24px rgba(0, 0, 0, 0.18);
+  color: #f5f3ff;
+  font-weight: 600;
+}
+
+.blocks-status-select:hover {
+  border-color: rgba(124, 58, 237, 0.45);
+  background:
+    linear-gradient(180deg, rgba(124, 58, 237, 0.14), rgba(255, 255, 255, 0.03)),
+    linear-gradient(45deg, transparent 50%, #ddd6fe 50%),
+    linear-gradient(135deg, #ddd6fe 50%, transparent 50%),
+    rgba(18, 19, 27, 0.94);
+  background-position:
+    0 0,
+    calc(100% - 18px) calc(50% - 2px),
+    calc(100% - 12px) calc(50% - 2px),
+    0 0;
+  background-size:
+    auto,
+    6px 6px,
+    6px 6px,
+    auto;
+  background-repeat: no-repeat;
 }
 
 .blocks-detail textarea {
@@ -2100,7 +2196,8 @@ select {
   .blocks-browse-layout,
   .blocks-idea-stage,
   .blocks-focus-actions,
-  .blocks-focus-grid {
+  .blocks-focus-grid,
+  .blocks-results-head {
     grid-template-columns: 1fr;
   }
 
@@ -2140,6 +2237,15 @@ select {
   .blocks-idea-workspace,
   .blocks-idea-hero {
     padding: 18px;
+  }
+
+  .blocks-results-head {
+    display: grid;
+  }
+
+  .blocks-results-head p {
+    max-width: none;
+    text-align: left;
   }
 }
 

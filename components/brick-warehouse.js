@@ -332,9 +332,8 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
       return;
     }
 
-    const selectedStillVisible = filteredBlocks.some((block) => block.id === selectedId);
-    if (!selectedStillVisible) {
-      setSelectedId(filteredBlocks[0].id);
+    if (selectedId && !filteredBlocks.some((block) => block.id === selectedId)) {
+      setSelectedId(null);
     }
   }, [filteredBlocks, selectedId]);
 
@@ -342,7 +341,8 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     return null;
   }
 
-  const selectedBlock = buildingBlocks.find((block) => block.id === selectedId) ?? filteredBlocks[0] ?? null;
+  const selectedBlock = buildingBlocks.find((block) => block.id === selectedId) ?? null;
+  const digestSelectedBlock = filteredBlocks.find((block) => block.id === selectedId) ?? null;
   const selectedStatus = selectedBlock ? blockState[selectedBlock.id]?.status ?? defaultStatus : defaultStatus;
   const selectedRecords = selectedBlock ? [...(blockState[selectedBlock.id]?.records ?? [])].reverse() : [];
 
@@ -405,25 +405,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
           </div>
 
           <div className="blocks-top-actions">
-            <label className="blocks-search">
-              <input
-                type="text"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="搜索项目、标签、概念..."
-              />
-              {query ? (
-                <button
-                  type="button"
-                  className="blocks-search-clear"
-                  aria-label="清空搜索"
-                  title="清空搜索"
-                  onClick={() => setQuery("")}
-                >
-                  x
-                </button>
-              ) : null}
-            </label>
             <button type="button" className="blocks-close" aria-label="关闭积木仓库" title="关闭积木仓库" onClick={onClose}>
               x
             </button>
@@ -459,6 +440,26 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 </div>
                 <strong>{filteredBlocks.length}</strong>
               </div>
+
+              <label className="blocks-search blocks-digest-search">
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="搜索项目、标签、概念..."
+                />
+                {query ? (
+                  <button
+                    type="button"
+                    className="blocks-search-clear"
+                    aria-label="清空搜索"
+                    title="清空搜索"
+                    onClick={() => setQuery("")}
+                  >
+                    x
+                  </button>
+                ) : null}
+              </label>
 
               <div className="blocks-explorer-stack">
                 <section className="blocks-filter-card blocks-filter-card-muted">
@@ -519,56 +520,34 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 </section>
               </div>
 
-              <div className="blocks-result-list">
-                {filteredBlocks.map((block) => {
-                  const status = blockState[block.id]?.status ?? defaultStatus;
-                  return (
-                    <button
-                      key={block.id}
-                      type="button"
-                      className={`blocks-result-item ${selectedBlock?.id === block.id ? "active" : ""}`}
-                      onClick={() => setSelectedId(block.id)}
-                    >
-                      <div className="blocks-card-top">
-                        <span className="blocks-card-category">{blockCategoryLabels[block.category] ?? block.category}</span>
-                        <span className="blocks-card-status">{status}</span>
-                      </div>
-                      <h4>{block.name}</h4>
-                      <p>{block.summary}</p>
-                      <div className="blocks-card-tags">
-                        {block.tags.slice(0, 3).map((tag) => (
-                          <span key={tag}>{tag}</span>
-                        ))}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
             </aside>
 
             <section className="blocks-focus scroll-surface">
-              {selectedBlock ? (
+              {digestSelectedBlock ? (
                 <>
                   <div className="blocks-focus-hero">
                     <div className="blocks-focus-copy">
                       <p className="blocks-panel-kicker">当前聚焦项目</p>
                       <div className="blocks-detail-top">
                         <div>
-                          <h3>{selectedBlock.name}</h3>
-                          <p className="blocks-detail-summary">{selectedBlock.summary}</p>
+                          <h3>{digestSelectedBlock.name}</h3>
+                          <p className="blocks-detail-summary">{digestSelectedBlock.summary}</p>
                         </div>
-                        <span className="blocks-detail-category">{blockCategoryLabels[selectedBlock.category] ?? selectedBlock.category}</span>
+                        <span className="blocks-detail-category">{blockCategoryLabels[digestSelectedBlock.category] ?? digestSelectedBlock.category}</span>
                       </div>
                     </div>
 
                     <div className="blocks-focus-actions">
-                      <a href={selectedBlock.github} target="_blank" rel="noreferrer" className="blocks-link-row">
+                      <button type="button" className="blocks-inline-action blocks-back-action" onClick={() => setSelectedId(null)}>
+                        返回结果列表
+                      </button>
+                      <a href={digestSelectedBlock.github} target="_blank" rel="noreferrer" className="blocks-link-row">
                         <span>GitHub 地址</span>
-                        <code>{selectedBlock.github}</code>
+                        <code>{digestSelectedBlock.github}</code>
                       </a>
-                      <a href={selectedBlock.website} target="_blank" rel="noreferrer" className="blocks-link-row">
+                      <a href={digestSelectedBlock.website} target="_blank" rel="noreferrer" className="blocks-link-row">
                         <span>官网 / 文档</span>
-                        <code>{selectedBlock.website}</code>
+                        <code>{digestSelectedBlock.website}</code>
                       </a>
                     </div>
                   </div>
@@ -577,13 +556,13 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                     <section className="blocks-focus-main">
                       <section className="blocks-detail-section">
                         <span>它解决什么问题</span>
-                        <p>{selectedBlock.solves}</p>
+                        <p>{digestSelectedBlock.solves}</p>
                       </section>
 
                       <section className="blocks-detail-section">
                         <span>可以和谁组合</span>
                         <div className="blocks-pill-row">
-                          {selectedBlock.composeWith.map((item) => (
+                          {digestSelectedBlock.composeWith.map((item) => (
                             <button key={item} type="button" className="blocks-pill" onClick={() => setQuery(item)}>
                               {item}
                             </button>
@@ -594,7 +573,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                       <section className="blocks-detail-section">
                         <span>适合产出什么</span>
                         <div className="blocks-pill-row">
-                          {selectedBlock.outputs.map((item) => (
+                          {digestSelectedBlock.outputs.map((item) => (
                             <span key={item} className="blocks-pill blocks-pill-static">
                               {item}
                             </span>
@@ -605,7 +584,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                       <section className="blocks-detail-section">
                         <span>相关概念</span>
                         <div className="blocks-pill-row">
-                          {(selectedBlock.relatedConcepts ?? []).map((item) => (
+                          {(digestSelectedBlock.relatedConcepts ?? []).map((item) => (
                             <button key={item} type="button" className="blocks-pill" onClick={() => jumpToConcept(item)}>
                               {item}
                             </button>
@@ -616,7 +595,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                       <section className="blocks-detail-section">
                         <span>标签</span>
                         <div className="blocks-pill-row">
-                          {selectedBlock.tags.map((item) => (
+                          {digestSelectedBlock.tags.map((item) => (
                             <button key={item} type="button" className="blocks-pill" onClick={() => setQuery(item)}>
                               {item}
                             </button>
@@ -628,7 +607,11 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                     <aside className="blocks-focus-side">
                       <section className="blocks-detail-section blocks-side-card">
                         <span>研究状态</span>
-                        <select value={selectedStatus} onChange={(event) => updateSelectedBlock({ status: event.target.value })}>
+                        <select
+                          className="blocks-status-select"
+                          value={selectedStatus}
+                          onChange={(event) => updateSelectedBlock({ status: event.target.value })}
+                        >
                           {blockStatuses.map((status) => (
                             <option key={status} value={status}>
                               {status}
@@ -672,9 +655,42 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                   </div>
                 </>
               ) : (
-                <div className="blocks-empty">
-                  <h3>没有匹配结果</h3>
-                  <p>换一个关键词、分类或状态试试。</p>
+                <div className="blocks-results-stage">
+                  <div className="blocks-results-head">
+                    <div>
+                      <p className="blocks-panel-kicker">检索结果</p>
+                      <h3>{filteredBlocks.length ? "先看结果，再决定深入哪个项目" : "没有匹配结果"}</h3>
+                    </div>
+                    <p>{filteredBlocks.length ? `当前共有 ${filteredBlocks.length} 个结果` : "换一个关键词、分类或状态试试。"}</p>
+                  </div>
+
+                  {filteredBlocks.length ? (
+                    <div className="blocks-results-grid">
+                      {filteredBlocks.map((block) => {
+                        const status = blockState[block.id]?.status ?? defaultStatus;
+                        return (
+                          <button
+                            key={block.id}
+                            type="button"
+                            className="blocks-card blocks-results-card"
+                            onClick={() => setSelectedId(block.id)}
+                          >
+                            <div className="blocks-card-top">
+                              <span className="blocks-card-category">{blockCategoryLabels[block.category] ?? block.category}</span>
+                              <span className="blocks-card-status">{status}</span>
+                            </div>
+                            <h4>{block.name}</h4>
+                            <p>{block.summary}</p>
+                            <div className="blocks-card-tags">
+                              {block.tags.slice(0, 3).map((tag) => (
+                                <span key={tag}>{tag}</span>
+                              ))}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : null}
                 </div>
               )}
             </section>
