@@ -419,9 +419,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 <span>想法组合</span>
               </button>
             </div>
-            <button type="button" className="blocks-close" aria-label="关闭积木仓库" title="关闭积木仓库" onClick={onClose}>
-              x
-            </button>
+            <button type="button" className="blocks-close" aria-label="关闭积木仓库" title="关闭积木仓库" onClick={onClose} />
           </div>
         </div>
 
@@ -429,6 +427,9 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
           <div className="blocks-browse-layout">
             <aside className="blocks-explorer scroll-surface">
               <div className="blocks-explorer-head">
+                <div>
+                  <p className="blocks-panel-kicker">检索</p>
+                </div>
                 <strong>{filteredBlocks.length}</strong>
               </div>
 
@@ -653,7 +654,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                   <div className="blocks-results-head">
                     <div>
                       <p className="blocks-panel-kicker">检索结果</p>
-                      <h3>{filteredBlocks.length ? "先看结果，再决定深入哪个项目" : "没有匹配结果"}</h3>
+                      <h3>{filteredBlocks.length ? "结果列表" : "没有匹配结果"}</h3>
                     </div>
                     <p>{filteredBlocks.length ? `当前共有 ${filteredBlocks.length} 个结果` : "换一个关键词、分类或状态试试。"}</p>
                   </div>
