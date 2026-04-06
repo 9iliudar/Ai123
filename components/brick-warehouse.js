@@ -399,7 +399,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
       <div className="blocks-shell" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
         <div className="blocks-topbar">
           <div className="blocks-brand">
-            <p className="blocks-kicker">Open Source Building Blocks</p>
             <h2>积木仓库</h2>
             <p>把值得反复研究的开源能力模块沉淀下来，未来再拼成真正适合你的产品。</p>
           </div>
@@ -433,7 +432,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
               <div className="blocks-explorer-head">
                 <div>
                   <p className="blocks-panel-kicker">项目探索</p>
-                  <h3>先搜到项目，再把它放上主舞台</h3>
                 </div>
                 <strong>{filteredBlocks.length}</strong>
               </div>
