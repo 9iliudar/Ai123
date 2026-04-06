@@ -170,6 +170,13 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     return mergedNodes.filter((node) => activeFreshness === ALL_FRESHNESS || isRecentAdded(node.addedAt));
   }, [activeFreshness, mergedNodes]);
   const recentConceptCount = useMemo(() => mergedNodes.filter((node) => isRecentAdded(node.addedAt)).length, [mergedNodes]);
+  const activeClusterNodes = useMemo(() => {
+    if (!activeCluster) {
+      return filteredNodePool;
+    }
+
+    return filteredNodePool.filter((node) => node.domain === activeCluster.label);
+  }, [activeCluster, filteredNodePool]);
   const [accent, accentSoft, accentStrong] = themeMap[themeNode.theme] ?? themeMap.violet;
 
   const visibleNodes = useMemo(() => {
@@ -368,7 +375,11 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
       return;
     }
 
-    const nextCenter = filteredNodePool.find((node) => node.domain === activeCluster.label) ?? mergedNodes.find((node) => node.domain === activeCluster.label);
+    const nextCenter =
+      activeClusterNodes[0] ??
+      (activeFreshness === ALL_FRESHNESS
+        ? mergedNodes.find((node) => node.domain === activeCluster.label)
+        : null);
     if (!nextCenter) {
       return;
     }
@@ -378,7 +389,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     setHistory([nextCenter.id]);
     setRotation({ x: -0.24, y: 0.42 });
     setIsHudPinned(false);
-  }, [activeCluster, centerNode.domain, filteredNodePool, mergedNodes, open]);
+  }, [activeCluster, activeClusterNodes, activeFreshness, centerNode.domain, mergedNodes, open]);
 
   useEffect(() => {
     if (!open || activeFreshness !== RECENT_FRESHNESS || !centerNode) {
@@ -389,7 +400,9 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
       return;
     }
 
-    const nextCenter = filteredNodePool.find((node) => node.domain === centerNode.domain) ?? filteredNodePool[0];
+    const nextCenter = activeCluster
+      ? activeClusterNodes[0] ?? null
+      : filteredNodePool.find((node) => node.domain === centerNode.domain) ?? filteredNodePool[0];
     if (!nextCenter) {
       return;
     }
@@ -397,7 +410,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     setCenterId(nextCenter.id);
     setSelectedId(null);
     setHistory([nextCenter.id]);
-  }, [activeFreshness, centerNode, filteredNodePool, open]);
+  }, [activeCluster, activeClusterNodes, activeFreshness, centerNode, filteredNodePool, open]);
 
   useEffect(() => {
     if (!open) {
@@ -712,7 +725,6 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
       <div className="universe-shell" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
         <div className="universe-topbar">
           <div className="universe-brand">
-            <p className="universe-kicker">Concept Universe</p>
             <h2>概念宇宙</h2>
           </div>
 

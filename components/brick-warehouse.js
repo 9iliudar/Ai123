@@ -288,7 +288,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   const [ideaInput, setIdeaInput] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeStatus, setActiveStatus] = useState(ALL_STATUS);
-  const [activeFreshness, setActiveFreshness] = useState(RECENT_FRESHNESS);
+  const [activeFreshness, setActiveFreshness] = useState(ALL_FRESHNESS);
   const [customBlocks, setCustomBlocks] = useState([]);
   const [selectedId, setSelectedId] = useState(buildingBlocks[0]?.id ?? null);
   const [blockState, setBlockState] = useState(getInitialBlockState);
@@ -536,17 +536,17 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                   <div className="blocks-chip-group">
                     <button
                       type="button"
-                      className={`blocks-chip ${activeFreshness === RECENT_FRESHNESS ? "active" : ""}`}
-                      onClick={() => setActiveFreshness(RECENT_FRESHNESS)}
-                    >
-                      最近添加
-                    </button>
-                    <button
-                      type="button"
                       className={`blocks-chip ${activeFreshness === ALL_FRESHNESS ? "active" : ""}`}
                       onClick={() => setActiveFreshness(ALL_FRESHNESS)}
                     >
                       全部
+                    </button>
+                    <button
+                      type="button"
+                      className={`blocks-chip ${activeFreshness === RECENT_FRESHNESS ? "active" : ""}`}
+                      onClick={() => setActiveFreshness(RECENT_FRESHNESS)}
+                    >
+                      最近添加
                     </button>
                   </div>
                 </section>

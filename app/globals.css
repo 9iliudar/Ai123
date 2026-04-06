@@ -2192,14 +2192,22 @@ select {
   font-size: 0.92rem;
 }
 
+.modal-hint {
+  margin: -2px 0 2px;
+  color: rgba(212, 212, 216, 0.72);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
 .modal-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   margin-top: 8px;
 }
 
 .modal-actions > * {
-  flex: 1;
+  flex: 1 1 132px;
 }
 
 @media (max-width: 720px) {

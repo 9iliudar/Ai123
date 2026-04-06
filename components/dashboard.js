@@ -98,6 +98,28 @@ function splitDraftList(value) {
     .filter(Boolean);
 }
 
+function getEmptyDraft() {
+  return {
+    name: "",
+    link: "",
+    cat: "Other",
+    desc: "",
+    clusterId: conceptUniverse.clusters[0]?.id ?? "",
+  };
+}
+
+function downloadJson(filename, payload) {
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {
+    type: "application/json;charset=utf-8",
+  });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function Dashboard() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
@@ -109,17 +131,7 @@ export default function Dashboard() {
   const [isWarehouseOpen, setIsWarehouseOpen] = useState(false);
   const [requestedConcept, setRequestedConcept] = useState("");
   const [requestedBlockId, setRequestedBlockId] = useState(null);
-  const [draft, setDraft] = useState({
-    name: "",
-    link: "",
-    cat: "Other",
-    desc: "",
-    website: "",
-    tags: "",
-    detail: "",
-    relatedConcepts: "",
-    clusterId: conceptUniverse.clusters[0]?.id ?? "",
-  });
+  const [draft, setDraft] = useState(getEmptyDraft);
   const [draggedId, setDraggedId] = useState(null);
   const [dragArmedId, setDragArmedId] = useState(null);
   const [dropTargetId, setDropTargetId] = useState(null);
@@ -169,6 +181,47 @@ export default function Dashboard() {
   function handleDraftChange(event) {
     const { name, value } = event.target;
     setDraft((current) => ({ ...current, [name]: value }));
+  }
+
+  function resetDraft(type = "tool") {
+    setDraft({
+      ...getEmptyDraft(),
+      cat: type === "block" ? "Agent" : "Other",
+    });
+  }
+
+  function handleDraftTypeChange(type) {
+    setDraftType(type);
+    resetDraft(type);
+  }
+
+  function handleExportDraftType() {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const exportTime = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+
+    if (draftType === "tool") {
+      downloadJson(
+        `ai123-tools-${exportTime}.json`,
+        customTools.filter((tool) => tool.isCustom)
+      );
+      return;
+    }
+
+    if (draftType === "block") {
+      downloadJson(
+        `ai123-blocks-${exportTime}.json`,
+        JSON.parse(window.localStorage.getItem(CUSTOM_BLOCKS_KEY) ?? "[]")
+      );
+      return;
+    }
+
+    downloadJson(
+      `ai123-concepts-${exportTime}.json`,
+      JSON.parse(window.localStorage.getItem(CUSTOM_CONCEPTS_KEY) ?? "[]")
+    );
   }
 
   function handleAddTool(event) {
@@ -274,6 +327,85 @@ export default function Dashboard() {
   function handleDeleteTool(id) {
     setCustomTools((current) => current.filter((tool) => tool.id !== id));
     setOrder((current) => current.filter((item) => item !== id));
+  }
+
+  function handleAddItemSubmit(event) {
+    event.preventDefault();
+
+    if (!draft.name.trim()) {
+      return;
+    }
+
+    const timestamp = new Date().toISOString();
+
+    if (draftType === "tool") {
+      if (!draft.link.trim()) {
+        return;
+      }
+
+      const nextTool = {
+        id: `custom_${Date.now()}`,
+        name: draft.name.trim(),
+        link: normalizeUrl(draft.link),
+        desc: draft.desc.trim() || "自定义快捷入口",
+        cat: draft.cat,
+        isCustom: true,
+        addedAt: timestamp,
+      };
+
+      setCustomTools((current) => [nextTool, ...current]);
+      setOrder((current) => [nextTool.id, ...current]);
+      resetDraft("tool");
+      setIsModalOpen(false);
+      return;
+    }
+
+    if (draftType === "block") {
+      const nextBlocks = JSON.parse(window.localStorage.getItem(CUSTOM_BLOCKS_KEY) ?? "[]");
+      const nextBlock = {
+        id: `custom-block-${Date.now()}`,
+        name: draft.name.trim(),
+        category: draft.cat,
+        github: "",
+        website: "",
+        summary: draft.desc.trim() || `${draft.name.trim()} 的自定义积木条目`,
+        tags: [],
+        solves: draft.desc.trim() || `${draft.name.trim()} 的能力说明`,
+        composeWith: [],
+        outputs: [],
+        relatedConcepts: [],
+        isCustom: true,
+        addedAt: timestamp,
+      };
+
+      window.localStorage.setItem(CUSTOM_BLOCKS_KEY, JSON.stringify([nextBlock, ...nextBlocks]));
+      resetDraft("block");
+      setIsModalOpen(false);
+      return;
+    }
+
+    const cluster =
+      conceptUniverse.clusters.find((item) => item.id === draft.clusterId) ??
+      conceptUniverse.clusters[0];
+    const nextConcepts = JSON.parse(window.localStorage.getItem(CUSTOM_CONCEPTS_KEY) ?? "[]");
+    const nextConcept = {
+      id: `custom-concept-${slugify(draft.name)}-${Date.now()}`,
+      name: draft.name.trim(),
+      summary: draft.desc.trim() || `${draft.name.trim()} 的概念摘要`,
+      detail: draft.desc.trim() || `${draft.name.trim()} 的概念说明`,
+      importance: 3,
+      english: "",
+      chinese: "",
+      domain: cluster?.label ?? conceptUniverse.clusters[0]?.label ?? "",
+      theme: cluster?.theme ?? "violet",
+      related: [],
+      isCustom: true,
+      addedAt: timestamp,
+    };
+
+    window.localStorage.setItem(CUSTOM_CONCEPTS_KEY, JSON.stringify([nextConcept, ...nextConcepts]));
+    resetDraft("concept");
+    setIsModalOpen(false);
   }
 
   function handleReset() {
@@ -479,11 +611,11 @@ export default function Dashboard() {
       {isModalOpen ? (
         <div className="modal-overlay" role="presentation" onClick={() => setIsModalOpen(false)}>
           <div className="modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
-            <h3>添加自定义网站</h3>
-            <form onSubmit={handleAddTool}>
+            <h3>追加信息项</h3>
+            <form onSubmit={handleAddItemSubmit}>
               <div className="modal-type-row">
                 {ADDABLE_TYPES.map((type) => (
-                  <button key={type} type="button" className={`modal-type-chip ${draftType === type ? "active" : ""}`} onClick={() => setDraftType(type)}>
+                  <button key={type} type="button" className={`modal-type-chip ${draftType === type ? "active" : ""}`} onClick={() => handleDraftTypeChange(type)}>
                     {type === "tool" ? "网站" : type === "block" ? "积木" : "概念"}
                   </button>
                 ))}
@@ -492,10 +624,12 @@ export default function Dashboard() {
                 名称
                 <input name="name" type="text" value={draft.name} onChange={handleDraftChange} placeholder="例如：飞书后台" />
               </label>
-              <label>
-                URL
-                <input name="link" type="text" value={draft.link} onChange={handleDraftChange} placeholder="https://..." />
-              </label>
+              {draftType === "tool" ? (
+                <label>
+                  URL
+                  <input name="link" type="text" value={draft.link} onChange={handleDraftChange} placeholder="https://..." />
+                </label>
+              ) : null}
               <label>
                 分类
                 <select name={draftType === "concept" ? "clusterId" : "cat"} value={draftType === "concept" ? draft.clusterId : draft.cat} onChange={handleDraftChange}>
@@ -514,38 +648,16 @@ export default function Dashboard() {
                 备注
                 <input name="desc" type="text" value={draft.desc} onChange={handleDraftChange} placeholder="一句话说明用途" />
               </label>
-              {draftType === "block" ? (
-                <>
-                  <label>
-                    文档 / 官网
-                    <input name="website" type="text" value={draft.website} onChange={handleDraftChange} placeholder="https://..." />
-                  </label>
-                  <label>
-                    标签
-                    <input name="tags" type="text" value={draft.tags} onChange={handleDraftChange} placeholder="用逗号分隔" />
-                  </label>
-                  <label>
-                    详细说明
-                    <input name="detail" type="text" value={draft.detail} onChange={handleDraftChange} placeholder="它解决什么问题，适合如何组合" />
-                  </label>
-                  <label>
-                    关联概念
-                    <input name="relatedConcepts" type="text" value={draft.relatedConcepts} onChange={handleDraftChange} placeholder="用逗号分隔" />
-                  </label>
-                </>
-              ) : null}
-              {draftType === "concept" ? (
-                <label>
-                  详细说明
-                  <input name="detail" type="text" value={draft.detail} onChange={handleDraftChange} placeholder="补充概念解释、使用场景或理解要点" />
-                </label>
-              ) : null}
+              <p className="modal-hint">新增内容先保存在浏览器本地，可直接导出为 JSON，后续再统一补齐和网络化。</p>
               <div className="modal-actions">
                 <button className="secondary-button" type="button" onClick={() => setIsModalOpen(false)}>
                   取消
                 </button>
+                <button className="secondary-button" type="button" onClick={handleExportDraftType}>
+                  导出本地新增
+                </button>
                 <button className="primary-button" type="submit">
-                  添加到导航页
+                  {draftType === "tool" ? "保存网站" : draftType === "block" ? "保存积木" : "保存概念"}
                 </button>
               </div>
             </form>
