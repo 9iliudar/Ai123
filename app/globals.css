@@ -1361,6 +1361,34 @@ select {
   color: #d8ccff;
 }
 
+.blocks-card-meta,
+.blocks-detail-meta,
+.universe-hud-meta {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.blocks-sync-flag,
+.universe-sync-flag {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(226, 232, 240, 0.72);
+  font-size: 0.72rem;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+
+.blocks-sync-flag-compact {
+  padding: 4px 8px;
+  font-size: 0.68rem;
+}
+
 .blocks-card-status {
   background: rgba(255, 255, 255, 0.04);
   color: #cbd5e1;
@@ -3041,12 +3069,16 @@ select {
 
 .universe-hud-domain {
   display: inline-flex;
-  margin: 12px 0 0;
+  margin: 0;
   padding: 6px 10px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.05);
   color: #e2e8f0;
   font-size: 0.78rem;
+}
+
+.universe-hud-meta {
+  margin: 12px 0 0;
 }
 
 .universe-hud-summary,

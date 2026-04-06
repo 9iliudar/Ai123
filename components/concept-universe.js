@@ -982,7 +982,10 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
                 {selectedNode.name}
               </h3>
               {getSecondaryLabel(selectedNode) ? <p className="universe-hud-alt">{getSecondaryLabel(selectedNode)}</p> : null}
-              <p className="universe-hud-domain">{selectedNode.domain}</p>
+              <div className="universe-hud-meta">
+                <p className="universe-hud-domain">{selectedNode.domain}</p>
+                {selectedNode.needsLinking ? <span className="universe-sync-flag">待网络化</span> : null}
+              </div>
               <p className="universe-hud-summary">{selectedNode.summary}</p>
               <p className="universe-hud-detail">{selectedNode.detail}</p>
               <div className="universe-mastery universe-mastery-inline">

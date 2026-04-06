@@ -636,7 +636,10 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                           <h3>{digestSelectedBlock.name}</h3>
                           <p className="blocks-detail-summary">{digestSelectedBlock.summary}</p>
                         </div>
-                        <span className="blocks-detail-category">{blockCategoryLabels[digestSelectedBlock.category] ?? digestSelectedBlock.category}</span>
+                        <div className="blocks-detail-meta">
+                          <span className="blocks-detail-category">{blockCategoryLabels[digestSelectedBlock.category] ?? digestSelectedBlock.category}</span>
+                          {digestSelectedBlock.needsEnrichment ? <span className="blocks-sync-flag">待补全</span> : null}
+                        </div>
                       </div>
                     </div>
 
@@ -776,7 +779,10 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                           >
                             <div className="blocks-card-top">
                               <span className="blocks-card-category">{blockCategoryLabels[block.category] ?? block.category}</span>
-                              <span className="blocks-card-status">{status}</span>
+                              <div className="blocks-card-meta">
+                                {block.needsEnrichment ? <span className="blocks-sync-flag blocks-sync-flag-compact">待补全</span> : null}
+                                <span className="blocks-card-status">{status}</span>
+                              </div>
                             </div>
                             <h4>{block.name}</h4>
                             <p>{block.summary}</p>
