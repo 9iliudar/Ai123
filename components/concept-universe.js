@@ -149,6 +149,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   const selectedNode = selectedId ? nodeMap.get(selectedId) ?? null : null;
   const themeNode = selectedNode ?? centerNode;
   const activeCluster = clusters.find((cluster) => cluster.id === activeClusterId) ?? null;
+  const activeClusterCount = activeCluster ? conceptUniverse.nodes.filter((node) => node.domain === activeCluster.label).length : 0;
   const [accent, accentSoft, accentStrong] = themeMap[themeNode.theme] ?? themeMap.violet;
 
   const visibleNodes = useMemo(() => {
@@ -798,7 +799,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
               aria-expanded={isClusterMenuOpen}
             >
               <span>{"\u5f53\u524d\u7c7b\u522b"}</span>
-              <strong>{activeCluster?.label ?? centerNode.domain}</strong>
+              <strong>{`${activeCluster?.label ?? centerNode.domain} · ${activeClusterCount}`}</strong>
             </button>
             {isClusterMenuOpen ? (
               <div className="universe-category-menu">
