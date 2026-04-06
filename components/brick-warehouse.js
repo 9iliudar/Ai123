@@ -12,9 +12,9 @@ const BLOCK_STATE_KEY = "ai123_building_blocks_state";
 const ALL_STATUS = "ALL_STATUS";
 
 const IDEA_EXAMPLES = [
-  "research assistant that crawls websites and builds a knowledge base",
-  "desktop operator that can use browser and local apps",
-  "internal multi-model AI workspace for a company",
+  "做一个自动抓网页并进入知识库的研究助手",
+  "做一个能操作浏览器和本地应用的桌面代理",
+  "做一个企业内部多模型 AI 工作台",
 ];
 
 const IDEA_SIGNAL_MAP = [
@@ -191,8 +191,8 @@ function buildIdeaPlans(recommendedBlocks) {
     const workflowBlock = categories.get("Workflow") ?? categories.get("Agent");
 
     plans.push({
-      title: "Acquire to Knowledge Base",
-      summary: "Collect information first, organize it second, then connect it into a searchable system.",
+      title: "采集到知识库",
+      summary: "先抓信息，再整理入库，最后接成可搜索、可追问、可复用的知识系统。",
       stack: [browserBlock, knowledgeBlock, workflowBlock].filter(Boolean).map((block) => block.name),
     });
   }
@@ -203,8 +203,8 @@ function buildIdeaPlans(recommendedBlocks) {
     const infraBlock = categories.get("Infra");
 
     plans.push({
-      title: "Execution Agent",
-      summary: "Let the agent move beyond understanding and actually operate interfaces and tools.",
+      title: "执行型代理",
+      summary: "让代理不只会理解任务，还能真正操作界面、调用工具并跑完整流程。",
       stack: [agentBlock, executionBlock, infraBlock].filter(Boolean).map((block) => block.name),
     });
   }
@@ -215,8 +215,8 @@ function buildIdeaPlans(recommendedBlocks) {
     const infraBlock = categories.get("Infra");
 
     plans.push({
-      title: "Builder Workbench",
-      summary: "Put code generation, workflow orchestration, and model routing on the same path.",
+      title: "研发加速台",
+      summary: "把代码生成、工作流编排和模型路由放在一条链路里，适合快速出原型。",
       stack: [codingBlock, workflowBlock, infraBlock].filter(Boolean).map((block) => block.name),
     });
   }
@@ -400,8 +400,8 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
         <div className="blocks-topbar">
           <div className="blocks-brand">
             <p className="blocks-kicker">Open Source Building Blocks</p>
-            <h2>Brick Warehouse</h2>
-            <p>Collect the open-source building blocks worth repeated study, then recombine them into real products.</p>
+            <h2>积木仓库</h2>
+            <p>把值得反复研究的开源能力模块沉淀下来，未来再拼成真正适合你的产品。</p>
           </div>
 
           <div className="blocks-top-actions">
@@ -410,21 +410,21 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 type="text"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search projects, tags, concepts..."
+                placeholder="搜索项目、标签、概念..."
               />
               {query ? (
                 <button
                   type="button"
                   className="blocks-search-clear"
-                  aria-label="Clear search"
-                  title="Clear search"
+                  aria-label="清空搜索"
+                  title="清空搜索"
                   onClick={() => setQuery("")}
                 >
                   x
                 </button>
               ) : null}
             </label>
-            <button type="button" className="blocks-close" aria-label="Close brick warehouse" title="Close brick warehouse" onClick={onClose}>
+            <button type="button" className="blocks-close" aria-label="关闭积木仓库" title="关闭积木仓库" onClick={onClose}>
               x
             </button>
           </div>
@@ -436,16 +436,16 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
             className={`blocks-workspace-tab ${activeWorkspace === "digest" ? "active" : ""}`}
             onClick={() => setActiveWorkspace("digest")}
           >
-            <span>Project Digest</span>
-            <small>Search, read deeply, annotate</small>
+            <span>项目消化</span>
+            <small>搜索、深读、批注</small>
           </button>
           <button
             type="button"
             className={`blocks-workspace-tab ${activeWorkspace === "idea" ? "active" : ""}`}
             onClick={() => setActiveWorkspace("idea")}
           >
-            <span>Idea Composer</span>
-            <small>Describe once, generate stacks</small>
+            <span>想法组合</span>
+            <small>输入目标，展开组合</small>
           </button>
         </div>
 
@@ -454,8 +454,8 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
             <aside className="blocks-explorer scroll-surface">
               <div className="blocks-explorer-head">
                 <div>
-                  <p className="blocks-panel-kicker">Project Explorer</p>
-                  <h3>Find a project, then give it the whole stage</h3>
+                  <p className="blocks-panel-kicker">项目探索</p>
+                  <h3>先搜到项目，再把它放上主舞台</h3>
                 </div>
                 <strong>{filteredBlocks.length}</strong>
               </div>
@@ -463,7 +463,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
               <div className="blocks-explorer-stack">
                 <section className="blocks-filter-card blocks-filter-card-muted">
                   <div className="blocks-filter-head">
-                    <span>Category</span>
+                    <span>分类</span>
                     <strong>{filteredBlocks.length}</strong>
                   </div>
                   <div className="blocks-chip-group">
@@ -482,7 +482,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
 
                 <section className="blocks-filter-card blocks-filter-card-muted">
                   <div className="blocks-filter-head">
-                    <span>Status</span>
+                    <span>状态</span>
                   </div>
                   <div className="blocks-chip-group">
                     <button
@@ -490,7 +490,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                       className={`blocks-chip ${activeStatus === ALL_STATUS ? "active" : ""}`}
                       onClick={() => setActiveStatus(ALL_STATUS)}
                     >
-                      All
+                      全部
                     </button>
                     {blockStatuses.map((status) => (
                       <button
@@ -507,7 +507,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
 
                 <section className="blocks-filter-card blocks-filter-card-muted">
                   <div className="blocks-filter-head">
-                    <span>Tags</span>
+                    <span>标签</span>
                   </div>
                   <div className="blocks-tag-cloud">
                     {tags.map((tag) => (
@@ -551,7 +551,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 <>
                   <div className="blocks-focus-hero">
                     <div className="blocks-focus-copy">
-                      <p className="blocks-panel-kicker">Focus Project</p>
+                      <p className="blocks-panel-kicker">当前聚焦项目</p>
                       <div className="blocks-detail-top">
                         <div>
                           <h3>{selectedBlock.name}</h3>
@@ -563,11 +563,11 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
 
                     <div className="blocks-focus-actions">
                       <a href={selectedBlock.github} target="_blank" rel="noreferrer" className="blocks-link-row">
-                        <span>GitHub</span>
+                        <span>GitHub 地址</span>
                         <code>{selectedBlock.github}</code>
                       </a>
                       <a href={selectedBlock.website} target="_blank" rel="noreferrer" className="blocks-link-row">
-                        <span>Website / Docs</span>
+                        <span>官网 / 文档</span>
                         <code>{selectedBlock.website}</code>
                       </a>
                     </div>
@@ -576,12 +576,12 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                   <div className="blocks-focus-grid">
                     <section className="blocks-focus-main">
                       <section className="blocks-detail-section">
-                        <span>What problem does it solve</span>
+                        <span>它解决什么问题</span>
                         <p>{selectedBlock.solves}</p>
                       </section>
 
                       <section className="blocks-detail-section">
-                        <span>What can it compose with</span>
+                        <span>可以和谁组合</span>
                         <div className="blocks-pill-row">
                           {selectedBlock.composeWith.map((item) => (
                             <button key={item} type="button" className="blocks-pill" onClick={() => setQuery(item)}>
@@ -592,7 +592,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                       </section>
 
                       <section className="blocks-detail-section">
-                        <span>Typical outputs</span>
+                        <span>适合产出什么</span>
                         <div className="blocks-pill-row">
                           {selectedBlock.outputs.map((item) => (
                             <span key={item} className="blocks-pill blocks-pill-static">
@@ -603,7 +603,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                       </section>
 
                       <section className="blocks-detail-section">
-                        <span>Related concepts</span>
+                        <span>相关概念</span>
                         <div className="blocks-pill-row">
                           {(selectedBlock.relatedConcepts ?? []).map((item) => (
                             <button key={item} type="button" className="blocks-pill" onClick={() => jumpToConcept(item)}>
@@ -614,7 +614,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                       </section>
 
                       <section className="blocks-detail-section">
-                        <span>Tags</span>
+                        <span>标签</span>
                         <div className="blocks-pill-row">
                           {selectedBlock.tags.map((item) => (
                             <button key={item} type="button" className="blocks-pill" onClick={() => setQuery(item)}>
@@ -627,7 +627,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
 
                     <aside className="blocks-focus-side">
                       <section className="blocks-detail-section blocks-side-card">
-                        <span>Research status</span>
+                        <span>研究状态</span>
                         <select value={selectedStatus} onChange={(event) => updateSelectedBlock({ status: event.target.value })}>
                           {blockStatuses.map((status) => (
                             <option key={status} value={status}>
@@ -639,17 +639,17 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
 
                       <section className="blocks-detail-section blocks-side-card">
                         <div className="blocks-section-head">
-                          <span>Research notes</span>
+                          <span>研究记录</span>
                           <strong>{selectedRecords.length}</strong>
                         </div>
                         <div className="blocks-record-composer">
                           <textarea
                             value={recordDraft}
                             onChange={(event) => setRecordDraft(event.target.value)}
-                            placeholder="Add a judgement, test result, composition idea, or open question."
+                            placeholder="追加一条新的判断、试用结论、组合灵感或待验证问题。"
                           />
                           <button type="button" className="primary-button blocks-record-submit" onClick={appendRecord}>
-                            Add note
+                            追加记录
                           </button>
                         </div>
                         <div className="blocks-record-list">
@@ -664,7 +664,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                               </article>
                             ))
                           ) : (
-                            <div className="blocks-record-empty">No notes yet. Capture your first reaction here.</div>
+                            <div className="blocks-record-empty">还没有记录，先记下你对它的第一印象。</div>
                           )}
                         </div>
                       </section>
@@ -673,8 +673,8 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 </>
               ) : (
                 <div className="blocks-empty">
-                  <h3>No matching results</h3>
-                  <p>Try another keyword, category, or status.</p>
+                  <h3>没有匹配结果</h3>
+                  <p>换一个关键词、分类或状态试试。</p>
                 </div>
               )}
             </section>
@@ -684,16 +684,16 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
             <section className="blocks-idea-workspace scroll-surface">
               <section className="blocks-idea-hero">
                 <div className="blocks-idea-copy">
-                  <p className="blocks-panel-kicker">Idea Workspace</p>
-                  <h3>Write one goal, then fan out combinations</h3>
-                  <p>This view is for composition first. It keeps the project catalog out of the way until you need it.</p>
+                  <p className="blocks-panel-kicker">想法工作台</p>
+                  <h3>先写一句目标，再批量展开组合</h3>
+                  <p>这里优先服务你的组合创新，在你需要之前，尽量不让整个项目库干扰你。</p>
                 </div>
 
                 <div className="blocks-idea-input-wrap">
                   <textarea
                     value={ideaInput}
                     onChange={(event) => setIdeaInput(event.target.value)}
-                    placeholder="Example: an assistant that crawls websites, organizes sources, builds a knowledge base, and keeps answering follow-up questions."
+                    placeholder="例如：做一个能自动抓网页、整理资料、进入知识库并持续回答问题的研究助手。"
                   />
                   <div className="blocks-idea-examples">
                     {IDEA_EXAMPLES.map((example) => (
@@ -709,7 +709,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 <div className="blocks-idea-stage">
                   <section className="blocks-idea-main">
                     <div className="blocks-section-head">
-                      <span>Suggested combinations</span>
+                      <span>组合方案</span>
                       <strong>{ideaPlans.length}</strong>
                     </div>
                     <div className="blocks-plan-grid">
@@ -730,7 +730,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                   <aside className="blocks-idea-side">
                     <section className="blocks-idea-column blocks-side-card">
                       <div className="blocks-section-head">
-                        <span>Recommended blocks</span>
+                        <span>推荐积木</span>
                         <strong>{ideaRecommendations.length}</strong>
                       </div>
                       <div className="blocks-recommendation-list">
@@ -751,9 +751,9 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                     {selectedBlock ? (
                       <section className="blocks-idea-column blocks-side-card">
                         <div className="blocks-section-head">
-                          <span>Focused block</span>
+                          <span>当前聚焦项目</span>
                           <button type="button" className="blocks-inline-action" onClick={() => focusBlock(selectedBlock.id)}>
-                            Open deep read
+                            进入深读
                           </button>
                         </div>
                         <div className="blocks-spotlight-card">
@@ -777,8 +777,8 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 </div>
               ) : (
                 <section className="blocks-idea-empty">
-                  <h3>Put the idea on the table first</h3>
-                  <p>Once you type a goal, this view will prioritize combinations and recommended blocks instead of the full project list.</p>
+                  <h3>先把想法放上桌</h3>
+                  <p>输入一句目标后，这里会优先展示组合方案和推荐积木，而不是把你丢进完整项目列表里。</p>
                 </section>
               )}
             </section>
