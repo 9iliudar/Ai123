@@ -405,29 +405,26 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
           </div>
 
           <div className="blocks-top-actions">
+            <div className="blocks-workspace-switch blocks-workspace-switch-compact">
+              <button
+                type="button"
+                className={`blocks-workspace-tab ${activeWorkspace === "digest" ? "active" : ""}`}
+                onClick={() => setActiveWorkspace("digest")}
+              >
+                <span>项目消化</span>
+              </button>
+              <button
+                type="button"
+                className={`blocks-workspace-tab ${activeWorkspace === "idea" ? "active" : ""}`}
+                onClick={() => setActiveWorkspace("idea")}
+              >
+                <span>想法组合</span>
+              </button>
+            </div>
             <button type="button" className="blocks-close" aria-label="关闭积木仓库" title="关闭积木仓库" onClick={onClose}>
               x
             </button>
           </div>
-        </div>
-
-        <div className="blocks-workspace-switch">
-          <button
-            type="button"
-            className={`blocks-workspace-tab ${activeWorkspace === "digest" ? "active" : ""}`}
-            onClick={() => setActiveWorkspace("digest")}
-          >
-            <span>项目消化</span>
-            <small>搜索、深读、批注</small>
-          </button>
-          <button
-            type="button"
-            className={`blocks-workspace-tab ${activeWorkspace === "idea" ? "active" : ""}`}
-            onClick={() => setActiveWorkspace("idea")}
-          >
-            <span>想法组合</span>
-            <small>输入目标，展开组合</small>
-          </button>
         </div>
 
         {activeWorkspace === "digest" ? (
