@@ -2801,6 +2801,7 @@ select {
   background: rgba(8, 11, 19, 0.56);
   color: #d7deea;
   font-size: 0.8rem;
+  cursor: pointer;
 }
 
 .universe-category-trigger {
@@ -2877,16 +2878,17 @@ select {
   cursor: text;
   user-select: text;
   padding: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 24px;
-  background: rgba(8, 11, 19, 0.7);
-  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.22);
+  background: rgba(8, 11, 19, 0.82);
+  backdrop-filter: blur(22px);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
 }
 
 .universe-hud-top {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
 }
 
@@ -3018,10 +3020,10 @@ select {
   width: 9px;
   height: 9px;
   padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.24);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.03);
-  opacity: 0.72;
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 0.88;
   cursor: pointer;
   transition: transform 160ms ease, opacity 160ms ease, border-color 160ms ease, background 160ms ease;
 }

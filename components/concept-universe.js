@@ -149,7 +149,6 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   const selectedNode = selectedId ? nodeMap.get(selectedId) ?? null : null;
   const themeNode = selectedNode ?? centerNode;
   const activeCluster = clusters.find((cluster) => cluster.id === activeClusterId) ?? null;
-  const activeDomain = activeCluster?.label ?? null;
   const [accent, accentSoft, accentStrong] = themeMap[themeNode.theme] ?? themeMap.violet;
 
   const visibleNodes = useMemo(() => {
@@ -164,10 +163,9 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     return dedupe([...firstRing, ...secondRing].map((node) => node.id))
       .map((id) => nodeMap.get(id))
       .filter(Boolean)
-      .filter((node) => !activeDomain || node.domain === activeDomain)
       .sort((left, right) => scoreNode(right) - scoreNode(left))
       .slice(0, MAX_VISIBLE_NODES);
-  }, [activeDomain, centerNode, nodeMap]);
+  }, [centerNode, nodeMap]);
 
   const quickLinks = useMemo(() => {
     if (!selectedNode) {
@@ -177,11 +175,10 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     return selectedNode.related
       .map((id) => nodeMap.get(id))
       .filter(Boolean)
-      .filter((node) => !activeDomain || node.domain === activeDomain)
       .sort((left, right) => scoreNode(right) - scoreNode(left))
       .slice(0, 8);
-  }, [activeDomain, nodeMap, selectedNode]);
-  const selectedMastery = selectedNode ? masteryMap[selectedNode.id] ?? 0 : 0;
+  }, [nodeMap, selectedNode]);
+  const selectedMastery = selectedNode ? masteryMap[selectedNode.id] ?? 2 : 2;
 
   const searchResults = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -192,11 +189,11 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     return conceptUniverse.nodes
       .filter((node) => {
         const corpus = `${node.name} ${node.domain} ${node.summary} ${node.detail} ${node.english} ${node.chinese}`.toLowerCase();
-        return corpus.includes(keyword) && (!activeDomain || node.domain === activeDomain);
+        return corpus.includes(keyword);
       })
       .sort((left, right) => scoreNode(right) - scoreNode(left))
       .slice(0, 12);
-  }, [activeDomain, query]);
+  }, [query]);
 
   const projectedNodes = useMemo(() => {
     const spherePoints = fibonacciSphere(Math.max(visibleNodes.length, 1));
@@ -551,7 +548,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   }
 
   function handlePointerDown(event) {
-    if (event.target.closest(".universe-node, .universe-hud, .universe-controls, .universe-search-panel, .universe-topbar, input")) {
+    if (event.target.closest(".universe-node, .universe-hud, .universe-controls, .universe-search-panel, .universe-topbar, .universe-category-panel, input")) {
       return;
     }
 
@@ -793,7 +790,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
             <span>当前节点：{centerNode.name}</span>
           </div>
 
-          <div className="universe-category-panel">
+          <div className="universe-category-panel" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>
             <button
               type="button"
               className={`universe-category-trigger ${isClusterMenuOpen ? "is-open" : ""}`}
