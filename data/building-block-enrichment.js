@@ -465,11 +465,11 @@ const BLOCK_OVERRIDES = {
 const OFFICIAL_DESCRIPTION_OVERRIDES = {
   crewai: {
     summary:
-      "crewAI 官方把自己定义成面向多智能体自动化的轻量高性能 Python 框架，强调从零构建、独立于 LangChain，并同时提供 Crews 与 Flows 两套组织方式。",
+      "crewAI 官方强调的是 Crews 与 Flows 两套核心抽象：前者处理角色化团队协作，后者处理事件驱动、可审计的生产工作流，所以它不只是“多 agent 聊天框架”。",
     solves:
-      "它主要解决多角色 agent 的协作组织问题，不只是让几个模型轮流说话，而是把角色、任务委派、事件流和生产级流程控制放进同一框架。",
+      "它解决的是多智能体系统既要有角色分工，又要有可落地流程控制的问题，把 agent 协作和 production workflows 放到同一套 Python 框架里。",
     bestFor:
-      "最适合先拿来做角色分工明确的多智能体流程，比如调研团队、内容生产链、分析协作流，或者需要把 autonomous crews 和 event-driven flows 结合起来的任务。",
+      "最适合先拿来做需要角色协作加流程编排一起出现的任务，比如研究团队、内容链路、分析协作流，以及从实验直接走向生产编排的多 agent 系统。",
   },
   openmanus: {
     summary:
@@ -593,11 +593,11 @@ const OFFICIAL_DESCRIPTION_OVERRIDES = {
   },
   ollama: {
     summary:
-      "Ollama 官方定位始终很实用，就是让你在本地快速跑起各类开源模型，并提供统一的模型下载、运行和 API 访问体验。",
+      "Ollama 官方主轴很稳定，就是在本地快速拉起并运行各类开源模型，围绕本地推理提供统一的下载、管理、运行和 API 体验。",
     solves:
-      "它解决的是本地模型运行门槛高、环境碎片化的问题，把模型获取、推理服务和本地调用统一成非常低门槛的一层。",
+      "它解决的是本地模型运行需要自己处理模型格式、服务封装和调用接口的问题，把“把模型跑起来”这一步压成极低门槛的本地入口。",
     bestFor:
-      "最适合先拿来做本地模型实验、隐私优先原型、边缘演示和个人工作台的模型运行入口。",
+      "最适合先拿来做本地模型工作台、隐私优先演示、个人设备实验和给自托管 AI 前端提供统一模型运行后端。",
   },
   vllm: {
     summary:
@@ -641,11 +641,11 @@ const OFFICIAL_DESCRIPTION_OVERRIDES = {
   },
   continue: {
     summary:
-      "Continue 当前官方定位已经转向 source-controlled AI checks，可在 CI 中强制执行，核心不再只是 IDE 聊天补全，而是代码库级 AI 检查。",
+      "Continue 的官方定位已经明显从“IDE 插件”转向 Continuous AI：既有可在 TUI 中运行的 coding agent，也有 Headless 模式的后台 agent，并把重点放到 source-controlled AI checks。",
     solves:
-      "它解决的是团队如何把 AI 检查规则固化进仓库和 CI，让 AI 能力变成可审查、可复现、可执行的工程约束，而不是每个人各自临时提问。",
+      "它解决的是团队使用 AI 编码时能力分散、规则无法落仓库的问题，让 AI 检查、后台代理和代码库约束进入同一条工程链路，而不只是补全或聊天。",
     bestFor:
-      "最适合先拿来做仓库级 AI 审查、规范检查和 CI 里的 AI 验证流程，特别适合重视团队一致性的代码库。",
+      "最适合先拿来做代码库级 AI 检查、CI 中的规则化验证，以及需要 TUI/Headless agent 持续跑任务的团队工作流。",
   },
   "bolt-diy": {
     summary:
@@ -697,11 +697,11 @@ const OFFICIAL_DESCRIPTION_OVERRIDES = {
   },
   langchain: {
     summary:
-      "LangChain 官方目前的定位是 agent engineering platform 的核心框架层，用来构建 agents 与 LLM-powered applications，并强调可互操作组件。",
+      "LangChain 官方现在直接把自己写成 reliable agents 平台的核心框架层，强调 agents、LLM-powered applications、标准接口和大量可互操作集成。",
     solves:
-      "它解决的是 AI 应用开发时模型、工具、检索与外部集成碎片化的问题，把常用抽象与生态连接器统一到一个框架里。",
+      "它解决的是模型、embedding、vector stores、tools 和外部系统集成各自分裂的问题，让开发者能用统一抽象去组织 AI 应用。",
     bestFor:
-      "最适合先拿来做需要大量第三方集成和组件拼装的 LLM 应用，尤其是 Python 生态里的 agent 与工具链原型。",
+      "最适合先拿来做需要大量组件拼装和第三方集成的 Python LLM 应用，尤其适合想先用标准接口快速把模型、工具和检索链拼起来的场景。",
   },
   deepagents: {
     summary:
@@ -745,11 +745,11 @@ const OFFICIAL_DESCRIPTION_OVERRIDES = {
   },
   "lobe-chat": {
     summary:
-      "LobeHub 官方最新定位已经不只是聊天前端，而是围绕 agent teammates 的工作与生活空间，强调多 agent 协作、Agent Builder 与把 agent 作为工作单元。",
+      "Lobe Chat 官方产品叙事已经从聊天前端扩展成 AI Agent Workspace，核心不是单轮问答，而是把 agent teammates、Agent Builder、知识与模型入口做成高完成度工作空间。",
     solves:
-      "它解决的是今天很多 AI 工具彼此割裂、上下文分散的问题，试图把模型、技能、知识、协作与多 agent 工作空间统一起来。",
+      "它解决的是 AI 使用入口分散的问题，试图把模型接入、知识、插件/技能和多 agent 协作统一在一个长期可用的前端工作台里。",
     bestFor:
-      "最适合先拿来研究高完成度 AI 工作台和 agent 协作界面，尤其适合多模型、多技能、多 agent 的长期使用入口。",
+      "最适合先拿来做团队级 AI 工作台和多 agent 交互入口，尤其适合研究“什么样的 AI 前端值得用户每天打开”这类问题。",
   },
   ragflow: {
     summary:
@@ -801,11 +801,11 @@ const OFFICIAL_DESCRIPTION_OVERRIDES = {
   },
   composio: {
     summary:
-      "Composio 官方定位是 agent action layer，提供 1000+ toolkits、tool search、context management、auth 与 sandboxed workbench，让 agent 真正把意图变成动作。",
+      "Composio 官方最近的核心表述很集中：一方面是让 AI agents 和 LLM 通过 function calling 接入 100+ 高质量集成，另一方面用 SDK 和 Rube 这种 MCP server 形态把这些工具真正送进 agent 生态。",
     solves:
-      "它解决的是 agent 接第三方工具时认证、上下文和执行环境过于分散的问题，把大量 SaaS/API 集成收束成统一动作层。",
+      "它解决的是 agent 接第三方工具时集成、认证、上下文管理和跨客户端复用都很分散的问题，把 SaaS/API 能力收束成统一工具接入层。",
     bestFor:
-      "最适合先拿来做需要大量第三方工具接入的 agent 系统，尤其是要统一鉴权、工具发现和执行环境的时候。",
+      "最适合先拿来做需要大规模第三方工具接入的 agent 系统，尤其适合既要 function calling，又要 MCP 兼容和统一鉴权体验的场景。",
   },
   "simular-ai-agent-s": {
     summary:
