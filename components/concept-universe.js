@@ -120,6 +120,7 @@ function getHudAvoidance(projection, depth, hasHud) {
 
 export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   const nodeMap = useMemo(() => buildNodeMap(conceptUniverse.nodes), []);
+  const clusters = conceptUniverse.clusters;
   const [centerId, setCenterId] = useState(conceptUniverse.entryId);
   const [selectedId, setSelectedId] = useState(null);
   const [history, setHistory] = useState([conceptUniverse.entryId]);
@@ -131,6 +132,8 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   const [arrivalOrigin, setArrivalOrigin] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [isHudPinned, setIsHudPinned] = useState(false);
   const [masteryMap, setMasteryMap] = useState({});
+  const [activeClusterId, setActiveClusterId] = useState(conceptUniverse.clusters[0]?.id ?? null);
+  const [isClusterMenuOpen, setIsClusterMenuOpen] = useState(false);
   const [isPointerDown, setIsPointerDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isSettling, setIsSettling] = useState(false);
@@ -145,6 +148,8 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   const centerNode = nodeMap.get(centerId) ?? conceptUniverse.nodes[0];
   const selectedNode = selectedId ? nodeMap.get(selectedId) ?? null : null;
   const themeNode = selectedNode ?? centerNode;
+  const activeCluster = clusters.find((cluster) => cluster.id === activeClusterId) ?? null;
+  const activeDomain = activeCluster?.label ?? null;
   const [accent, accentSoft, accentStrong] = themeMap[themeNode.theme] ?? themeMap.violet;
 
   const visibleNodes = useMemo(() => {
@@ -159,9 +164,10 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     return dedupe([...firstRing, ...secondRing].map((node) => node.id))
       .map((id) => nodeMap.get(id))
       .filter(Boolean)
+      .filter((node) => !activeDomain || node.domain === activeDomain)
       .sort((left, right) => scoreNode(right) - scoreNode(left))
       .slice(0, MAX_VISIBLE_NODES);
-  }, [centerNode, nodeMap]);
+  }, [activeDomain, centerNode, nodeMap]);
 
   const quickLinks = useMemo(() => {
     if (!selectedNode) {
@@ -171,9 +177,10 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     return selectedNode.related
       .map((id) => nodeMap.get(id))
       .filter(Boolean)
+      .filter((node) => !activeDomain || node.domain === activeDomain)
       .sort((left, right) => scoreNode(right) - scoreNode(left))
       .slice(0, 8);
-  }, [nodeMap, selectedNode]);
+  }, [activeDomain, nodeMap, selectedNode]);
   const selectedMastery = selectedNode ? masteryMap[selectedNode.id] ?? 0 : 0;
 
   const searchResults = useMemo(() => {
@@ -185,11 +192,11 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     return conceptUniverse.nodes
       .filter((node) => {
         const corpus = `${node.name} ${node.domain} ${node.summary} ${node.detail} ${node.english} ${node.chinese}`.toLowerCase();
-        return corpus.includes(keyword);
+        return corpus.includes(keyword) && (!activeDomain || node.domain === activeDomain);
       })
       .sort((left, right) => scoreNode(right) - scoreNode(left))
       .slice(0, 12);
-  }, [query]);
+  }, [activeDomain, query]);
 
   const projectedNodes = useMemo(() => {
     const spherePoints = fibonacciSphere(Math.max(visibleNodes.length, 1));
@@ -308,13 +315,36 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
 
     setCenterId(match.id);
     setSelectedId(match.id);
+    const matchCluster = clusters.find((cluster) => cluster.label === match.domain);
+    setActiveClusterId(matchCluster?.id ?? null);
     setHistory((current) => {
       const next = current.filter((id) => id !== match.id);
       return [...next, match.id].slice(-12);
     });
     setRotation({ x: -0.24, y: 0.42 });
     setIsHudPinned(false);
-  }, [open, requestedConcept]);
+  }, [clusters, open, requestedConcept]);
+
+  useEffect(() => {
+    if (!open || !activeCluster) {
+      return;
+    }
+
+    if (centerNode.domain === activeCluster.label) {
+      return;
+    }
+
+    const nextCenter = conceptUniverse.nodes.find((node) => node.domain === activeCluster.label);
+    if (!nextCenter) {
+      return;
+    }
+
+    setCenterId(nextCenter.id);
+    setSelectedId(null);
+    setHistory([nextCenter.id]);
+    setRotation({ x: -0.24, y: 0.42 });
+    setIsHudPinned(false);
+  }, [activeCluster, centerNode.domain, open]);
 
   useEffect(() => {
     if (!open) {
@@ -390,6 +420,12 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
       return;
     }
 
+    const targetNode = nodeMap.get(targetId);
+    const targetCluster = clusters.find((cluster) => cluster.label === targetNode?.domain);
+    if (targetCluster && targetCluster.id !== activeClusterId) {
+      setActiveClusterId(targetCluster.id);
+    }
+
     warpTimeoutsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId));
     warpTimeoutsRef.current = [];
     const ghostNode = projectedNodes.find((node) => node.id === targetId);
@@ -462,6 +498,32 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
       ...current,
       [nodeId]: current[nodeId] === value ? 0 : value,
     }));
+  }
+
+  async function copyConceptName(name) {
+    if (!name || typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(name);
+    } catch {}
+  }
+
+  function selectTitleText(event) {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const selection = window.getSelection();
+    if (!selection) {
+      return;
+    }
+
+    const range = document.createRange();
+    range.selectNodeContents(event.currentTarget);
+    selection.removeAllRanges();
+    selection.addRange(range);
   }
 
   function scheduleDragRotation() {
@@ -643,6 +705,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
             "--warp-origin-y": warpOrigin.y,
           }}
           onClick={(event) => {
+            setIsClusterMenuOpen(false);
             if (event.target === event.currentTarget || event.target.classList.contains("universe-backdrop")) {
               if (!isHudPinned) {
                 setSelectedId(null);
@@ -730,6 +793,35 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
             <span>当前节点：{centerNode.name}</span>
           </div>
 
+          <div className="universe-category-panel">
+            <button
+              type="button"
+              className={`universe-category-trigger ${isClusterMenuOpen ? "is-open" : ""}`}
+              onClick={() => setIsClusterMenuOpen((current) => !current)}
+              aria-expanded={isClusterMenuOpen}
+            >
+              <span>{"\u5f53\u524d\u7c7b\u522b"}</span>
+              <strong>{activeCluster?.label ?? centerNode.domain}</strong>
+            </button>
+            {isClusterMenuOpen ? (
+              <div className="universe-category-menu">
+                {clusters.map((cluster) => (
+                  <button
+                    key={cluster.id}
+                    type="button"
+                    className={cluster.id === activeClusterId ? "is-active" : ""}
+                    onClick={() => {
+                      setActiveClusterId(cluster.id);
+                      setIsClusterMenuOpen(false);
+                    }}
+                  >
+                    {cluster.label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
           <div className="universe-controls">
             <button type="button" aria-label="返回上一级" title="返回上一级" onClick={handleBack}>
               ↶
@@ -795,11 +887,31 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
                   📌
                 </button>
               </div>
-              <h3>{selectedNode.name}</h3>
+              <h3 onClick={() => copyConceptName(selectedNode.name)} onDoubleClick={selectTitleText} title={"点击复制，双击选中文字"}>
+                {selectedNode.name}
+              </h3>
               {getSecondaryLabel(selectedNode) ? <p className="universe-hud-alt">{getSecondaryLabel(selectedNode)}</p> : null}
               <p className="universe-hud-domain">{selectedNode.domain}</p>
               <p className="universe-hud-summary">{selectedNode.summary}</p>
               <p className="universe-hud-detail">{selectedNode.detail}</p>
+              <div className="universe-mastery universe-mastery-inline">
+                <span className="universe-hud-label">{"\u638c\u63e1\u7a0b\u5ea6"}</span>
+                <div className="universe-mastery-dots" aria-label={`\u638c\u63e1\u7a0b\u5ea6 ${selectedMastery} / 5`}>
+                  {Array.from({ length: 5 }).map((_, index) => {
+                    const value = index + 1;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        className={`universe-mastery-dot ${value <= selectedMastery ? "is-active" : ""}`}
+                        aria-label={`\u638c\u63e1\u7a0b\u5ea6 ${value} / 5`}
+                        title={`\u638c\u63e1\u7a0b\u5ea6 ${value} / 5`}
+                        onClick={() => updateMastery(selectedNode.id, value)}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
               <div className="universe-importance" aria-label={`重要度 ${selectedNode.importance} / 5`}>
                 {Array.from({ length: 5 }).map((_, index) => (
                   <span key={index} className={index < selectedNode.importance ? "filled" : ""}>
