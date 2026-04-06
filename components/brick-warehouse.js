@@ -450,7 +450,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 className={`blocks-workspace-tab ${activeWorkspace === "idea" ? "active" : ""}`}
                 onClick={() => setActiveWorkspace("idea")}
               >
-                <span>想法组合</span>
+                <span>Idear idea</span>
               </button>
             </div>
             <button type="button" className="blocks-close" aria-label="关闭积木仓库" title="关闭积木仓库" onClick={onClose} />
