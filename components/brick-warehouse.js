@@ -19,47 +19,47 @@ const IDEA_EXAMPLES = [
 
 const IDEA_SIGNAL_MAP = [
   {
-    phrases: ["browser", "web", "crawl", "scrape", "form", "website"],
+    phrases: ["浏览器", "网页", "网站", "抓取", "爬取", "采集", "表单", "browser", "web", "crawl", "scrape", "form", "website"],
     category: "Browser Automation",
     labels: ["Browser Agent", "Automation", "Crawling"],
   },
   {
-    phrases: ["desktop", "gui", "computer use", "app", "screen"],
+    phrases: ["桌面", "界面", "应用", "本地应用", "电脑", "屏幕", "desktop", "gui", "computer use", "app", "screen"],
     category: "GUI Agent",
     labels: ["GUI Agent", "Computer Use", "Desktop"],
   },
   {
-    phrases: ["knowledge", "docs", "rag", "search", "pdf", "qa"],
+    phrases: ["知识库", "文档", "资料", "检索", "问答", "搜索", "pdf", "knowledge", "docs", "rag", "search", "qa"],
     category: "Knowledge",
     labels: ["RAG", "Knowledge Base", "Search", "Documents"],
   },
   {
-    phrases: ["workflow", "automation", "pipeline", "orchestration", "trigger"],
+    phrases: ["工作流", "自动化", "流程", "编排", "触发", "workflow", "automation", "pipeline", "orchestration", "trigger"],
     category: "Workflow",
     labels: ["Workflow", "Automation", "Integrations"],
   },
   {
-    phrases: ["code", "coding", "repo", "developer", "debug", "fix"],
+    phrases: ["代码", "编程", "开发", "仓库", "调试", "修复", "code", "coding", "repo", "developer", "debug", "fix"],
     category: "Coding",
     labels: ["Coding", "Code Agent", "Developer Experience"],
   },
   {
-    phrases: ["multimodal", "vision", "image", "video", "audio", "voice"],
+    phrases: ["多模态", "视觉", "图像", "图片", "视频", "音频", "语音", "multimodal", "vision", "image", "video", "audio", "voice"],
     category: "Multimodal",
     labels: ["Multimodal", "Vision", "Image Generation"],
   },
   {
-    phrases: ["infra", "serving", "gateway", "routing", "inference", "deploy"],
+    phrases: ["基础设施", "部署", "推理", "路由", "网关", "服务", "infra", "serving", "gateway", "routing", "inference", "deploy"],
     category: "Infra",
     labels: ["Serving", "Gateway", "Inference", "Model Router"],
   },
   {
-    phrases: ["robot", "robotics", "embodied"],
+    phrases: ["机器人", "具身", "robot", "robotics", "embodied"],
     category: "Robotics",
     labels: ["Robotics", "Embodied AI", "Policies"],
   },
   {
-    phrases: ["agent", "copilot", "assistant"],
+    phrases: ["代理", "智能体", "助手", "agent", "copilot", "assistant"],
     category: "Agent",
     labels: ["Agent", "Autonomous", "Planner"],
   },
@@ -219,6 +219,40 @@ function buildIdeaPlans(recommendedBlocks) {
       summary: "把代码生成、工作流编排和模型路由放在一条链路里，适合快速出原型。",
       stack: [codingBlock, workflowBlock, infraBlock].filter(Boolean).map((block) => block.name),
     });
+  }
+
+  if (!plans.length) {
+    plans.push({
+      title: "首选组合",
+      summary: "先从当前最相关的积木开始，尽快拼出第一条可验证的路径，再决定后续补哪些模块。",
+      stack: recommendedBlocks.slice(0, 3).map((block) => block.name),
+    });
+  }
+
+  if (plans.length < 3) {
+    const diverseBlocks = [];
+    const seenCategories = new Set();
+
+    for (const block of recommendedBlocks) {
+      if (seenCategories.has(block.category)) {
+        continue;
+      }
+
+      seenCategories.add(block.category);
+      diverseBlocks.push(block.name);
+
+      if (diverseBlocks.length >= 4) {
+        break;
+      }
+    }
+
+    if (diverseBlocks.length >= 2) {
+      plans.push({
+        title: "探索组合",
+        summary: "把不同类别的积木先拉到一张桌上，快速判断是走自动化、知识库还是代理路线更合适。",
+        stack: diverseBlocks,
+      });
+    }
   }
 
   return plans.slice(0, 3);
@@ -723,19 +757,26 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                       <span>组合方案</span>
                       <strong>{ideaPlans.length}</strong>
                     </div>
-                    <div className="blocks-plan-grid">
-                      {ideaPlans.map((plan) => (
-                        <article key={plan.title} className="blocks-plan-card blocks-plan-card-featured">
-                          <strong>{plan.title}</strong>
-                          <p>{plan.summary}</p>
-                          <div className="blocks-plan-stack">
-                            {plan.stack.map((item) => (
-                              <span key={item}>{item}</span>
-                            ))}
-                          </div>
-                        </article>
-                      ))}
-                    </div>
+                    {ideaPlans.length ? (
+                      <div className="blocks-plan-grid">
+                        {ideaPlans.map((plan) => (
+                          <article key={plan.title} className="blocks-plan-card blocks-plan-card-featured">
+                            <strong>{plan.title}</strong>
+                            <p>{plan.summary}</p>
+                            <div className="blocks-plan-stack">
+                              {plan.stack.map((item) => (
+                                <span key={item}>{item}</span>
+                              ))}
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+                    ) : (
+                      <section className="blocks-idea-empty">
+                        <h3>还没拼出可用方案</h3>
+                        <p>当前输入没有形成足够明确的组合方向。你可以换一种说法，或者先从右侧推荐积木里挑一个继续深入。</p>
+                      </section>
+                    )}
                   </section>
 
                   <aside className="blocks-idea-side">
