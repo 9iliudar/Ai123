@@ -35,5 +35,17 @@
     "status": "未开始",
     "records": [],
     "fields": {}
+  },
+  "autogen": {
+    "status": "未开始",
+    "records": [
+      {
+        "id": "autogen-1775573388973",
+        "content": "微软的 agentic AI 编程框架，重点是多智能体工作流",
+        "status": "未开始",
+        "createdAt": "2026-04-07T14:49:48.973Z"
+      }
+    ],
+    "fields": {}
   }
 }
