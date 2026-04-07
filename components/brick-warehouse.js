@@ -721,22 +721,26 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
       return null;
     }
 
-    const { multiline = false, className = "", asLink = false, allowDisplayEdit = true } = options;
+    const { multiline = false, className = "", asLink = false, allowDisplayEdit = true, forceTextarea = false } = options;
     const value = typeof selectedBlock[fieldKey] === "string" ? selectedBlock[fieldKey].trim() : "";
     const isEditing = editingField === fieldKey;
     const placeholder = BLOCK_EDIT_PLACEHOLDERS[fieldKey] ?? "暂无描述";
 
     if (isEditing) {
-      if (multiline) {
+      if (multiline || forceTextarea) {
         return (
           <textarea
             autoFocus
-            className={`blocks-inline-editor blocks-inline-editor-multiline ${className}`.trim()}
+            rows={forceTextarea ? 1 : undefined}
+            className={`blocks-inline-editor ${multiline ? "blocks-inline-editor-multiline" : "blocks-inline-editor-singleline"} ${className}`.trim()}
             value={editingDraft}
             onChange={(event) => setEditingDraft(event.target.value)}
             onBlur={() => commitFieldEdit(fieldKey)}
             onKeyDown={(event) => {
-              if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+              if (forceTextarea && event.key === "Enter") {
+                event.preventDefault();
+                commitFieldEdit(fieldKey);
+              } else if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
                 event.preventDefault();
                 commitFieldEdit(fieldKey);
               } else if (event.key === "Escape") {
@@ -953,6 +957,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                           <div className="blocks-detail-section blocks-detail-section-tight">
                             <span>积木简介</span>
                             {renderEditableField("summary", {
+                              forceTextarea: true,
                               className: "blocks-detail-summary blocks-detail-summary-secondary blocks-detail-editable-copy",
                             })}
                           </div>

@@ -1704,6 +1704,16 @@ select {
   overflow: hidden;
 }
 
+.blocks-inline-editor-singleline {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  height: 2.2em;
+  resize: none;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 .blocks-record-actions {
   display: flex;
   gap: 10px;
