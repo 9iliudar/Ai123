@@ -1014,6 +1014,8 @@ select {
   border-radius: 22px;
   border: 1px solid rgba(63, 63, 70, 0.65);
   background: rgba(255, 255, 255, 0.03);
+  margin-top: 0;
+  padding-top: 18px;
 }
 
 .blocks-focus-side {
