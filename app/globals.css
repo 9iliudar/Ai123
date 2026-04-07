@@ -1590,10 +1590,10 @@ select {
 .blocks-detail-title-value {
   margin-top: -18px;
   color: #f8fafc;
-  font-size: 3.18rem;
+  font-size: 2.86rem;
   font-weight: 900;
-  letter-spacing: -0.065em;
-  line-height: 0.92;
+  letter-spacing: -0.055em;
+  line-height: 0.95;
 }
 
 .blocks-detail-summary {
@@ -1788,10 +1788,10 @@ select {
 
 .blocks-detail-title-value.blocks-inline-editor,
 .blocks-detail-title-value.blocks-inline-display {
-  font-size: 3.18rem;
+  font-size: 2.86rem;
   font-weight: 900;
-  letter-spacing: -0.065em;
-  line-height: 1.08;
+  letter-spacing: -0.055em;
+  line-height: 1.04;
 }
 
 .blocks-detail-summary.blocks-inline-editor,
