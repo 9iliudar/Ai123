@@ -173,6 +173,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   const [warpPhase, setWarpPhase] = useState("idle");
   const [warpTargetId, setWarpTargetId] = useState(null);
   const [warpGhost, setWarpGhost] = useState(null);
+  const [warpOrigin, setWarpOrigin] = useState({ x: "50%", y: "50%" });
   const [arrivalOrigin, setArrivalOrigin] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [isHudPinned, setIsHudPinned] = useState(false);
   const [masteryMap, setMasteryMap] = useState(repoConceptMastery);
@@ -297,18 +298,6 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
       .sort((left, right) => left.z - right.z);
   }, [arrivalOrigin.height, arrivalOrigin.width, arrivalOrigin.x, arrivalOrigin.y, rotation.x, rotation.y, selectedNode, visibleNodes]);
 
-  const warpOrigin = useMemo(() => {
-    const targetNode = projectedNodes.find((node) => node.id === warpTargetId);
-    if (!targetNode) {
-      return { x: "50%", y: "50%" };
-    }
-
-    return {
-      x: `calc(${targetNode.left}% + ${targetNode.hudShiftX})`,
-      y: `calc(${targetNode.top}% + ${targetNode.hudShiftY})`,
-    };
-  }, [projectedNodes, warpTargetId]);
-
   useEffect(() => {
     rotationRef.current = rotation;
   }, [rotation]);
@@ -373,6 +362,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
       inertiaFrameRef.current = 0;
       moveFrameRef.current = 0;
       setWarpGhost(null);
+      setWarpOrigin({ x: "50%", y: "50%" });
       setArrivalOrigin({ x: 0, y: 0, width: 0, height: 0 });
     }
   }, [open]);
@@ -534,6 +524,10 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     const ghostNode = projectedNodes.find((node) => node.id === targetId);
     if (ghostNode) {
       setWarpGhost(ghostNode);
+      setWarpOrigin({
+        x: `calc(${ghostNode.left}% + ${ghostNode.hudShiftX})`,
+        y: `calc(${ghostNode.top}% + ${ghostNode.hudShiftY})`,
+      });
       if (sceneRef.current) {
         const rect = sceneRef.current.getBoundingClientRect();
         setArrivalOrigin({
@@ -555,24 +549,25 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     );
     warpTimeoutsRef.current.push(
       window.setTimeout(() => {
-      setCenterId(targetId);
-      setSelectedId(targetId);
-      setHistory((current) => [...current, targetId].slice(-12));
-      setRotation({
-        x: -0.24 + Math.sin(performance.now() * 0.001) * 0.06,
-        y: 0.42,
-      });
-      setWarpPhase("warp-in");
-      warpTimeoutsRef.current.push(
-        window.setTimeout(() => {
-        setWarpPhase("idle");
-        setWarpTargetId(null);
-        setWarpGhost(null);
-        setArrivalOrigin({ x: 0, y: 0, width: 0, height: 0 });
-        warpTimeoutsRef.current = [];
-      }, 520)
-      );
-    }, 560)
+        setCenterId(targetId);
+        setSelectedId(targetId);
+        setHistory((current) => [...current, targetId].slice(-12));
+        setRotation({
+          x: -0.24 + Math.sin(performance.now() * 0.001) * 0.06,
+          y: 0.42,
+        });
+        setWarpPhase("warp-in");
+        warpTimeoutsRef.current.push(
+          window.setTimeout(() => {
+            setWarpPhase("idle");
+            setWarpTargetId(null);
+            setWarpGhost(null);
+            setWarpOrigin({ x: "50%", y: "50%" });
+            setArrivalOrigin({ x: 0, y: 0, width: 0, height: 0 });
+            warpTimeoutsRef.current = [];
+          }, 520)
+        );
+      }, 560)
     );
   }
 
