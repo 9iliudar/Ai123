@@ -13,7 +13,6 @@ import repoBlockState from "@/data/block-state.json";
 const BLOCK_STATE_KEY = "ai123_building_blocks_state";
 const CUSTOM_BLOCKS_KEY = "ai123_custom_blocks";
 const LAST_SELECTED_BLOCK_KEY = "ai123_last_selected_block";
-const DAILY_FEATURE_DISMISSED_KEY = "ai123_daily_feature_dismissed_at";
 const BLOCK_EDIT_PLACEHOLDERS = {
   name: "暂无描述",
   summary: "暂无描述",
@@ -368,7 +367,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   const [selectedId, setSelectedId] = useState(null);
   const [blockState, setBlockState] = useState(() => normalizeStoredState(repoBlockState));
   const [recordDraft, setRecordDraft] = useState("");
-  const [showDailyFeature, setShowDailyFeature] = useState(false);
   const [editingField, setEditingField] = useState(null);
   const [editingDraft, setEditingDraft] = useState("");
 
@@ -547,15 +545,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     }
   }, [filteredBlocks, selectedId]);
 
-  useEffect(() => {
-    if (!open || typeof window === "undefined") {
-      return;
-    }
-
-    const dismissedAt = window.localStorage.getItem(DAILY_FEATURE_DISMISSED_KEY);
-    setShowDailyFeature(dismissedAt !== todayKey);
-  }, [open, todayKey]);
-
   if (!open) {
     return null;
   }
@@ -717,21 +706,12 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     setActiveWorkspace("digest");
   }
 
-  function dismissDailyFeature() {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(DAILY_FEATURE_DISMISSED_KEY, todayKey);
-    }
-
-    setShowDailyFeature(false);
-  }
-
   function openDailyFeature() {
     if (!dailyFeaturedBlock) {
       return;
     }
 
     setSelectedId(dailyFeaturedBlock.id);
-    dismissDailyFeature();
   }
 
   function renderEditableField(fieldKey, options = {}) {
@@ -1090,7 +1070,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 </>
               ) : (
                 <div className="blocks-results-stage">
-                  {showDailyFeature && dailyFeaturedBlock ? (
+                  {dailyFeaturedBlock ? (
                     <section className="blocks-daily-feature" aria-label="每日一木">
                       <div className="blocks-daily-feature-copy">
                         <div className="blocks-daily-feature-head">

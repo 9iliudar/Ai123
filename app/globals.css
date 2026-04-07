@@ -964,8 +964,8 @@ select {
 
 .blocks-focus-hero {
   display: grid;
-  gap: 18px;
-  padding: 22px;
+  gap: 12px;
+  padding: 18px 22px 22px;
   border-radius: 26px;
   border: 1px solid rgba(124, 58, 237, 0.2);
   background:
@@ -1146,6 +1146,10 @@ select {
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
+}
+
+.blocks-daily-feature-head > .blocks-inline-action {
+  display: none;
 }
 
 .blocks-daily-feature-copy {
@@ -1545,8 +1549,8 @@ select {
 .blocks-card-links span,
 .blocks-detail-section span {
   color: #e4e4e7;
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: 1.05rem;
+  font-weight: 800;
   letter-spacing: 0.01em;
 }
 
@@ -1564,7 +1568,7 @@ select {
 
 .blocks-detail-edit-stack {
   display: grid;
-  gap: 2px;
+  gap: 0;
 }
 
 .blocks-detail-edit-stack .blocks-detail-section-tight:nth-child(2) > span {
@@ -1584,23 +1588,23 @@ select {
 }
 
 .blocks-detail-title-value {
-  margin-top: -10px;
+  margin-top: -18px;
   color: #f8fafc;
-  font-size: 3.18rem;
+  font-size: 3.76rem;
   font-weight: 900;
-  letter-spacing: -0.065em;
-  line-height: 0.92;
+  letter-spacing: -0.075em;
+  line-height: 0.88;
 }
 
 .blocks-detail-summary {
-  margin-top: 14px;
+  margin-top: 10px;
   font-size: 1.06rem;
   line-height: 1.9;
   color: #e7e5ff;
 }
 
 .blocks-detail-summary-secondary {
-  margin-top: 12px;
+  margin-top: 8px;
   font-size: 0.96rem;
   line-height: 1.8;
   color: rgba(226, 232, 240, 0.76);
