@@ -1708,7 +1708,9 @@ select {
   display: block;
   width: 100%;
   min-height: 0;
-  height: 2.2em;
+  height: 3.1em;
+  padding-top: 0.18em;
+  padding-bottom: 0.42em;
   resize: none;
   overflow: hidden;
   white-space: nowrap;
@@ -1786,6 +1788,9 @@ select {
 
 .blocks-detail-title-value.blocks-inline-editor,
 .blocks-detail-title-value.blocks-inline-display {
+  font-size: 3.76rem;
+  font-weight: 900;
+  letter-spacing: -0.075em;
   line-height: 1.15;
 }
 
@@ -1793,6 +1798,8 @@ select {
 .blocks-detail-summary.blocks-inline-display,
 .blocks-detail-editable-copy.blocks-inline-editor,
 .blocks-detail-editable-copy.blocks-inline-display {
+  font-size: 0.96rem;
+  line-height: 1.8;
   white-space: pre-wrap;
 }
 
