@@ -25,5 +25,10 @@
     "status": "未开始",
     "records": [],
     "fields": {}
+  },
+  "semantic-kernel": {
+    "status": "未开始",
+    "records": [],
+    "fields": {}
   }
 }
