@@ -1,36 +1,80 @@
 <svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="256" height="256" rx="72" fill="url(#panel)"/>
+  <rect width="256" height="256" rx="72" fill="url(#bg)"/>
   <path
-    d="M78 182C78 149.333 93.6667 127.833 125 117.5C156.333 107.167 172 88 172 60"
-    stroke="url(#trail)"
-    stroke-width="34"
-    stroke-linecap="round"
+    d="M61 182L70 76L108 99C119.5 89.5 134 84.5 150 85C163 85.5 175.5 89 187 97L214 70L219 163C219 193.376 193.928 218 163 218H118C87.0721 218 61 195.376 61 182Z"
+    fill="#FFF4DA"
   />
   <path
-    d="M169 61C169 89.6667 151.333 109 116 119C80.6667 129 63 151 63 185"
-    stroke="#F8FAFC"
-    stroke-opacity="0.12"
+    d="M88 188C95.5 200.5 110.5 208 127 208H163C184.5 208 202.5 195 209 175"
+    stroke="#D97706"
+    stroke-width="10"
+    stroke-linecap="round"
+    stroke-opacity="0.28"
+  />
+  <path
+    d="M92 109C100.5 101.5 111.833 97.3333 126 96.5"
+    stroke="#2B1D17"
     stroke-width="11"
     stroke-linecap="round"
   />
-  <circle cx="172" cy="60" r="32" fill="url(#sun)"/>
-  <circle cx="172" cy="60" r="13" fill="#FFF8E1"/>
-  <circle cx="78" cy="182" r="16" fill="#E2E8F0" fill-opacity="0.92"/>
+  <path
+    d="M147 97C162.333 97.1667 175.333 101.833 186 111"
+    stroke="#2B1D17"
+    stroke-width="11"
+    stroke-linecap="round"
+  />
+  <ellipse cx="112" cy="130" rx="12" ry="15" fill="#201714"/>
+  <ellipse cx="170" cy="134" rx="12" ry="15" fill="#201714"/>
+  <path
+    d="M102 124C108 118.5 116.333 116 127 116"
+    stroke="#2B1D17"
+    stroke-width="8"
+    stroke-linecap="round"
+  />
+  <path
+    d="M156 122C164 118 173 118.667 183 124"
+    stroke="#2B1D17"
+    stroke-width="8"
+    stroke-linecap="round"
+  />
+  <path
+    d="M132 146C139.5 141 146 141 151 146"
+    stroke="#C97316"
+    stroke-width="8"
+    stroke-linecap="round"
+  />
+  <path
+    d="M141 146C139.375 159.375 143.375 167.375 153 170"
+    stroke="#2B1D17"
+    stroke-width="9"
+    stroke-linecap="round"
+  />
+  <path
+    d="M87 149C98 145.5 108 145.5 117 149"
+    stroke="#9A3412"
+    stroke-width="5"
+    stroke-linecap="round"
+    stroke-opacity="0.6"
+  />
+  <path
+    d="M165 152C176 148.5 186 149.333 195 154.5"
+    stroke="#9A3412"
+    stroke-width="5"
+    stroke-linecap="round"
+    stroke-opacity="0.6"
+  />
+  <path
+    d="M141 78C149.5 67.5 162.333 61.8333 179.5 61"
+    stroke="#FFF8EC"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-opacity="0.8"
+  />
   <defs>
-    <linearGradient id="panel" x1="24" y1="12" x2="238" y2="244" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#1A3854"/>
-      <stop offset="0.48" stop-color="#0E2339"/>
-      <stop offset="1" stop-color="#08111F"/>
+    <linearGradient id="bg" x1="26" y1="18" x2="234" y2="238" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1F314A"/>
+      <stop offset="0.48" stop-color="#152235"/>
+      <stop offset="1" stop-color="#0C1320"/>
     </linearGradient>
-    <linearGradient id="trail" x1="76" y1="184" x2="179" y2="54" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#93C5FD"/>
-      <stop offset="0.45" stop-color="#67E8F9"/>
-      <stop offset="1" stop-color="#F8FAFC"/>
-    </linearGradient>
-    <radialGradient id="sun" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(172 60) rotate(90) scale(32)">
-      <stop stop-color="#FDE68A"/>
-      <stop offset="0.58" stop-color="#FBBF24"/>
-      <stop offset="1" stop-color="#F59E0B"/>
-    </radialGradient>
   </defs>
 </svg>
