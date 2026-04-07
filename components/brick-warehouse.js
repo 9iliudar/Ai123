@@ -995,13 +995,13 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                   </div>
 
                       <section className="blocks-focus-main">
-                      <section className="blocks-detail-section blocks-detail-link-editors">
-                        <span onDoubleClick={() => beginFieldEdit("github")}>github地址：</span>
+                      <section className="blocks-detail-section blocks-detail-link-editors" onDoubleClick={() => beginFieldEdit("github")}>
+                        <span>github地址：</span>
                         {renderEditableField("github", { className: "blocks-link-value", asLink: true, allowDisplayEdit: false })}
                       </section>
 
-                      <section className="blocks-detail-section blocks-detail-link-editors">
-                        <span onDoubleClick={() => beginFieldEdit("website")}>官网 / 文档地址：</span>
+                      <section className="blocks-detail-section blocks-detail-link-editors" onDoubleClick={() => beginFieldEdit("website")}>
+                        <span>官网 / 文档地址：</span>
                         {renderEditableField("website", { className: "blocks-link-value", asLink: true, allowDisplayEdit: false })}
                       </section>
 

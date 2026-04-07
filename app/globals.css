@@ -1749,6 +1749,7 @@ select {
 
 .blocks-detail-link-editors {
   margin-top: 0;
+  cursor: text;
 }
 
 .blocks-detail-link-editors .blocks-inline-display,
