@@ -10,26 +10,6 @@ function jsonResponse(body, init) {
   return NextResponse.json(body, init);
 }
 
-function resolveWriteMode(syncCode) {
-  const incomingCode = syncCode?.trim() || "";
-
-  if (!incomingCode) {
-    return "local";
-  }
-
-  const writeToken = process.env.WRITE_API_TOKEN?.trim();
-
-  if (!writeToken) {
-    throw new Error("missing_write_token");
-  }
-
-  if (incomingCode !== writeToken) {
-    throw new Error("invalid_sync_code");
-  }
-
-  return "remote";
-}
-
 function normalizeState(state) {
   if (!state || typeof state !== "object" || Array.isArray(state)) {
     throw new Error("invalid_state");
@@ -94,11 +74,6 @@ export async function POST(request) {
   try {
     const payload = await request.json();
     const state = normalizeState(payload?.state);
-    const writeMode = resolveWriteMode(payload?.syncCode);
-
-    if (writeMode === "local") {
-      return jsonResponse({ ok: true, mode: "local", state });
-    }
 
     const token = process.env.GITHUB_TOKEN;
     const owner = process.env.GITHUB_REPO_OWNER || "9iliudar";
@@ -118,21 +93,9 @@ export async function POST(request) {
 
     return jsonResponse({ ok: true, mode: "remote", path: FILE_PATH, state });
   } catch (error) {
-    const status =
-      error.message === "invalid_state"
-        ? 400
-        : error.message === "invalid_sync_code"
-          ? 403
-          : 500;
-
+    const status = error.message === "invalid_state" ? 400 : 500;
     const message =
-      status === 400
-        ? "研究状态数据无效。"
-        : status === 403
-          ? "入库校验码不正确。"
-          : error.message === "missing_write_token"
-            ? "服务端未配置入库校验码。"
-            : "保存研究状态失败，请稍后重试。";
+      status === 400 ? "研究状态数据无效。" : "保存研究状态失败，请稍后重试。";
 
     return jsonResponse({ error: error.message, message }, { status });
   }

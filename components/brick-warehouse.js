@@ -12,7 +12,6 @@ import repoBlockState from "@/data/block-state.json";
 
 const BLOCK_STATE_KEY = "ai123_building_blocks_state";
 const CUSTOM_BLOCKS_KEY = "ai123_custom_blocks";
-const SYNC_CODE_KEY = "ai123_sync_code";
 const LAST_SELECTED_BLOCK_KEY = "ai123_last_selected_block";
 const DAILY_FEATURE_DISMISSED_KEY = "ai123_daily_feature_dismissed_at";
 const ALL_STATUS = "ALL_STATUS";
@@ -98,14 +97,6 @@ const IDEA_SIGNAL_MAP = [
 
 function getInitialBlockState() {
   return {};
-}
-
-function getStoredSyncCode() {
-  if (typeof window === "undefined") {
-    return "";
-  }
-
-  return window.localStorage.getItem(SYNC_CODE_KEY) ?? "";
 }
 
 function normalizeStoredState(rawState) {
@@ -355,12 +346,10 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   const [selectedId, setSelectedId] = useState(null);
   const [blockState, setBlockState] = useState(() => normalizeStoredState(repoBlockState));
   const [recordDraft, setRecordDraft] = useState("");
-  const [syncCode, setSyncCode] = useState("");
   const [showDailyFeature, setShowDailyFeature] = useState(false);
 
   useEffect(() => {
     const storedState = window.localStorage.getItem(BLOCK_STATE_KEY);
-    const storedSyncCode = getStoredSyncCode();
     if (storedState) {
       setBlockState((current) =>
         normalizeStoredState({
@@ -369,8 +358,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
         })
       );
     }
-
-    setSyncCode(storedSyncCode);
   }, []);
 
   useEffect(() => {
@@ -400,19 +387,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   useEffect(() => {
     window.localStorage.setItem(BLOCK_STATE_KEY, JSON.stringify(blockState));
   }, [blockState]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    if (!syncCode.trim()) {
-      window.localStorage.removeItem(SYNC_CODE_KEY);
-      return;
-    }
-
-    window.localStorage.setItem(SYNC_CODE_KEY, syncCode.trim());
-  }, [syncCode]);
 
   useEffect(() => {
     if (!open) {
@@ -562,12 +536,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   const selectedRecords = selectedBlock ? [...(blockState[selectedBlock.id]?.records ?? [])].reverse() : [];
 
   async function persistBlockState(nextState) {
-    const normalizedSyncCode = syncCode.trim();
-
-    if (!normalizedSyncCode) {
-      return false;
-    }
-
     try {
       const response = await fetch("/api/save-block-state", {
         method: "POST",
@@ -576,7 +544,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
         },
         body: JSON.stringify({
           state: nextState,
-          syncCode: normalizedSyncCode,
         }),
       });
 
@@ -929,13 +896,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                             placeholder="追加一条新的判断、试用结论、组合灵感或待验证问题。"
                           />
                           <div className="blocks-record-actions">
-                            <input
-                              className="blocks-status-sync"
-                              type="password"
-                              value={syncCode}
-                              onChange={(event) => setSyncCode(event.target.value)}
-                              placeholder="入库校验码"
-                            />
                             <button type="button" className="primary-button blocks-record-submit" onClick={appendRecord}>
                               追加记录
                             </button>
