@@ -706,6 +706,8 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     setActiveWorkspace("digest");
   }
 
+  function dismissDailyFeature() {}
+
   function openDailyFeature() {
     if (!dailyFeaturedBlock) {
       return;
