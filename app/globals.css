@@ -1605,6 +1605,10 @@ select {
   margin-top: 0;
 }
 
+.blocks-detail-title-row {
+  padding-top: 0;
+}
+
 .blocks-detail h3 {
   font-size: 2rem;
 }
@@ -1804,6 +1808,11 @@ select {
 .blocks-detail-section-tight .blocks-inline-display,
 .blocks-detail-section-tight .blocks-inline-editor {
   margin-top: 6px;
+}
+
+.blocks-detail-title-row .blocks-inline-display,
+.blocks-detail-title-row .blocks-inline-editor {
+  margin-top: 0;
 }
 
 .blocks-detail-section-tight .blocks-detail-title-value.blocks-inline-display,

@@ -951,7 +951,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                       <p className="blocks-panel-kicker">当前聚焦项目</p>
                       <div className="blocks-detail-top">
                         <div className="blocks-detail-edit-stack">
-                          <div className="blocks-detail-section blocks-detail-section-tight">
+                          <div className="blocks-detail-section blocks-detail-section-tight blocks-detail-title-row">
                             {renderEditableField("name", { className: "blocks-detail-title-value" })}
                           </div>
                           <div className="blocks-detail-section blocks-detail-section-tight">
@@ -970,11 +970,11 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                     </div>
 
                     <div className="blocks-focus-actions">
-                      <a href={digestSelectedBlock.github} target="_blank" rel="noreferrer" className="blocks-link-row">
+                      <a href={digestSelectedBlock.github} target="_blank" rel="noreferrer" className="blocks-link-row" style={{ order: 2 }}>
                         <span>GitHub 地址</span>
                         <code>{digestSelectedBlock.github}</code>
                       </a>
-                      <a href={digestSelectedBlock.website} target="_blank" rel="noreferrer" className="blocks-link-row">
+                      <a href={digestSelectedBlock.website} target="_blank" rel="noreferrer" className="blocks-link-row" style={{ order: 1 }}>
                         <span>官网 / 文档</span>
                         <code>{digestSelectedBlock.website}</code>
                       </a>
