@@ -14,6 +14,7 @@ const BLOCK_STATE_KEY = "ai123_building_blocks_state";
 const CUSTOM_BLOCKS_KEY = "ai123_custom_blocks";
 const SYNC_CODE_KEY = "ai123_sync_code";
 const LAST_SELECTED_BLOCK_KEY = "ai123_last_selected_block";
+const DAILY_FEATURE_DISMISSED_KEY = "ai123_daily_feature_dismissed_at";
 const ALL_STATUS = "ALL_STATUS";
 const ALL_FRESHNESS = "ALL_FRESHNESS";
 const RECENT_FRESHNESS = "RECENT_FRESHNESS";
@@ -315,6 +316,19 @@ function isRecentAdded(value) {
   return Number.isFinite(addedAt) && addedAt >= ninetyDaysAgo;
 }
 
+function getTodayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function pickDailyFeaturedBlock(items, todayKey) {
+  if (!items.length) {
+    return null;
+  }
+
+  const seed = todayKey.split("").reduce((total, char) => total + char.charCodeAt(0), 0);
+  return items[seed % items.length] ?? items[0] ?? null;
+}
+
 export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSelectedId }) {
   const defaultStatus = blockStatuses[0] ?? "";
   const [activeWorkspace, setActiveWorkspace] = useState("digest");
@@ -328,6 +342,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   const [blockState, setBlockState] = useState(() => normalizeStoredState(repoBlockState));
   const [recordDraft, setRecordDraft] = useState("");
   const [syncCode, setSyncCode] = useState("");
+  const [showDailyFeature, setShowDailyFeature] = useState(false);
 
   useEffect(() => {
     const storedState = window.localStorage.getItem(BLOCK_STATE_KEY);
@@ -457,6 +472,11 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     () => mergeUniqueById([...customBlocks, ...repoCustomBlocks, ...buildingBlocks]),
     [customBlocks]
   );
+  const todayKey = useMemo(() => getTodayKey(), []);
+  const dailyFeaturedBlock = useMemo(
+    () => pickDailyFeaturedBlock(mergedBlocks.filter((block) => !block.isCustom), todayKey),
+    [mergedBlocks, todayKey]
+  );
 
   const recentBlocksCount = useMemo(() => mergedBlocks.filter((block) => isRecentAdded(block.addedAt)).length, [mergedBlocks]);
 
@@ -496,6 +516,15 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
       setSelectedId(null);
     }
   }, [filteredBlocks, selectedId]);
+
+  useEffect(() => {
+    if (!open || typeof window === "undefined") {
+      return;
+    }
+
+    const dismissedAt = window.localStorage.getItem(DAILY_FEATURE_DISMISSED_KEY);
+    setShowDailyFeature(dismissedAt !== todayKey);
+  }, [open, todayKey]);
 
   if (!open) {
     return null;
@@ -618,6 +647,23 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   function focusBlock(blockId) {
     setSelectedId(blockId);
     setActiveWorkspace("digest");
+  }
+
+  function dismissDailyFeature() {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(DAILY_FEATURE_DISMISSED_KEY, todayKey);
+    }
+
+    setShowDailyFeature(false);
+  }
+
+  function openDailyFeature() {
+    if (!dailyFeaturedBlock) {
+      return;
+    }
+
+    setSelectedId(dailyFeaturedBlock.id);
+    dismissDailyFeature();
   }
 
   return (
@@ -898,6 +944,28 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 </>
               ) : (
                 <div className="blocks-results-stage">
+                  {showDailyFeature && dailyFeaturedBlock ? (
+                    <section className="blocks-daily-feature" aria-label="每日一木">
+                      <div className="blocks-daily-feature-head">
+                        <div>
+                          <span className="blocks-panel-kicker">每日一木</span>
+                          <strong>{dailyFeaturedBlock.name}</strong>
+                        </div>
+                        <button type="button" className="blocks-inline-action" onClick={dismissDailyFeature}>
+                          稍后再看
+                        </button>
+                      </div>
+                      <p>{dailyFeaturedBlock.summary}</p>
+                      <div className="blocks-daily-feature-meta">
+                        <span className="blocks-detail-category">
+                          {blockCategoryLabels[dailyFeaturedBlock.category] ?? dailyFeaturedBlock.category}
+                        </span>
+                        <button type="button" className="primary-button blocks-daily-feature-action" onClick={openDailyFeature}>
+                          进入看看
+                        </button>
+                      </div>
+                    </section>
+                  ) : null}
                   <div className="blocks-results-head">
                     <div>
                       <h3>{filteredBlocks.length ? "结果列表" : "没有匹配结果"}</h3>

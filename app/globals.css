@@ -635,7 +635,7 @@ select {
 
 .blocks-topbar {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 20px;
   padding: 10px 26px 8px;
@@ -647,7 +647,7 @@ select {
   max-width: 760px;
   display: flex;
   align-items: center;
-  min-height: 42px;
+  min-height: 48px;
 }
 
 .blocks-kicker,
@@ -667,7 +667,9 @@ select {
 }
 
 .blocks-brand h2 {
+  margin: 0;
   font-size: clamp(1.45rem, 2.2vw, 1.9rem);
+  line-height: 1.1;
 }
 
 .blocks-brand p:last-child {
@@ -996,8 +998,9 @@ select {
 
 .blocks-focus-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 380px;
+  grid-template-columns: minmax(0, 3fr) minmax(360px, 2fr);
   gap: 20px;
+  align-items: start;
 }
 
 .blocks-focus-main,
@@ -1017,6 +1020,7 @@ select {
   display: grid;
   gap: 18px;
   align-content: start;
+  align-self: start;
 }
 
 .blocks-idea-hero {
@@ -1111,6 +1115,53 @@ select {
 .blocks-results-stage {
   display: grid;
   gap: 20px;
+}
+
+.blocks-daily-feature {
+  justify-self: end;
+  width: min(100%, 430px);
+  display: grid;
+  gap: 14px;
+  padding: 18px 20px;
+  border-radius: 24px;
+  border: 1px solid rgba(124, 58, 237, 0.22);
+  background:
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 30%),
+    linear-gradient(180deg, rgba(124, 58, 237, 0.12), transparent 60%),
+    rgba(17, 18, 25, 0.9);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
+}
+
+.blocks-daily-feature-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.blocks-daily-feature-head strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.08rem;
+  line-height: 1.3;
+}
+
+.blocks-daily-feature p {
+  margin: 0;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+
+.blocks-daily-feature-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.blocks-daily-feature-action {
+  min-width: 112px;
 }
 
 .blocks-results-head {
@@ -1530,48 +1581,41 @@ select {
 
 .blocks-status-select {
   appearance: none;
-  padding: 13px 42px 13px 14px !important;
-  border-radius: 16px;
-  border-color: rgba(124, 58, 237, 0.26);
+  padding: 10px 36px 10px 12px !important;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   background:
-    linear-gradient(180deg, rgba(124, 58, 237, 0.1), rgba(255, 255, 255, 0.02)),
-    linear-gradient(45deg, transparent 50%, #c4b5fd 50%),
-    linear-gradient(135deg, #c4b5fd 50%, transparent 50%),
-    rgba(16, 17, 24, 0.9);
+    linear-gradient(45deg, transparent 50%, rgba(228, 228, 231, 0.72) 50%),
+    linear-gradient(135deg, rgba(228, 228, 231, 0.72) 50%, transparent 50%),
+    rgba(255, 255, 255, 0.035);
   background-position:
-    0 0,
-    calc(100% - 18px) calc(50% - 2px),
-    calc(100% - 12px) calc(50% - 2px),
+    calc(100% - 16px) calc(50% - 2px),
+    calc(100% - 11px) calc(50% - 2px),
     0 0;
   background-size:
-    auto,
-    6px 6px,
-    6px 6px,
+    5px 5px,
+    5px 5px,
     auto;
   background-repeat: no-repeat;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 10px 24px rgba(0, 0, 0, 0.18);
-  color: #f5f3ff;
-  font-weight: 600;
+  box-shadow: none;
+  color: #e4e4e7;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
 }
 
 .blocks-status-select:hover {
-  border-color: rgba(124, 58, 237, 0.45);
+  border-color: rgba(255, 255, 255, 0.12);
   background:
-    linear-gradient(180deg, rgba(124, 58, 237, 0.14), rgba(255, 255, 255, 0.03)),
-    linear-gradient(45deg, transparent 50%, #ddd6fe 50%),
-    linear-gradient(135deg, #ddd6fe 50%, transparent 50%),
-    rgba(18, 19, 27, 0.94);
+    linear-gradient(45deg, transparent 50%, rgba(244, 244, 245, 0.82) 50%),
+    linear-gradient(135deg, rgba(244, 244, 245, 0.82) 50%, transparent 50%),
+    rgba(255, 255, 255, 0.05);
   background-position:
-    0 0,
-    calc(100% - 18px) calc(50% - 2px),
-    calc(100% - 12px) calc(50% - 2px),
+    calc(100% - 16px) calc(50% - 2px),
+    calc(100% - 11px) calc(50% - 2px),
     0 0;
   background-size:
-    auto,
-    6px 6px,
-    6px 6px,
+    5px 5px,
+    5px 5px,
     auto;
   background-repeat: no-repeat;
 }
