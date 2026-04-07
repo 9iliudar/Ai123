@@ -1564,7 +1564,7 @@ select {
 
 .blocks-detail-edit-stack {
   display: grid;
-  gap: 6px;
+  gap: 2px;
 }
 
 .blocks-detail-section-tight {
@@ -1576,7 +1576,7 @@ select {
 }
 
 .blocks-detail-title-value {
-  margin-top: 10px;
+  margin-top: 8px;
   color: #f8fafc;
   font-size: 1.9rem;
   font-weight: 700;
@@ -1652,42 +1652,34 @@ select {
 
 .blocks-inline-display {
   margin-top: 10px;
-  border-radius: 14px;
-  border: 1px dashed rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.02);
-  padding: 12px 14px;
   color: #e7e5ff;
   line-height: 1.8;
   cursor: text;
 }
 
-.blocks-inline-display:hover {
-  border-color: rgba(125, 211, 252, 0.22);
-  background: rgba(255, 255, 255, 0.03);
-}
-
 .blocks-inline-display.is-placeholder {
-  color: rgba(226, 232, 240, 0.44);
+  color: rgba(226, 232, 240, 0.58);
 }
 
 .blocks-inline-editor {
   margin-top: 10px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(125, 211, 252, 0.28);
-  background: rgba(15, 23, 42, 0.92);
+  padding: 0 0 3px;
+  border: 0;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.32);
+  border-radius: 0;
+  background: transparent;
   color: #f8fafc;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: none;
 }
 
 .blocks-inline-editor:focus {
   outline: none;
-  border-color: rgba(125, 211, 252, 0.46);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
+  border-bottom-color: rgba(125, 211, 252, 0.62);
+  box-shadow: none;
 }
 
 .blocks-inline-editor-multiline {
-  min-height: 132px;
+  min-height: 120px;
   resize: vertical;
 }
 
@@ -1748,6 +1740,16 @@ select {
 
 .blocks-detail-link-editors {
   margin-top: 0;
+}
+
+.blocks-detail-link-editors .blocks-inline-display,
+.blocks-detail-link-editors .blocks-inline-editor {
+  margin-top: 6px;
+}
+
+.blocks-detail-section-tight .blocks-inline-display,
+.blocks-detail-section-tight .blocks-inline-editor {
+  margin-top: 6px;
 }
 
 .blocks-pill-strong {
