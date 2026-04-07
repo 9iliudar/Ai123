@@ -1562,8 +1562,26 @@ select {
   align-items: flex-start;
 }
 
+.blocks-detail-edit-stack {
+  display: grid;
+  gap: 6px;
+}
+
+.blocks-detail-section-tight {
+  margin-top: 0;
+}
+
 .blocks-detail h3 {
   font-size: 2rem;
+}
+
+.blocks-detail-title-value {
+  margin-top: 10px;
+  color: #f8fafc;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
 }
 
 .blocks-detail-summary {
@@ -1578,6 +1596,10 @@ select {
   font-size: 0.96rem;
   line-height: 1.8;
   color: rgba(226, 232, 240, 0.76);
+}
+
+.blocks-detail-editable-copy {
+  white-space: pre-wrap;
 }
 
 .blocks-detail-actions {
@@ -1622,6 +1644,53 @@ select {
   resize: vertical;
 }
 
+.blocks-inline-display,
+.blocks-inline-editor {
+  width: 100%;
+  min-width: 0;
+}
+
+.blocks-inline-display {
+  margin-top: 10px;
+  border-radius: 14px;
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 12px 14px;
+  color: #e7e5ff;
+  line-height: 1.8;
+  cursor: text;
+}
+
+.blocks-inline-display:hover {
+  border-color: rgba(125, 211, 252, 0.22);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.blocks-inline-display.is-placeholder {
+  color: rgba(226, 232, 240, 0.44);
+}
+
+.blocks-inline-editor {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(125, 211, 252, 0.28);
+  background: rgba(15, 23, 42, 0.92);
+  color: #f8fafc;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.blocks-inline-editor:focus {
+  outline: none;
+  border-color: rgba(125, 211, 252, 0.46);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
+}
+
+.blocks-inline-editor-multiline {
+  min-height: 132px;
+  resize: vertical;
+}
+
 .blocks-record-actions {
   display: flex;
   gap: 10px;
@@ -1650,6 +1719,10 @@ select {
   background: transparent;
 }
 
+.blocks-focus-actions {
+  display: none;
+}
+
 .blocks-link-row:hover {
   background: transparent;
 }
@@ -1664,6 +1737,17 @@ select {
   color: #93c5fd;
   font-family: "Cascadia Code", "Consolas", monospace;
   font-size: 0.78rem;
+}
+
+.blocks-link-value {
+  overflow-wrap: anywhere;
+  color: #93c5fd;
+  font-family: "Cascadia Code", "Consolas", monospace;
+  font-size: 0.84rem;
+}
+
+.blocks-detail-link-editors {
+  margin-top: 0;
 }
 
 .blocks-pill-strong {

@@ -14,6 +14,14 @@ const BLOCK_STATE_KEY = "ai123_building_blocks_state";
 const CUSTOM_BLOCKS_KEY = "ai123_custom_blocks";
 const LAST_SELECTED_BLOCK_KEY = "ai123_last_selected_block";
 const DAILY_FEATURE_DISMISSED_KEY = "ai123_daily_feature_dismissed_at";
+const BLOCK_EDIT_PLACEHOLDERS = {
+  name: "暂无描述",
+  summary: "暂无描述",
+  github: "暂无描述",
+  website: "暂无描述",
+  solves: "暂无描述",
+  bestFor: "暂无描述",
+};
 const ALL_STATUS = "ALL_STATUS";
 const ALL_FRESHNESS = "ALL_FRESHNESS";
 const RECENT_FRESHNESS = "RECENT_FRESHNESS";
@@ -127,10 +135,24 @@ function normalizeStoredState(rawState) {
         {
           status,
           records,
+          fields: value?.fields && typeof value.fields === "object" && !Array.isArray(value.fields) ? value.fields : {},
         },
       ];
     })
   );
+}
+
+function applyBlockFieldOverrides(block, stateEntry) {
+  const fields = stateEntry?.fields ?? {};
+  return {
+    ...block,
+    name: typeof fields.name === "string" && fields.name.trim() ? fields.name.trim() : block.name,
+    summary: typeof fields.summary === "string" && fields.summary.trim() ? fields.summary.trim() : block.summary,
+    github: typeof fields.github === "string" ? fields.github.trim() : block.github,
+    website: typeof fields.website === "string" ? fields.website.trim() : block.website,
+    solves: typeof fields.solves === "string" && fields.solves.trim() ? fields.solves.trim() : block.solves,
+    bestFor: typeof fields.bestFor === "string" && fields.bestFor.trim() ? fields.bestFor.trim() : block.bestFor,
+  };
 }
 
 function matchesText(block, keyword) {
@@ -347,6 +369,8 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   const [blockState, setBlockState] = useState(() => normalizeStoredState(repoBlockState));
   const [recordDraft, setRecordDraft] = useState("");
   const [showDailyFeature, setShowDailyFeature] = useState(false);
+  const [editingField, setEditingField] = useState(null);
+  const [editingDraft, setEditingDraft] = useState("");
 
   useEffect(() => {
     const storedState = window.localStorage.getItem(BLOCK_STATE_KEY);
@@ -442,6 +466,8 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
 
   useEffect(() => {
     setRecordDraft("");
+    setEditingField(null);
+    setEditingDraft("");
   }, [selectedId]);
 
   useEffect(() => {
@@ -457,8 +483,11 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   }, [selectedId]);
 
   const mergedBlocks = useMemo(
-    () => mergeUniqueById([...customBlocks, ...repoCustomBlocks, ...buildingBlocks]),
-    [customBlocks]
+    () =>
+      mergeUniqueById([...customBlocks, ...repoCustomBlocks, ...buildingBlocks]).map((block) =>
+        applyBlockFieldOverrides(block, blockState[block.id])
+      ),
+    [blockState, customBlocks]
   );
   const todayKey = useMemo(() => getTodayKey(), []);
   const dailyFeaturedBlock = useMemo(
@@ -574,6 +603,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
         [selectedBlock.id]: {
           status: current[selectedBlock.id]?.status ?? defaultStatus,
           records: current[selectedBlock.id]?.records ?? [],
+          fields: current[selectedBlock.id]?.fields ?? {},
           ...current[selectedBlock.id],
           ...nextPatch,
         },
@@ -606,6 +636,51 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
       { persist: true }
     );
     setRecordDraft("");
+  }
+
+  function beginFieldEdit(fieldKey) {
+    if (!selectedBlock) {
+      return;
+    }
+
+    const currentValue = selectedBlock[fieldKey];
+    setEditingField(fieldKey);
+    setEditingDraft(typeof currentValue === "string" ? currentValue : "");
+  }
+
+  function commitFieldEdit(fieldKey) {
+    if (!selectedBlock) {
+      setEditingField(null);
+      setEditingDraft("");
+      return;
+    }
+
+    const nextValue = editingDraft.trim();
+    const baseBlock = [...customBlocks, ...repoCustomBlocks, ...buildingBlocks].find((block) => block.id === selectedBlock.id) ?? selectedBlock;
+    const baseValue = typeof baseBlock[fieldKey] === "string" ? baseBlock[fieldKey].trim() : "";
+    const existingFields = blockState[selectedBlock.id]?.fields ?? {};
+    const nextFields = { ...existingFields };
+
+    if (nextValue && nextValue !== baseValue) {
+      nextFields[fieldKey] = nextValue;
+    } else {
+      delete nextFields[fieldKey];
+    }
+
+    updateSelectedBlock(
+      {
+        fields: nextFields,
+      },
+      { persist: true }
+    );
+
+    setEditingField(null);
+    setEditingDraft("");
+  }
+
+  function cancelFieldEdit() {
+    setEditingField(null);
+    setEditingDraft("");
   }
 
   function jumpToConcept(conceptName) {
@@ -657,6 +732,88 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
 
     setSelectedId(dailyFeaturedBlock.id);
     dismissDailyFeature();
+  }
+
+  function renderEditableField(fieldKey, options = {}) {
+    if (!selectedBlock) {
+      return null;
+    }
+
+    const { multiline = false, className = "", asLink = false } = options;
+    const value = typeof selectedBlock[fieldKey] === "string" ? selectedBlock[fieldKey].trim() : "";
+    const isEditing = editingField === fieldKey;
+    const placeholder = BLOCK_EDIT_PLACEHOLDERS[fieldKey] ?? "暂无描述";
+
+    if (isEditing) {
+      if (multiline) {
+        return (
+          <textarea
+            autoFocus
+            className={`blocks-inline-editor blocks-inline-editor-multiline ${className}`.trim()}
+            value={editingDraft}
+            onChange={(event) => setEditingDraft(event.target.value)}
+            onBlur={() => commitFieldEdit(fieldKey)}
+            onKeyDown={(event) => {
+              if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+                event.preventDefault();
+                commitFieldEdit(fieldKey);
+              } else if (event.key === "Escape") {
+                event.preventDefault();
+                cancelFieldEdit();
+              }
+            }}
+            placeholder={placeholder}
+          />
+        );
+      }
+
+      return (
+        <input
+          autoFocus
+          className={`blocks-inline-editor ${className}`.trim()}
+          value={editingDraft}
+          onChange={(event) => setEditingDraft(event.target.value)}
+          onBlur={() => commitFieldEdit(fieldKey)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              commitFieldEdit(fieldKey);
+            } else if (event.key === "Escape") {
+              event.preventDefault();
+              cancelFieldEdit();
+            }
+          }}
+          placeholder={placeholder}
+        />
+      );
+    }
+
+    const displayClassName = `${className} ${value ? "blocks-inline-display" : "blocks-inline-display is-placeholder"}`.trim();
+    const content = value || placeholder;
+
+    if (asLink && value) {
+      return (
+        <a
+          href={value}
+          target="_blank"
+          rel="noreferrer"
+          className={displayClassName}
+          onDoubleClick={(event) => {
+            event.preventDefault();
+            beginFieldEdit(fieldKey);
+          }}
+          title="双击编辑"
+        >
+          {content}
+        </a>
+      );
+    }
+
+    return (
+      <div className={displayClassName} onDoubleClick={() => beginFieldEdit(fieldKey)} title="双击编辑">
+        {content}
+      </div>
+    );
   }
 
   return (
@@ -812,10 +969,18 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                     <div className="blocks-focus-copy">
                       <p className="blocks-panel-kicker">当前聚焦项目</p>
                       <div className="blocks-detail-top">
-                        <div>
-                          <h3>{digestSelectedBlock.name}</h3>
-                          <p className="blocks-detail-summary">{digestSelectedBlock.positioning ?? digestSelectedBlock.summary}</p>
-                          <p className="blocks-detail-summary blocks-detail-summary-secondary">{digestSelectedBlock.summary}</p>
+                        <div className="blocks-detail-edit-stack">
+                          <div className="blocks-detail-section blocks-detail-section-tight">
+                            <span>积木名称</span>
+                            {renderEditableField("name", { className: "blocks-detail-title-value" })}
+                          </div>
+                          <div className="blocks-detail-section blocks-detail-section-tight">
+                            <span>积木简介</span>
+                            {renderEditableField("summary", {
+                              multiline: true,
+                              className: "blocks-detail-summary blocks-detail-summary-secondary blocks-detail-editable-copy",
+                            })}
+                          </div>
                         </div>
                         <div className="blocks-detail-meta">
                           <span className="blocks-detail-category">{blockCategoryLabels[digestSelectedBlock.category] ?? digestSelectedBlock.category}</span>
@@ -837,14 +1002,24 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                   </div>
 
                       <section className="blocks-focus-main">
+                      <section className="blocks-detail-section blocks-detail-link-editors">
+                        <span>github地址</span>
+                        {renderEditableField("github", { className: "blocks-link-value", asLink: true })}
+                      </section>
+
+                      <section className="blocks-detail-section blocks-detail-link-editors">
+                        <span>官网 / 文档地址</span>
+                        {renderEditableField("website", { className: "blocks-link-value", asLink: true })}
+                      </section>
+
                       <section className="blocks-detail-section">
                         <span>它解决什么问题</span>
-                        <p>{digestSelectedBlock.solves}</p>
+                        {renderEditableField("solves", { multiline: true, className: "blocks-detail-editable-copy" })}
                       </section>
 
                       <section className="blocks-detail-section">
                         <span>最适合先拿来做什么</span>
-                        <p>{digestSelectedBlock.bestFor}</p>
+                        {renderEditableField("bestFor", { multiline: true, className: "blocks-detail-editable-copy" })}
                       </section>
 
                       <section className="blocks-detail-section">
