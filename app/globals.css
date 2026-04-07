@@ -965,7 +965,7 @@ select {
 .blocks-focus-hero {
   display: grid;
   gap: 12px;
-  padding: 18px 22px 22px;
+  padding: 14px 22px 22px;
   border-radius: 26px;
   border: 1px solid rgba(124, 58, 237, 0.2);
   background:
@@ -987,6 +987,12 @@ select {
 .blocks-focus-copy {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+.blocks-focus-copy .blocks-detail-meta {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  align-self: flex-start;
 }
 
 .blocks-focus-actions {
@@ -1489,6 +1495,7 @@ select {
   padding: 6px 10px;
   border-radius: 999px;
   font-size: 0.76rem;
+  white-space: nowrap;
 }
 
 .blocks-card-category,
@@ -1595,7 +1602,7 @@ select {
 }
 
 .blocks-detail-title-value {
-  margin-top: -18px;
+  margin-top: -24px;
   color: #f8fafc;
   font-size: 2.34rem;
   font-weight: 900;
