@@ -1061,7 +1061,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                             selectedRecords.map((record) => (
                               <article key={record.id} className="blocks-record-item">
                                 <div className="blocks-record-meta">
-                                  <span>{record.status}</span>
                                   <time dateTime={record.createdAt}>{formatRecordDate(record.createdAt)}</time>
                                 </div>
                                 <p>{record.content}</p>
@@ -1255,4 +1254,3 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     </div>
   );
 }
-

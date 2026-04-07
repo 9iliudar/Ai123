@@ -1448,8 +1448,7 @@ select {
   margin-top: 12px;
 }
 
-.blocks-plan-stack span,
-.blocks-record-meta span {
+.blocks-plan-stack span {
   padding: 5px 8px;
   border-radius: 999px;
   background: rgba(124, 58, 237, 0.14);
