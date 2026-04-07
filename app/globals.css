@@ -1648,6 +1648,10 @@ select {
 .blocks-inline-editor {
   width: 100%;
   min-width: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  text-align: inherit;
 }
 
 .blocks-inline-display {
@@ -1681,6 +1685,7 @@ select {
 .blocks-inline-editor-multiline {
   min-height: 120px;
   resize: vertical;
+  overflow: hidden;
 }
 
 .blocks-record-actions {
@@ -1750,6 +1755,23 @@ select {
 .blocks-detail-section-tight .blocks-inline-display,
 .blocks-detail-section-tight .blocks-inline-editor {
   margin-top: 6px;
+}
+
+.blocks-detail-title-value.blocks-inline-editor,
+.blocks-detail-title-value.blocks-inline-display {
+  line-height: 1.15;
+}
+
+.blocks-detail-summary.blocks-inline-editor,
+.blocks-detail-summary.blocks-inline-display,
+.blocks-detail-editable-copy.blocks-inline-editor,
+.blocks-detail-editable-copy.blocks-inline-display {
+  white-space: pre-wrap;
+}
+
+.blocks-detail-summary.blocks-inline-editor,
+.blocks-detail-editable-copy.blocks-inline-editor {
+  padding-bottom: 6px;
 }
 
 .blocks-pill-strong {

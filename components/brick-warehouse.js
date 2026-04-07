@@ -739,7 +739,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
       return null;
     }
 
-    const { multiline = false, className = "", asLink = false } = options;
+    const { multiline = false, className = "", asLink = false, allowDisplayEdit = true } = options;
     const value = typeof selectedBlock[fieldKey] === "string" ? selectedBlock[fieldKey].trim() : "";
     const isEditing = editingField === fieldKey;
     const placeholder = BLOCK_EDIT_PLACEHOLDERS[fieldKey] ?? "暂无描述";
@@ -798,11 +798,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
           target="_blank"
           rel="noreferrer"
           className={displayClassName}
-          onDoubleClick={(event) => {
-            event.preventDefault();
-            beginFieldEdit(fieldKey);
-          }}
-          title="双击编辑"
         >
           {content}
         </a>
@@ -810,7 +805,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     }
 
     return (
-      <div className={displayClassName} onDoubleClick={() => beginFieldEdit(fieldKey)} title="双击编辑">
+      <div className={displayClassName} onDoubleClick={allowDisplayEdit ? () => beginFieldEdit(fieldKey) : undefined}>
         {content}
       </div>
     );
@@ -971,7 +966,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                       <div className="blocks-detail-top">
                         <div className="blocks-detail-edit-stack">
                           <div className="blocks-detail-section blocks-detail-section-tight">
-                            <span>积木名称</span>
                             {renderEditableField("name", { className: "blocks-detail-title-value" })}
                           </div>
                           <div className="blocks-detail-section blocks-detail-section-tight">
@@ -1003,13 +997,13 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
 
                       <section className="blocks-focus-main">
                       <section className="blocks-detail-section blocks-detail-link-editors">
-                        <span>github地址</span>
-                        {renderEditableField("github", { className: "blocks-link-value", asLink: true })}
+                        <span onDoubleClick={() => beginFieldEdit("github")}>github地址 “”</span>
+                        {renderEditableField("github", { className: "blocks-link-value", asLink: true, allowDisplayEdit: false })}
                       </section>
 
                       <section className="blocks-detail-section blocks-detail-link-editors">
-                        <span>官网 / 文档地址</span>
-                        {renderEditableField("website", { className: "blocks-link-value", asLink: true })}
+                        <span onDoubleClick={() => beginFieldEdit("website")}>官网 / 文档地址 “”</span>
+                        {renderEditableField("website", { className: "blocks-link-value", asLink: true, allowDisplayEdit: false })}
                       </section>
 
                       <section className="blocks-detail-section">
