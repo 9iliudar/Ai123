@@ -1025,6 +1025,11 @@ select {
   align-self: start;
 }
 
+.blocks-focus-side > .blocks-side-card {
+  margin-top: 0;
+  padding-top: 18px;
+}
+
 .blocks-idea-hero {
   padding: 24px;
   border-radius: 28px;
