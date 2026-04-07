@@ -25,10 +25,10 @@ const ALL_STATUS = "ALL_STATUS";
 const ALL_FRESHNESS = "ALL_FRESHNESS";
 const RECENT_FRESHNESS = "RECENT_FRESHNESS";
 const RECENT_RESEARCH_FRESHNESS = "RECENT_RESEARCH_FRESHNESS";
-const REMOVED_TEST_BLOCK_NAMES = new Set(["积木本地测试", "积木入库测试", "这是一条积木新增测试"]);
+const REMOVED_TEST_BLOCK_NAMES = new Set(["积木本地测试", "积木入库测试", "这是一条积木新增测�?]);
 const REMOVED_TEST_BLOCK_IDS = new Set([
-  "custom-block-绉湪鍏ュ簱娴嬭瘯-1775478163643",
-  "custom-block-杩欐槸涓€鏉＄Ｎ鏈ㄦ柊澧炴祴璇?1775469920381",
+  "custom-block-绉湪鍏ュ簱娴嬭�?1775478163643",
+  "custom-block-杩欐槸涓€鏉＄Ｎ鏈ㄦ柊澧炴祴�?1775469920381",
 ]);
 
 function sanitizeCustomBlocks(items) {
@@ -49,14 +49,14 @@ function mergeUniqueById(items) {
 }
 
 const IDEA_EXAMPLES = [
-  "做一个自动抓网页并进入知识库的研究助手",
-  "做一个能操作浏览器和本地应用的桌面代理",
-  "做一个企业内部多模型 AI 工作台",
+  "做一个自动抓网页并进入知识库的研究助�?,
+  "做一个能操作浏览器和本地应用的桌面代�?,
+  "做一个企业内部多模型 AI 工作�?,
 ];
 
 const IDEA_SIGNAL_MAP = [
   {
-    phrases: ["浏览器", "网页", "网站", "抓取", "爬取", "采集", "表单", "browser", "web", "crawl", "scrape", "form", "website"],
+    phrases: ["浏览�?, "网页", "网站", "抓取", "爬取", "采集", "表单", "browser", "web", "crawl", "scrape", "form", "website"],
     category: "Browser Automation",
     labels: ["Browser Agent", "Automation", "Crawling"],
   },
@@ -66,22 +66,22 @@ const IDEA_SIGNAL_MAP = [
     labels: ["GUI Agent", "Computer Use", "Desktop"],
   },
   {
-    phrases: ["知识库", "文档", "资料", "检索", "问答", "搜索", "pdf", "knowledge", "docs", "rag", "search", "qa"],
+    phrases: ["知识�?, "文档", "资料", "检�?, "问答", "搜索", "pdf", "knowledge", "docs", "rag", "search", "qa"],
     category: "Knowledge",
     labels: ["RAG", "Knowledge Base", "Search", "Documents"],
   },
   {
-    phrases: ["工作流", "自动化", "流程", "编排", "触发", "workflow", "automation", "pipeline", "orchestration", "trigger"],
+    phrases: ["工作�?, "自动�?, "流程", "编排", "触发", "workflow", "automation", "pipeline", "orchestration", "trigger"],
     category: "Workflow",
     labels: ["Workflow", "Automation", "Integrations"],
   },
   {
-    phrases: ["代码", "编程", "开发", "仓库", "调试", "修复", "code", "coding", "repo", "developer", "debug", "fix"],
+    phrases: ["代码", "编程", "开�?, "仓库", "调试", "修复", "code", "coding", "repo", "developer", "debug", "fix"],
     category: "Coding",
     labels: ["Coding", "Code Agent", "Developer Experience"],
   },
   {
-    phrases: ["多模态", "视觉", "图像", "图片", "视频", "音频", "语音", "multimodal", "vision", "image", "video", "audio", "voice"],
+    phrases: ["多模�?, "视觉", "图像", "图片", "视频", "音频", "语音", "multimodal", "vision", "image", "video", "audio", "voice"],
     category: "Multimodal",
     labels: ["Multimodal", "Vision", "Image Generation"],
   },
@@ -91,12 +91,12 @@ const IDEA_SIGNAL_MAP = [
     labels: ["Serving", "Gateway", "Inference", "Model Router"],
   },
   {
-    phrases: ["机器人", "具身", "robot", "robotics", "embodied"],
+    phrases: ["机器�?, "具身", "robot", "robotics", "embodied"],
     category: "Robotics",
     labels: ["Robotics", "Embodied AI", "Policies"],
   },
   {
-    phrases: ["代理", "智能体", "助手", "agent", "copilot", "assistant"],
+    phrases: ["代理", "智能�?, "助手", "agent", "copilot", "assistant"],
     category: "Agent",
     labels: ["Agent", "Autonomous", "Planner"],
   },
@@ -243,7 +243,7 @@ function buildIdeaPlans(recommendedBlocks) {
 
     plans.push({
       title: "采集到知识库",
-      summary: "先抓信息，再整理入库，最后接成可搜索、可追问、可复用的知识系统。",
+      summary: "先抓信息，再整理入库，最后接成可搜索、可追问、可复用的知识系统�?,
       stack: [browserBlock, knowledgeBlock, workflowBlock].filter(Boolean).map((block) => block.name),
     });
   }
@@ -254,8 +254,8 @@ function buildIdeaPlans(recommendedBlocks) {
     const infraBlock = categories.get("Infra");
 
     plans.push({
-      title: "执行型代理",
-      summary: "让代理不只会理解任务，还能真正操作界面、调用工具并跑完整流程。",
+      title: "执行型代�?,
+      summary: "让代理不只会理解任务，还能真正操作界面、调用工具并跑完整流程�?,
       stack: [agentBlock, executionBlock, infraBlock].filter(Boolean).map((block) => block.name),
     });
   }
@@ -267,15 +267,15 @@ function buildIdeaPlans(recommendedBlocks) {
 
     plans.push({
       title: "研发加速台",
-      summary: "把代码生成、工作流编排和模型路由放在一条链路里，适合快速出原型。",
+      summary: "把代码生成、工作流编排和模型路由放在一条链路里，适合快速出原型�?,
       stack: [codingBlock, workflowBlock, infraBlock].filter(Boolean).map((block) => block.name),
     });
   }
 
   if (!plans.length) {
     plans.push({
-      title: "首选组合",
-      summary: "先从当前最相关的积木开始，尽快拼出第一条可验证的路径，再决定后续补哪些模块。",
+      title: "首选组�?,
+      summary: "先从当前最相关的积木开始，尽快拼出第一条可验证的路径，再决定后续补哪些模块�?,
       stack: recommendedBlocks.slice(0, 3).map((block) => block.name),
     });
   }
@@ -300,7 +300,7 @@ function buildIdeaPlans(recommendedBlocks) {
     if (diverseBlocks.length >= 2) {
       plans.push({
         title: "探索组合",
-        summary: "把不同类别的积木先拉到一张桌上，快速判断是走自动化、知识库还是代理路线更合适。",
+        summary: "把不同类别的积木先拉到一张桌上，快速判断是走自动化、知识库还是代理路线更合适�?,
         stack: diverseBlocks,
       });
     }
@@ -572,10 +572,10 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
       return true;
 
       if (!response.ok) {
-        throw new Error(payload.message || "保存研究状态失败");
+        throw new Error(payload.message || "保存研究状态失�?);
       }
     } catch (error) {
-      window.alert(error.message || "保存研究状态失败，请稍后重试。");
+      window.alert(error.message || "保存研究状态失败，请稍后重试�?);
     }
   }
 
@@ -831,7 +831,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
             <aside className="blocks-explorer scroll-surface">
               <div className="blocks-explorer-head">
                 <div>
-                  <p className="blocks-panel-kicker">检索</p>
+                  <p className="blocks-panel-kicker">检�?/p>
                 </div>
                 <strong>{filteredBlocks.length}</strong>
               </div>
@@ -841,7 +841,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                   type="text"
                   value={query}
                   onChange={(event) => showResultsWithQuery(event.target.value)}
-                  placeholder="搜索项目、概念..."
+                  placeholder="搜索项目、概�?.."
                 />
                 {query ? (
                   <button
@@ -875,14 +875,14 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                       className={`blocks-chip ${activeFreshness === RECENT_FRESHNESS ? "active" : ""}`}
                       onClick={() => showResultsWithFreshness(RECENT_FRESHNESS)}
                     >
-                      最近添加
+                      最近添�?
                     </button>
                     <button
                       type="button"
                       className={`blocks-chip ${activeFreshness === RECENT_RESEARCH_FRESHNESS ? "active" : ""}`}
                       onClick={() => showResultsWithFreshness(RECENT_RESEARCH_FRESHNESS)}
                     >
-                      最近研究
+                      最近研�?
                     </button>
                   </div>
                 </section>
@@ -908,7 +908,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
 
                 <section className="blocks-filter-card blocks-filter-card-muted">
                   <div className="blocks-filter-head">
-                    <span>状态</span>
+                    <span>状�?/span>
                   </div>
                   <div className="blocks-chip-group">
                     <button
@@ -955,7 +955,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                             {renderEditableField("name", { className: "blocks-detail-title-value" })}
                           </div>
                           <div className="blocks-detail-section blocks-detail-section-tight">
-                            <span>积木简介</span>
+                            <span>积木简�?/span>
                             {renderEditableField("summary", {
                               multiline: true,
                               className: "blocks-detail-summary blocks-detail-summary-secondary blocks-detail-editable-copy",
@@ -964,14 +964,14 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                         </div>
                         <div className="blocks-detail-meta">
                           <span className="blocks-detail-category">{blockCategoryLabels[digestSelectedBlock.category] ?? digestSelectedBlock.category}</span>
-                          {digestSelectedBlock.needsEnrichment ? <span className="blocks-sync-flag">待补全</span> : null}
+                          {digestSelectedBlock.needsEnrichment ? <span className="blocks-sync-flag">待补�?/span> : null}
                         </div>
                       </div>
                     </div>
 
                     <div className="blocks-focus-actions">
                       <a href={digestSelectedBlock.github} target="_blank" rel="noreferrer" className="blocks-link-row" style={{ order: 2 }}>
-                        <span>GitHub 地址</span>
+                        <span>Github 地址</span>
                         <code>{digestSelectedBlock.github}</code>
                       </a>
                       <a href={digestSelectedBlock.website} target="_blank" rel="noreferrer" className="blocks-link-row" style={{ order: 1 }}>
@@ -983,22 +983,22 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
 
                       <section className="blocks-focus-main">
                       <section className="blocks-detail-section blocks-detail-link-editors" onDoubleClick={() => beginFieldEdit("github")}>
-                        <span>github地址：</span>
+                        <span>github地址�?/span>
                         {renderEditableField("github", { className: "blocks-link-value", asLink: true, allowDisplayEdit: false })}
                       </section>
 
                       <section className="blocks-detail-section blocks-detail-link-editors" onDoubleClick={() => beginFieldEdit("website")}>
-                        <span>官网 / 文档地址：</span>
+                        <span>官网 / 文档地址�?/span>
                         {renderEditableField("website", { className: "blocks-link-value", asLink: true, allowDisplayEdit: false })}
                       </section>
 
                       <section className="blocks-detail-section">
-                        <span>它解决什么问题</span>
+                        <span>它解决什么问�?/span>
                         {renderEditableField("solves", { multiline: true, className: "blocks-detail-editable-copy" })}
                       </section>
 
                       <section className="blocks-detail-section">
-                        <span>最适合先拿来做什么</span>
+                        <span>最适合先拿来做什�?/span>
                         {renderEditableField("bestFor", { multiline: true, className: "blocks-detail-editable-copy" })}
                       </section>
 
@@ -1014,7 +1014,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                       </section>
 
                       <section className="blocks-detail-section">
-                        <span>适合产出什么</span>
+                        <span>适合产出什�?/span>
                         <div className="blocks-pill-row">
                           {digestSelectedBlock.outputs.map((item) => (
                             <span key={item} className="blocks-pill blocks-pill-static">
@@ -1048,7 +1048,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                           <textarea
                             value={recordDraft}
                             onChange={(event) => setRecordDraft(event.target.value)}
-                            placeholder="追加一条新的判断、试用结论、组合灵感或待验证问题。"
+                            placeholder="追加一条新的判断、试用结论、组合灵感或待验证问题�?
                           />
                           <div className="blocks-record-actions">
                             <button type="button" className="primary-button blocks-record-submit" onClick={appendRecord}>
@@ -1068,7 +1068,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                               </article>
                             ))
                           ) : (
-                            <div className="blocks-record-empty">还没有记录，先记下你对它的第一印象。</div>
+                            <div className="blocks-record-empty">还没有记录，先记下你对它的第一印象�?/div>
                           )}
                         </div>
                       </section>
@@ -1078,11 +1078,11 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
               ) : (
                 <div className="blocks-results-stage">
                   {dailyFeaturedBlock ? (
-                    <section className="blocks-daily-feature" aria-label="每日一木">
+                    <section className="blocks-daily-feature" aria-label="每日一�?>
                       <div className="blocks-daily-feature-copy">
                         <div className="blocks-daily-feature-head">
                           <div>
-                            <span className="blocks-panel-kicker">每日一木</span>
+                            <span className="blocks-panel-kicker">每日一�?/span>
                             <strong>{dailyFeaturedBlock.name}</strong>
                           </div>
                           <button type="button" className="blocks-inline-action" onClick={dismissDailyFeature}>
@@ -1108,7 +1108,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                     <div>
                       <h3>{filteredBlocks.length ? "结果列表" : "没有匹配结果"}</h3>
                     </div>
-                    <p>{filteredBlocks.length ? `当前共有 ${filteredBlocks.length} 个结果` : "换一个关键词、分类或状态试试。"}</p>
+                    <p>{filteredBlocks.length ? `当前共有 ${filteredBlocks.length} 个结果` : "换一个关键词、分类或状态试试�?}</p>
                   </div>
 
                   {filteredBlocks.length ? (
@@ -1125,7 +1125,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                             <div className="blocks-card-top">
                               <span className="blocks-card-category">{blockCategoryLabels[block.category] ?? block.category}</span>
                               <div className="blocks-card-meta">
-                                {block.needsEnrichment ? <span className="blocks-sync-flag blocks-sync-flag-compact">待补全</span> : null}
+                                {block.needsEnrichment ? <span className="blocks-sync-flag blocks-sync-flag-compact">待补�?/span> : null}
                                 <span className="blocks-card-status">{status}</span>
                               </div>
                             </div>
@@ -1145,16 +1145,16 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
             <section className="blocks-idea-workspace scroll-surface">
               <section className="blocks-idea-hero">
                 <div className="blocks-idea-copy">
-                  <p className="blocks-panel-kicker">想法工作台</p>
+                  <p className="blocks-panel-kicker">想法工作�?/p>
                   <h3>先写一句目标，再批量展开组合</h3>
-                  <p>这里优先服务你的组合创新，在你需要之前，尽量不让整个项目库干扰你。</p>
+                  <p>这里优先服务你的组合创新，在你需要之前，尽量不让整个项目库干扰你�?/p>
                 </div>
 
                 <div className="blocks-idea-input-wrap">
                   <textarea
                     value={ideaInput}
                     onChange={(event) => setIdeaInput(event.target.value)}
-                    placeholder="例如：做一个能自动抓网页、整理资料、进入知识库并持续回答问题的研究助手。"
+                    placeholder="例如：做一个能自动抓网页、整理资料、进入知识库并持续回答问题的研究助手�?
                   />
                   <div className="blocks-idea-examples">
                     {IDEA_EXAMPLES.map((example) => (
@@ -1190,7 +1190,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                     ) : (
                       <section className="blocks-idea-empty">
                         <h3>还没拼出可用方案</h3>
-                        <p>当前输入没有形成足够明确的组合方向。你可以换一种说法，或者先从右侧推荐积木里挑一个继续深入。</p>
+                        <p>当前输入没有形成足够明确的组合方向。你可以换一种说法，或者先从右侧推荐积木里挑一个继续深入�?/p>
                       </section>
                     )}
                   </section>
@@ -1244,8 +1244,8 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 </div>
               ) : (
                 <section className="blocks-idea-empty">
-                  <h3>先把想法放上桌</h3>
-                  <p>输入一句目标后，这里会优先展示组合方案和推荐积木，而不是把你丢进完整项目列表里。</p>
+                  <h3>先把想法放上�?/h3>
+                  <p>输入一句目标后，这里会优先展示组合方案和推荐积木，而不是把你丢进完整项目列表里�?/p>
                 </section>
               )}
             </section>
@@ -1255,4 +1255,5 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     </div>
   );
 }
+
 
