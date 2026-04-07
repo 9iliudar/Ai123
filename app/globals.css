@@ -984,6 +984,11 @@ select {
   align-items: flex-start;
 }
 
+.blocks-focus-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .blocks-focus-actions {
   display: grid;
   gap: 10px;
@@ -1569,6 +1574,8 @@ select {
 .blocks-detail-edit-stack {
   display: grid;
   gap: 0;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .blocks-detail-edit-stack .blocks-detail-section-tight:nth-child(2) > span {
