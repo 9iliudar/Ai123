@@ -1803,6 +1803,14 @@ select {
   white-space: pre-wrap;
 }
 
+.blocks-focus-hero .blocks-detail-summary.blocks-inline-editor,
+.blocks-focus-hero .blocks-detail-summary.blocks-inline-display {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  align-self: stretch;
+}
+
 .blocks-detail-summary.blocks-inline-editor,
 .blocks-detail-editable-copy.blocks-inline-editor {
   padding-bottom: 6px;
