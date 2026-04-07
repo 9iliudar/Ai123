@@ -970,13 +970,13 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                     </div>
 
                     <div className="blocks-focus-actions">
-                      <a href={digestSelectedBlock.github} target="_blank" rel="noreferrer" className="blocks-link-row" style={{ order: 2 }}>
-                        <span>Github Âú∞ÂùÄ</span>
-                        <code>{digestSelectedBlock.github}</code>
-                      </a>
-                      <a href={digestSelectedBlock.website} target="_blank" rel="noreferrer" className="blocks-link-row" style={{ order: 1 }}>
-                        <span>ÂÆòÁΩë / ÊñáÊ°£</span>
+                      <a href={digestSelectedBlock.website} target="_blank" rel="noreferrer" className="blocks-link-row">
+                        <span>πŸÕ¯/Œƒµµµÿ÷∑</span>
                         <code>{digestSelectedBlock.website}</code>
+                      </a>
+                      <a href={digestSelectedBlock.github} target="_blank" rel="noreferrer" className="blocks-link-row">
+                        <span>Githubµÿ÷∑</span>
+                        <code>{digestSelectedBlock.github}</code>
                       </a>
                     </div>
                   </div>
@@ -1255,6 +1255,8 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     </div>
   );
 }
+
+
 
 
 

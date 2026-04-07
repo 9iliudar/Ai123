@@ -965,7 +965,7 @@ select {
 .blocks-focus-hero {
   display: grid;
   gap: 12px;
-  padding: 22px;
+  padding: 8px 22px 22px;
   border-radius: 26px;
   border: 1px solid rgba(124, 58, 237, 0.2);
   background:
@@ -1613,7 +1613,6 @@ select {
   font-weight: 900;
   letter-spacing: -0.045em;
   line-height: 1;
-  transform: translateY(-8px);
 }
 
 .blocks-detail-summary {
@@ -1822,7 +1821,6 @@ select {
   font-weight: 900;
   letter-spacing: -0.045em;
   line-height: 1.02;
-  transform: translateY(-8px);
 }
 
 .blocks-detail-summary.blocks-inline-editor,
