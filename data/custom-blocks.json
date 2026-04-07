@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "custom-block-qdrant-1775543356840",
+    "name": "Qdrant",
+    "category": "Knowledge",
+    "github": "",
+    "website": "",
+    "summary": "面向下一代人工智能的高性能、大规模向量数据库与向量搜索引擎。",
+    "tags": [],
+    "solves": "面向下一代人工智能的高性能、大规模向量数据库与向量搜索引擎。",
+    "composeWith": [],
+    "outputs": [],
+    "relatedConcepts": [],
+    "isCustom": true,
+    "needsEnrichment": true,
+    "addedAt": "2026-04-07T06:29:16.840Z"
+  }
+]
