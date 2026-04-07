@@ -1666,6 +1666,7 @@ select {
 }
 
 .blocks-inline-editor {
+  display: block;
   margin-top: 10px;
   padding: 0 0 3px;
   border: 0;
@@ -1674,6 +1675,7 @@ select {
   background: transparent;
   color: #f8fafc;
   box-shadow: none;
+  box-sizing: border-box;
 }
 
 .blocks-inline-editor:focus {
@@ -1683,7 +1685,9 @@ select {
 }
 
 .blocks-inline-editor-multiline {
+  display: block;
   min-height: 120px;
+  width: 100%;
   resize: vertical;
   overflow: hidden;
 }

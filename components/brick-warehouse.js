@@ -971,7 +971,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                           <div className="blocks-detail-section blocks-detail-section-tight">
                             <span>积木简介</span>
                             {renderEditableField("summary", {
-                              multiline: true,
                               className: "blocks-detail-summary blocks-detail-summary-secondary blocks-detail-editable-copy",
                             })}
                           </div>
@@ -997,12 +996,12 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
 
                       <section className="blocks-focus-main">
                       <section className="blocks-detail-section blocks-detail-link-editors">
-                        <span onDoubleClick={() => beginFieldEdit("github")}>github地址 “”</span>
+                        <span onDoubleClick={() => beginFieldEdit("github")}>github地址：</span>
                         {renderEditableField("github", { className: "blocks-link-value", asLink: true, allowDisplayEdit: false })}
                       </section>
 
                       <section className="blocks-detail-section blocks-detail-link-editors">
-                        <span onDoubleClick={() => beginFieldEdit("website")}>官网 / 文档地址 “”</span>
+                        <span onDoubleClick={() => beginFieldEdit("website")}>官网 / 文档地址：</span>
                         {renderEditableField("website", { className: "blocks-link-value", asLink: true, allowDisplayEdit: false })}
                       </section>
 
