@@ -18,6 +18,7 @@ const DAILY_FEATURE_DISMISSED_KEY = "ai123_daily_feature_dismissed_at";
 const ALL_STATUS = "ALL_STATUS";
 const ALL_FRESHNESS = "ALL_FRESHNESS";
 const RECENT_FRESHNESS = "RECENT_FRESHNESS";
+const RECENT_RESEARCH_FRESHNESS = "RECENT_RESEARCH_FRESHNESS";
 const REMOVED_TEST_BLOCK_NAMES = new Set(["积木本地测试", "积木入库测试", "这是一条积木新增测试"]);
 const REMOVED_TEST_BLOCK_IDS = new Set([
   "custom-block-绉湪鍏ュ簱娴嬭瘯-1775478163643",
@@ -316,6 +317,19 @@ function isRecentAdded(value) {
   return Number.isFinite(addedAt) && addedAt >= ninetyDaysAgo;
 }
 
+function isRecentlyResearched(entry) {
+  const records = entry?.records;
+  if (!Array.isArray(records) || !records.length) {
+    return false;
+  }
+
+  const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  return records.some((record) => {
+    const createdAt = new Date(record?.createdAt).getTime();
+    return Number.isFinite(createdAt) && createdAt >= thirtyDaysAgo;
+  });
+}
+
 function getTodayKey() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -479,6 +493,16 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   );
 
   const recentBlocksCount = useMemo(() => mergedBlocks.filter((block) => isRecentAdded(block.addedAt)).length, [mergedBlocks]);
+  const recentResearchCount = useMemo(
+    () => mergedBlocks.filter((block) => isRecentlyResearched(blockState[block.id])).length,
+    [blockState, mergedBlocks]
+  );
+  const activeFreshnessCount =
+    activeFreshness === RECENT_FRESHNESS
+      ? recentBlocksCount
+      : activeFreshness === RECENT_RESEARCH_FRESHNESS
+        ? recentResearchCount
+        : mergedBlocks.length;
 
   const filteredBlocks = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -487,7 +511,10 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
       const status = blockState[block.id]?.status ?? defaultStatus;
       const matchCategory = activeCategory === "All" || block.category === activeCategory;
       const matchStatus = activeStatus === ALL_STATUS || status === activeStatus;
-      const matchFreshness = activeFreshness === ALL_FRESHNESS || isRecentAdded(block.addedAt);
+      const matchFreshness =
+        activeFreshness === ALL_FRESHNESS ||
+        (activeFreshness === RECENT_FRESHNESS && isRecentAdded(block.addedAt)) ||
+        (activeFreshness === RECENT_RESEARCH_FRESHNESS && isRecentlyResearched(blockState[block.id]));
       return matchCategory && matchStatus && matchFreshness && matchesText(block, keyword);
     });
   }, [activeCategory, activeFreshness, activeStatus, blockState, defaultStatus, mergedBlocks, query]);
@@ -728,7 +755,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 <section className="blocks-filter-card blocks-filter-card-muted">
                   <div className="blocks-filter-head">
                     <span>时间</span>
-                    <strong>{recentBlocksCount}</strong>
+                    <strong>{activeFreshnessCount}</strong>
                   </div>
                   <div className="blocks-chip-group">
                     <button
@@ -744,6 +771,13 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                       onClick={() => showResultsWithFreshness(RECENT_FRESHNESS)}
                     >
                       最近添加
+                    </button>
+                    <button
+                      type="button"
+                      className={`blocks-chip ${activeFreshness === RECENT_RESEARCH_FRESHNESS ? "active" : ""}`}
+                      onClick={() => showResultsWithFreshness(RECENT_RESEARCH_FRESHNESS)}
+                    >
+                      最近研究
                     </button>
                   </div>
                 </section>
