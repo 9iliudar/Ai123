@@ -957,7 +957,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                           <div className="blocks-detail-section blocks-detail-section-tight">
                             <span>积木简介</span>
                             {renderEditableField("summary", {
-                              forceTextarea: true,
+                              multiline: true,
                               className: "blocks-detail-summary blocks-detail-summary-secondary blocks-detail-editable-copy",
                             })}
                           </div>
