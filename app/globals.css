@@ -1567,6 +1567,10 @@ select {
   gap: 2px;
 }
 
+.blocks-focus-copy > .blocks-panel-kicker {
+  display: none;
+}
+
 .blocks-detail-section-tight {
   margin-top: 0;
 }
@@ -1576,12 +1580,12 @@ select {
 }
 
 .blocks-detail-title-value {
-  margin-top: 8px;
+  margin-top: 2px;
   color: #f8fafc;
-  font-size: 2.28rem;
-  font-weight: 800;
-  letter-spacing: -0.045em;
-  line-height: 1.04;
+  font-size: 2.68rem;
+  font-weight: 850;
+  letter-spacing: -0.055em;
+  line-height: 0.98;
 }
 
 .blocks-detail-summary {
