@@ -1,35 +1,35 @@
 <svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="256" height="256" rx="72" fill="#0F172A"/>
-  <rect x="22" y="22" width="212" height="212" rx="56" fill="url(#bgGlow)" fill-opacity="0.92"/>
+  <rect width="256" height="256" rx="72" fill="url(#panel)"/>
   <path
-    d="M113.5 168.5C113.5 152.479 115.818 139.942 120.454 130.891C125.091 121.841 132.778 111.847 143.516 100.909"
+    d="M78 182C78 149.333 93.6667 127.833 125 117.5C156.333 107.167 172 88 172 60"
     stroke="url(#trail)"
-    stroke-width="18"
+    stroke-width="34"
     stroke-linecap="round"
   />
   <path
-    d="M141.478 95.348C135.714 101.233 130.943 106.472 127.166 111.065"
+    d="M169 61C169 89.6667 151.333 109 116 119C80.6667 129 63 151 63 185"
     stroke="#F8FAFC"
-    stroke-opacity="0.88"
-    stroke-width="7"
+    stroke-opacity="0.12"
+    stroke-width="11"
     stroke-linecap="round"
   />
-  <circle cx="150" cy="84" r="22" fill="url(#dotGlow)"/>
-  <circle cx="150" cy="84" r="9.5" fill="#F8FAFC"/>
+  <circle cx="172" cy="60" r="32" fill="url(#sun)"/>
+  <circle cx="172" cy="60" r="13" fill="#FFF8E1"/>
+  <circle cx="78" cy="182" r="16" fill="#E2E8F0" fill-opacity="0.92"/>
   <defs>
-    <radialGradient id="bgGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(174 48) rotate(124.169) scale(232.686)">
-      <stop stop-color="#163047"/>
-      <stop offset="0.58" stop-color="#102338"/>
-      <stop offset="1" stop-color="#0B1324"/>
-    </radialGradient>
-    <linearGradient id="trail" x1="114" y1="168.5" x2="151.191" y2="83.1192" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#6EE7B7"/>
-      <stop offset="0.52" stop-color="#7DD3FC"/>
+    <linearGradient id="panel" x1="24" y1="12" x2="238" y2="244" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1A3854"/>
+      <stop offset="0.48" stop-color="#0E2339"/>
+      <stop offset="1" stop-color="#08111F"/>
+    </linearGradient>
+    <linearGradient id="trail" x1="76" y1="184" x2="179" y2="54" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#93C5FD"/>
+      <stop offset="0.45" stop-color="#67E8F9"/>
       <stop offset="1" stop-color="#F8FAFC"/>
     </linearGradient>
-    <radialGradient id="dotGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(150 84) rotate(90) scale(22)">
+    <radialGradient id="sun" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(172 60) rotate(90) scale(32)">
       <stop stop-color="#FDE68A"/>
-      <stop offset="0.5" stop-color="#FBBF24"/>
+      <stop offset="0.58" stop-color="#FBBF24"/>
       <stop offset="1" stop-color="#F59E0B"/>
     </radialGradient>
   </defs>
