@@ -532,7 +532,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
 
   const selectedBlock = mergedBlocks.find((block) => block.id === selectedId) ?? null;
   const digestSelectedBlock = filteredBlocks.find((block) => block.id === selectedId) ?? null;
-  const selectedStatus = selectedBlock ? blockState[selectedBlock.id]?.status ?? defaultStatus : defaultStatus;
   const selectedRecords = selectedBlock ? [...(blockState[selectedBlock.id]?.records ?? [])].reverse() : [];
 
   async function persistBlockState(nextState) {
@@ -602,7 +601,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     const nextRecord = {
       id: `${selectedBlock.id}-${Date.now()}`,
       content: recordDraft.trim(),
-      status: selectedStatus,
+      status: blockState[selectedBlock.id]?.status ?? defaultStatus,
       createdAt: new Date().toISOString(),
     };
 
@@ -885,21 +884,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
 
                     <aside className="blocks-focus-side">
                       <section className="blocks-detail-section blocks-side-card">
-                        <span>研究状态</span>
-                        <select
-                          className="blocks-status-select"
-                          value={selectedStatus}
-                          onChange={(event) => updateSelectedBlock({ status: event.target.value })}
-                        >
-                          {blockStatuses.map((status) => (
-                            <option key={status} value={status}>
-                              {status}
-                            </option>
-                          ))}
-                        </select>
-                      </section>
-
-                      <section className="blocks-detail-section blocks-side-card">
                         <div className="blocks-section-head">
                           <span>研究记录</span>
                           <strong>{selectedRecords.length}</strong>
@@ -946,20 +930,25 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 <div className="blocks-results-stage">
                   {showDailyFeature && dailyFeaturedBlock ? (
                     <section className="blocks-daily-feature" aria-label="每日一木">
-                      <div className="blocks-daily-feature-head">
-                        <div>
-                          <span className="blocks-panel-kicker">每日一木</span>
-                          <strong>{dailyFeaturedBlock.name}</strong>
+                      <div className="blocks-daily-feature-copy">
+                        <div className="blocks-daily-feature-head">
+                          <div>
+                            <span className="blocks-panel-kicker">每日一木</span>
+                            <strong>{dailyFeaturedBlock.name}</strong>
+                          </div>
+                          <button type="button" className="blocks-inline-action" onClick={dismissDailyFeature}>
+                            稍后再看
+                          </button>
                         </div>
-                        <button type="button" className="blocks-inline-action" onClick={dismissDailyFeature}>
-                          稍后再看
-                        </button>
+                        <p>{dailyFeaturedBlock.summary}</p>
                       </div>
-                      <p>{dailyFeaturedBlock.summary}</p>
-                      <div className="blocks-daily-feature-meta">
-                        <span className="blocks-detail-category">
-                          {blockCategoryLabels[dailyFeaturedBlock.category] ?? dailyFeaturedBlock.category}
-                        </span>
+
+                      <div className="blocks-daily-feature-side">
+                        <div className="blocks-daily-feature-meta">
+                          <span className="blocks-detail-category">
+                            {blockCategoryLabels[dailyFeaturedBlock.category] ?? dailyFeaturedBlock.category}
+                          </span>
+                        </div>
                         <button type="button" className="primary-button blocks-daily-feature-action" onClick={openDailyFeature}>
                           进入看看
                         </button>
@@ -1089,7 +1078,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                         <div className="blocks-spotlight-card">
                           <div className="blocks-card-top">
                             <span className="blocks-card-category">{blockCategoryLabels[selectedBlock.category] ?? selectedBlock.category}</span>
-                            <span className="blocks-card-status">{selectedStatus}</span>
                           </div>
                           <h4>{selectedBlock.name}</h4>
                           <p>{selectedBlock.summary}</p>
