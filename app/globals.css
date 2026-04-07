@@ -3174,6 +3174,7 @@ select {
 }
 
 .universe-hud-pin {
+  position: relative;
   display: grid;
   place-items: center;
   width: 30px;
@@ -3183,11 +3184,42 @@ select {
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.03);
   color: #cbd5e1;
-  font-size: 0.82rem;
+  font-size: 0;
   opacity: 0.82;
   transition: 180ms ease;
   cursor: pointer;
   user-select: none;
+  overflow: hidden;
+  --hud-pin-rotate: -54deg;
+}
+
+.universe-hud-pin::before,
+.universe-hud-pin::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transition: transform 180ms ease, opacity 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.universe-hud-pin::before {
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  transform-origin: 50% 60%;
+  transform: translate(-5px, -7px) rotate(var(--hud-pin-rotate));
+}
+
+.universe-hud-pin::after {
+  width: 2px;
+  height: 13px;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, currentColor 0 82%, rgba(255, 255, 255, 0) 82% 100%);
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 68% 80%, 50% 100%, 32% 80%, 0 80%);
+  transform-origin: 50% 8%;
+  transform: translate(-1px, -1px) rotate(var(--hud-pin-rotate));
 }
 
 .universe-hud-pin:hover {
@@ -3197,6 +3229,7 @@ select {
 }
 
 .universe-hud-pin.is-active {
+  --hud-pin-rotate: 0deg;
   color: var(--universe-accent, #c4b5fd);
   background: color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 78%, rgba(255, 255, 255, 0.03));
   border-color: color-mix(in srgb, var(--universe-accent, #c4b5fd) 48%, rgba(255, 255, 255, 0.12));
