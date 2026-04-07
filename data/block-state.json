@@ -20,5 +20,10 @@
     "status": "未开始",
     "records": [],
     "fields": {}
+  },
+  "openvino-genai": {
+    "status": "未开始",
+    "records": [],
+    "fields": {}
   }
 }
