@@ -68,6 +68,7 @@ function getEmptyDraft(syncCode = "") {
   return {
     name: "",
     link: "",
+    github: "",
     cat: "Other",
     desc: "",
     syncCode,
@@ -302,7 +303,7 @@ export default function Dashboard() {
         id: `custom-block-${slugify(draft.name)}-${Date.now()}`,
         name: draft.name.trim(),
         category: draft.cat,
-        github: "",
+        github: normalizeUrl(draft.github),
         website: "",
         summary: draft.desc.trim() || `${draft.name.trim()} 的自定义积木条目`,
         tags: [],
@@ -682,6 +683,13 @@ export default function Dashboard() {
                 <label>
                   URL
                   <input name="link" type="url" value={draft.link} onChange={handleDraftChange} placeholder="https://..." />
+                </label>
+              ) : null}
+
+              {draftType === "block" ? (
+                <label>
+                  Github
+                  <input name="github" type="url" value={draft.github} onChange={handleDraftChange} placeholder="https://github.com/..." />
                 </label>
               ) : null}
 

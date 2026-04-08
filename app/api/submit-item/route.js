@@ -86,7 +86,7 @@ function buildBlockItem(payload, timestamp) {
     id: `custom-block-${slugify(payload.name)}-${Date.now()}`,
     name: payload.name.trim(),
     category,
-    github: "",
+    github: normalizeUrl(payload.github || ""),
     website: "",
     summary: payload.desc?.trim() || `${payload.name.trim()} 的自定义积木条目`,
     tags: [],

@@ -454,7 +454,7 @@ select {
 .card-actions {
   position: absolute;
   right: 16px;
-  bottom: 14px;
+  bottom: 22px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -467,6 +467,8 @@ select {
   background: transparent;
   color: rgba(228, 228, 231, 0.88);
   cursor: pointer;
+  font-size: 0.72rem;
+  line-height: 1;
 }
 
 .card-action-button:hover {
@@ -1950,11 +1952,14 @@ select {
 
 .modal {
   width: min(460px, 100%);
+  min-height: 640px;
   padding: 28px;
   border-radius: 24px;
   background: #121217;
   border: 1px solid rgba(39, 39, 42, 0.95);
   box-shadow: var(--shadow);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 .concept-overlay {
@@ -2519,6 +2524,8 @@ select {
 .modal form {
   display: grid;
   gap: 14px;
+  min-height: 100%;
+  align-content: start;
 }
 
 .modal label {
@@ -2539,7 +2546,8 @@ select {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 8px;
+  margin-top: auto;
+  padding-top: 8px;
 }
 
 .modal-actions > * {
