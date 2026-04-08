@@ -1,16 +1,9 @@
 <svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
-  <path d="M65 96C65 83.8497 74.8497 74 87 74H151C163.15 74 173 83.8497 173 96V150C173 180.376 148.376 205 118 205C87.6243 205 63 180.376 63 150V98C63 96.8954 63.8954 96 65 96Z" fill="#FFF7ED"/>
-  <path d="M171 95H187C207.435 95 224 111.565 224 132C224 152.435 207.435 169 187 169H171" stroke="#FFF7ED" stroke-width="16" stroke-linecap="round"/>
-  <path d="M55 199H191" stroke="#FFF7ED" stroke-width="16" stroke-linecap="round"/>
-  <path d="M91 49C83 61 84 73 94 85" stroke="#FFF7ED" stroke-width="12" stroke-linecap="round" opacity="0.92"/>
-  <path d="M122 42C114 55 115 68 125 81" stroke="#FFF7ED" stroke-width="12" stroke-linecap="round" opacity="0.84"/>
-  <path d="M153 49C145 61 146 73 156 85" stroke="#FFF7ED" stroke-width="12" stroke-linecap="round" opacity="0.76"/>
+  <path d="M65 96C65 83.8497 74.8497 74 87 74H151C163.15 74 173 83.8497 173 96V150C173 180.376 148.376 205 118 205C87.6243 205 63 180.376 63 150V98C63 96.8954 63.8954 96 65 96Z" fill="#4B2E1F"/>
+  <path d="M171 95H187C207.435 95 224 111.565 224 132C224 152.435 207.435 169 187 169H171" stroke="#4B2E1F" stroke-width="16" stroke-linecap="round"/>
+  <path d="M55 199H191" stroke="#4B2E1F" stroke-width="16" stroke-linecap="round"/>
+  <path d="M91 49C83 61 84 73 94 85" stroke="#4B2E1F" stroke-width="12" stroke-linecap="round" opacity="0.92"/>
+  <path d="M122 42C114 55 115 68 125 81" stroke="#4B2E1F" stroke-width="12" stroke-linecap="round" opacity="0.84"/>
+  <path d="M153 49C145 61 146 73 156 85" stroke="#4B2E1F" stroke-width="12" stroke-linecap="round" opacity="0.76"/>
   <path d="M85 119H154" stroke="#C08457" stroke-width="12" stroke-linecap="round" opacity="0.95"/>
-  <defs>
-    <linearGradient id="bg" x1="24" y1="18" x2="224" y2="236" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#6F4E37"/>
-      <stop offset="1" stop-color="#2D1B14"/>
-    </linearGradient>
-  </defs>
 </svg>
