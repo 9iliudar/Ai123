@@ -1,12 +1,12 @@
 <svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect width="256" height="256" rx="56" fill="url(#bg)"/>
-  <path d="M79 103C79 92.5066 87.5066 84 98 84H153C163.493 84 172 92.5066 172 103V149C172 173.853 151.853 194 127 194H124C99.1472 194 79 173.853 79 149V103Z" fill="#FFF7ED"/>
-  <path d="M169 102H181C198.121 102 212 115.879 212 133C212 150.121 198.121 164 181 164H169" stroke="#FFF7ED" stroke-width="14" stroke-linecap="round"/>
-  <path d="M67 188H186" stroke="#FFF7ED" stroke-width="14" stroke-linecap="round"/>
-  <path d="M103 61C96 71 97 80 105 90" stroke="#FFF7ED" stroke-width="10" stroke-linecap="round" opacity="0.9"/>
-  <path d="M128 56C121 66 122 76 130 87" stroke="#FFF7ED" stroke-width="10" stroke-linecap="round" opacity="0.82"/>
-  <path d="M152 61C145 71 146 80 154 90" stroke="#FFF7ED" stroke-width="10" stroke-linecap="round" opacity="0.74"/>
-  <path d="M96 121H156" stroke="#C08457" stroke-width="10" stroke-linecap="round" opacity="0.95"/>
+  <path d="M65 96C65 83.8497 74.8497 74 87 74H151C163.15 74 173 83.8497 173 96V150C173 180.376 148.376 205 118 205C87.6243 205 63 180.376 63 150V98C63 96.8954 63.8954 96 65 96Z" fill="#FFF7ED"/>
+  <path d="M171 95H187C207.435 95 224 111.565 224 132C224 152.435 207.435 169 187 169H171" stroke="#FFF7ED" stroke-width="16" stroke-linecap="round"/>
+  <path d="M55 199H191" stroke="#FFF7ED" stroke-width="16" stroke-linecap="round"/>
+  <path d="M91 49C83 61 84 73 94 85" stroke="#FFF7ED" stroke-width="12" stroke-linecap="round" opacity="0.92"/>
+  <path d="M122 42C114 55 115 68 125 81" stroke="#FFF7ED" stroke-width="12" stroke-linecap="round" opacity="0.84"/>
+  <path d="M153 49C145 61 146 73 156 85" stroke="#FFF7ED" stroke-width="12" stroke-linecap="round" opacity="0.76"/>
+  <path d="M85 119H154" stroke="#C08457" stroke-width="12" stroke-linecap="round" opacity="0.95"/>
   <defs>
     <linearGradient id="bg" x1="24" y1="18" x2="224" y2="236" gradientUnits="userSpaceOnUse">
       <stop stop-color="#6F4E37"/>
