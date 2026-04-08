@@ -510,8 +510,11 @@ export default function Dashboard() {
       <div className="bg-orb bg-orb-b" />
 
       <nav className="topbar">
-        <a className="brand" href="/">
-          Aibc<span>.Cafe</span>
+        <a className="brand" href="/" aria-label="Aibc.Cafe">
+          <span className="brand-ai">Ai</span>
+          <span className="brand-core">bc</span>
+          <span className="brand-dot">.</span>
+          <span className="brand-suffix">Cafe</span>
         </a>
         <div className="topbar-actions">
           <a className="ghost-link" href="https://github.com/9iliudar/Ai123.git" target="_blank" rel="noreferrer">
