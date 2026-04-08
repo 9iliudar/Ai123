@@ -2535,6 +2535,46 @@ select {
   font-size: 0.92rem;
 }
 
+.modal-rating-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 54px;
+  color: var(--text-dim);
+  font-size: 0.92rem;
+}
+
+.modal-rating-dots {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.modal-rating-dot {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 0.88;
+  cursor: pointer;
+  transition: transform 160ms ease, opacity 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.modal-rating-dot:hover {
+  opacity: 0.96;
+  transform: translateY(-1px);
+}
+
+.modal-rating-dot.is-active {
+  opacity: 1;
+  border-color: rgba(124, 58, 237, 0.7);
+  background: rgba(124, 58, 237, 0.9);
+}
+
 .modal-hint {
   margin: -2px 0 2px;
   color: rgba(212, 212, 216, 0.72);

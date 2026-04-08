@@ -114,7 +114,7 @@ function buildConceptItem(payload, timestamp) {
     name: payload.name.trim(),
     summary: payload.desc?.trim() || `${payload.name.trim()} 的概念摘要`,
     detail: payload.desc?.trim() || `${payload.name.trim()} 的概念说明`,
-    importance: 3,
+    importance: Math.min(5, Math.max(1, Number(payload.importance) || 1)),
     english: "",
     chinese: "",
     domain: cluster?.label ?? "",

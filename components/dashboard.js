@@ -71,6 +71,7 @@ function getEmptyDraft(syncCode = "") {
     github: "",
     cat: "Other",
     desc: "",
+    importance: 1,
     syncCode,
     clusterId: conceptUniverse.clusters[0]?.id ?? "",
   };
@@ -326,7 +327,7 @@ export default function Dashboard() {
       name: draft.name.trim(),
       summary: draft.desc.trim() || `${draft.name.trim()} 的概念摘要`,
       detail: draft.desc.trim() || `${draft.name.trim()} 的概念说明`,
-      importance: 3,
+      importance: Number(draft.importance) || 1,
       english: "",
       chinese: "",
       domain: cluster?.label ?? "",
@@ -707,6 +708,33 @@ export default function Dashboard() {
                   ))}
                 </select>
               </label>
+
+              {draftType === "concept" ? (
+                <div className="modal-rating-row">
+                  <span>熟悉度</span>
+                  <div className="modal-rating-dots" role="radiogroup" aria-label="熟悉度">
+                    {[1, 2, 3, 4, 5].map((level) => (
+                      <button
+                        key={level}
+                        type="button"
+                        className={`modal-rating-dot ${Number(draft.importance) >= level ? "is-active" : ""}`}
+                        aria-label={`熟悉度 ${level}`}
+                        aria-checked={Number(draft.importance) === level}
+                        role="radio"
+                        onClick={() =>
+                          setDrafts((currentDrafts) => ({
+                            ...currentDrafts,
+                            [draftType]: {
+                              ...currentDrafts[draftType],
+                              importance: level,
+                            },
+                          }))
+                        }
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : null}
 
               <label>
                 梗概
