@@ -511,9 +511,7 @@ export default function Dashboard() {
 
       <nav className="topbar">
         <a className="brand" href="/" aria-label="Aibc.Cafe">
-          <span className="brand-core">Aibc</span>
-          <span className="brand-dot">.</span>
-          <span className="brand-suffix">Cafe</span>
+          Aibc<span>.Cafe</span>
         </a>
         <div className="topbar-actions">
           <a className="ghost-link" href="https://github.com/9iliudar/Ai123.git" target="_blank" rel="noreferrer">

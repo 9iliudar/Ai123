@@ -128,28 +128,13 @@ select {
 }
 
 .brand {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0;
-  font-size: 1.62rem;
+  font-size: 1.45rem;
   font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.04em;
 }
 
-.brand-core {
-  color: #f8fafc;
-}
-
-.brand-dot {
-  margin-left: 0.01em;
-  color: rgba(212, 212, 216, 0.55);
-}
-
-.brand-suffix {
-  color: rgba(196, 181, 253, 0.74);
-  font-weight: 800;
-  letter-spacing: -0.05em;
+.brand span {
+  color: #a78bfa;
 }
 
 .topbar-actions {
