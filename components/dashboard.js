@@ -511,7 +511,7 @@ export default function Dashboard() {
 
       <nav className="topbar">
         <a className="brand" href="/">
-          AI <span>123</span>
+          AIBC<span>.Zone</span>
         </a>
         <div className="topbar-actions">
           <a className="ghost-link" href="https://github.com/9iliudar/Ai123.git" target="_blank" rel="noreferrer">
