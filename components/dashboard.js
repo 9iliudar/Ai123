@@ -75,6 +75,25 @@ function getEmptyDraft(syncCode = "") {
   };
 }
 
+function getEmptyDraftByType(type, syncCode = "") {
+  return {
+    ...getEmptyDraft(syncCode),
+    cat: type === "block" ? "Agent" : "Other",
+  };
+}
+
+function createDraftState(syncCode = "") {
+  return Object.fromEntries(
+    ADDABLE_TYPES.map((type) => [type, getEmptyDraftByType(type, syncCode)])
+  );
+}
+
+function setAllDraftSyncCodes(drafts, syncCode) {
+  return Object.fromEntries(
+    Object.entries(drafts).map(([type, draft]) => [type, { ...draft, syncCode }])
+  );
+}
+
 function sortTools(tools, order) {
   const rankMap = new Map(order.map((id, index) => [id, index]));
   const dedupedTools = [...new Map(tools.map((tool) => [tool.id, tool])).values()];
@@ -134,7 +153,7 @@ export default function Dashboard() {
   const [order, setOrder] = useState(getInitialOrder);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [draftType, setDraftType] = useState("tool");
-  const [draft, setDraft] = useState(getEmptyDraft());
+  const [drafts, setDrafts] = useState(() => createDraftState());
   const [editingToolId, setEditingToolId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
@@ -145,6 +164,7 @@ export default function Dashboard() {
   const [draggedId, setDraggedId] = useState(null);
   const [dragArmedId, setDragArmedId] = useState(null);
   const [dropTargetId, setDropTargetId] = useState(null);
+  const draft = drafts[draftType];
 
   useEffect(() => {
     const storedTools = window.localStorage.getItem(CUSTOM_TOOLS_KEY);
@@ -159,7 +179,7 @@ export default function Dashboard() {
       setOrder(JSON.parse(storedOrder));
     }
 
-    setDraft((current) => ({ ...current, syncCode: storedSyncCode }));
+    setDrafts((current) => setAllDraftSyncCodes(current, storedSyncCode));
   }, []);
 
   useEffect(() => {
@@ -204,34 +224,37 @@ export default function Dashboard() {
   }, [activeCategory, customTools, order, search]);
 
   function resetDraft(type = draftType) {
-    const syncCode = draft.syncCode.trim();
-    setDraft({
-      ...getEmptyDraft(syncCode),
-      cat: type === "block" ? "Agent" : "Other",
-    });
+    setDrafts((current) => ({
+      ...current,
+      [type]: getEmptyDraftByType(type, current[type]?.syncCode?.trim() ?? ""),
+    }));
   }
 
   function handleDraftChange(event) {
     const { name, value } = event.target;
-    setDraft((current) => ({ ...current, [name]: value }));
+    setDrafts((current) => {
+      if (name === "syncCode") {
+        return setAllDraftSyncCodes(current, value);
+      }
+
+      return {
+        ...current,
+        [draftType]: {
+          ...current[draftType],
+          [name]: value,
+        },
+      };
+    });
   }
 
   function handleDraftTypeChange(type) {
     setDraftType(type);
     setEditingToolId(null);
-    setDraft((current) => ({
-      ...getEmptyDraft(current.syncCode),
-      cat: type === "block" ? "Agent" : "Other",
-    }));
   }
 
   function openAddModal(type = "tool") {
     setEditingToolId(null);
     setDraftType(type);
-    setDraft((current) => ({
-      ...getEmptyDraft(current.syncCode),
-      cat: type === "block" ? "Agent" : "Other",
-    }));
     setStatusMessage("");
     setIsModalOpen(true);
   }
@@ -245,12 +268,15 @@ export default function Dashboard() {
   function handleEditTool(tool) {
     setEditingToolId(tool.id);
     setDraftType("tool");
-    setDraft((current) => ({
-      ...getEmptyDraft(current.syncCode),
-      name: tool.name ?? "",
-      link: tool.link ?? "",
-      cat: tool.cat ?? "Other",
-      desc: tool.desc ?? "",
+    setDrafts((current) => ({
+      ...current,
+      tool: {
+        ...getEmptyDraftByType("tool", current.tool.syncCode),
+        name: tool.name ?? "",
+        link: tool.link ?? "",
+        cat: tool.cat ?? "Other",
+        desc: tool.desc ?? "",
+      },
     }));
     setStatusMessage("");
     setIsModalOpen(true);
@@ -424,7 +450,7 @@ export default function Dashboard() {
     window.localStorage.removeItem(SYNC_CODE_KEY);
     setCustomTools([]);
     setOrder(getInitialOrder());
-    setDraft(getEmptyDraft());
+    setDrafts(createDraftState());
     setStatusMessage("");
     setSearch("");
     setActiveCategory("All");
