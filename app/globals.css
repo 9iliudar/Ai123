@@ -131,10 +131,10 @@ select {
   display: inline-flex;
   align-items: baseline;
   gap: 0;
-  font-size: 1.58rem;
+  font-size: 1.62rem;
   font-weight: 800;
   line-height: 1;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.055em;
 }
 
 .brand-core {
@@ -148,8 +148,8 @@ select {
 
 .brand-suffix {
   color: rgba(196, 181, 253, 0.74);
-  font-weight: 650;
-  letter-spacing: -0.03em;
+  font-weight: 800;
+  letter-spacing: -0.05em;
 }
 
 .topbar-actions {
