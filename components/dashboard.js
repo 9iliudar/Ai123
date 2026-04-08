@@ -511,8 +511,7 @@ export default function Dashboard() {
 
       <nav className="topbar">
         <a className="brand" href="/" aria-label="Aibc.Cafe">
-          <span className="brand-ai">Ai</span>
-          <span className="brand-core">bc</span>
+          <span className="brand-core">Aibc</span>
           <span className="brand-dot">.</span>
           <span className="brand-suffix">Cafe</span>
         </a>

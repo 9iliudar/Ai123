@@ -131,18 +131,10 @@ select {
   display: inline-flex;
   align-items: baseline;
   gap: 0;
-  font-size: 1.62rem;
+  font-size: 1.58rem;
   font-weight: 800;
   line-height: 1;
-  letter-spacing: -0.055em;
-}
-
-.brand-ai {
-  background: linear-gradient(135deg, #f8fafc 8%, #8b5cf6 52%, #38bdf8 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-shadow: 0 0 18px rgba(56, 189, 248, 0.16);
+  letter-spacing: -0.05em;
 }
 
 .brand-core {
@@ -150,14 +142,14 @@ select {
 }
 
 .brand-dot {
-  margin-left: 0.02em;
-  color: rgba(167, 139, 250, 0.78);
+  margin-left: 0.01em;
+  color: rgba(212, 212, 216, 0.55);
 }
 
 .brand-suffix {
-  color: rgba(228, 228, 231, 0.86);
-  font-weight: 700;
-  letter-spacing: -0.045em;
+  color: rgba(196, 181, 253, 0.74);
+  font-weight: 650;
+  letter-spacing: -0.03em;
 }
 
 .topbar-actions {
