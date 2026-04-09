@@ -3137,7 +3137,7 @@ select {
   z-index: 6;
   width: min(360px, calc(100vw - 64px));
   display: grid;
-  gap: 10px;
+  gap: 14px;
   padding: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 18px;
@@ -3199,7 +3199,7 @@ select {
 
 .universe-composer-panel label {
   display: grid;
-  gap: 5px;
+  gap: 7px;
 }
 
 .universe-composer-panel label span,
@@ -3234,7 +3234,7 @@ select {
   display: grid;
   grid-template-columns: 1fr;
   align-items: stretch;
-  gap: 8px;
+  gap: 12px;
 }
 
 .universe-composer-dismiss,
