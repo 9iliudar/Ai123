@@ -1,5 +1,21 @@
 [
   {
+    "id": "custom-block-wow-harness-1775742831223",
+    "name": "wow-harness",
+    "category": "Agent",
+    "github": "https://github.com/NatureBlueee/wow-harness.git",
+    "website": "",
+    "summary": "给你的 Claude Code 项目装上一套完整的工程治理",
+    "tags": [],
+    "solves": "给你的 Claude Code 项目装上一套完整的工程治理",
+    "composeWith": [],
+    "outputs": [],
+    "relatedConcepts": [],
+    "isCustom": true,
+    "needsEnrichment": true,
+    "addedAt": "2026-04-09T13:53:51.223Z"
+  },
+  {
     "id": "custom-block-qdrant-1775543356840",
     "name": "Qdrant",
     "category": "Knowledge",
