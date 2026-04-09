@@ -13,7 +13,6 @@ import repoBlockState from "@/data/block-state.json";
 const BLOCK_STATE_KEY = "ai123_building_blocks_state";
 const CUSTOM_BLOCKS_KEY = "ai123_custom_blocks";
 const LAST_SELECTED_BLOCK_KEY = "ai123_last_selected_block";
-const SYNC_CODE_KEY = "ai123_sync_code";
 const BLOCK_EDIT_PLACEHOLDERS = {
   name: "暂无描述",
   summary: "暂无描述",
@@ -356,16 +355,6 @@ function pickDailyFeaturedBlock(items, todayKey) {
   return items[seed % items.length] ?? items[0] ?? null;
 }
 
-function createBlockDraft(syncCode = "") {
-  return {
-    name: "",
-    cat: "Agent",
-    github: "",
-    desc: "",
-    syncCode,
-  };
-}
-
 export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSelectedId }) {
   const defaultStatus = blockStatuses[0] ?? "";
   const [activeWorkspace, setActiveWorkspace] = useState("digest");
@@ -380,10 +369,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
   const [recordDraft, setRecordDraft] = useState("");
   const [editingField, setEditingField] = useState(null);
   const [editingDraft, setEditingDraft] = useState("");
-  const [isAddBlockOpen, setIsAddBlockOpen] = useState(false);
-  const [blockDraft, setBlockDraft] = useState(() => createBlockDraft());
-  const [isSubmittingBlock, setIsSubmittingBlock] = useState(false);
-  const [blockComposerMessage, setBlockComposerMessage] = useState("");
 
   useEffect(() => {
     const storedState = window.localStorage.getItem(BLOCK_STATE_KEY);
@@ -409,8 +394,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
       window.localStorage.setItem(CUSTOM_BLOCKS_KEY, JSON.stringify(parsed));
     }
 
-    const storedSyncCode = window.localStorage.getItem(SYNC_CODE_KEY) ?? "";
-    setBlockDraft(createBlockDraft(storedSyncCode));
   }, []);
 
   useEffect(() => {
@@ -423,20 +406,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     setCustomBlocks(parsed);
     window.localStorage.setItem(CUSTOM_BLOCKS_KEY, JSON.stringify(parsed));
   }, [open]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const syncCode = blockDraft.syncCode.trim();
-    if (!syncCode) {
-      window.localStorage.removeItem(SYNC_CODE_KEY);
-      return;
-    }
-
-    window.localStorage.setItem(SYNC_CODE_KEY, syncCode);
-  }, [blockDraft.syncCode]);
 
   useEffect(() => {
     window.localStorage.setItem(BLOCK_STATE_KEY, JSON.stringify(blockState));
@@ -659,61 +628,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
     setRecordDraft("");
   }
 
-  function updateBlockComposerDraft(field, value) {
-    setBlockDraft((current) => ({
-      ...current,
-      [field]: value,
-    }));
-  }
-
-  async function handleAddBlockSubmit(event) {
-    event.preventDefault();
-
-    if (!blockDraft.name.trim()) {
-      return;
-    }
-
-    setIsSubmittingBlock(true);
-    setBlockComposerMessage("");
-
-    try {
-      const response = await fetch("/api/submit-item", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          type: "block",
-          name: blockDraft.name,
-          cat: blockDraft.cat,
-          github: blockDraft.github,
-          desc: blockDraft.desc,
-          syncCode: blockDraft.syncCode.trim(),
-        }),
-      });
-
-      const payload = await response.json();
-
-      if (!response.ok) {
-        throw new Error(payload.message || "追加积木失败");
-      }
-
-      const nextItem = payload.item;
-      const nextBlocks = sanitizeCustomBlocks([nextItem, ...customBlocks.filter((item) => item.id !== nextItem.id)]);
-      setCustomBlocks(nextBlocks);
-      window.localStorage.setItem(CUSTOM_BLOCKS_KEY, JSON.stringify(nextBlocks));
-      setSelectedId(nextItem.id);
-      setActiveWorkspace("digest");
-      setIsAddBlockOpen(false);
-      setBlockComposerMessage(payload.mode === "remote" ? "已写入仓库" : "已追加到当前浏览器");
-      setBlockDraft((current) => createBlockDraft(current.syncCode));
-    } catch (error) {
-      window.alert(error.message || "追加积木失败，请稍后重试。");
-    } finally {
-      setIsSubmittingBlock(false);
-    }
-  }
-
   function beginFieldEdit(fieldKey) {
     if (!selectedBlock) {
       return;
@@ -920,19 +834,7 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                 <div>
                   <p className="blocks-panel-kicker">检索</p>
                 </div>
-                <div className="blocks-explorer-actions">
-                  <strong>{filteredBlocks.length}</strong>
-                  <button
-                    type="button"
-                    className={`blocks-inline-action blocks-composer-toggle ${isAddBlockOpen ? "active" : ""}`}
-                    onClick={() => {
-                      setIsAddBlockOpen((current) => !current);
-                      setBlockComposerMessage("");
-                    }}
-                  >
-                    追加积木
-                  </button>
-                </div>
+                <strong>{filteredBlocks.length}</strong>
               </div>
 
               <label className="blocks-search blocks-digest-search">
@@ -954,83 +856,6 @@ export default function BrickWarehouse({ open, onClose, onOpenConcept, initialSe
                   </button>
                 ) : null}
               </label>
-
-              {isAddBlockOpen ? (
-                <form className="blocks-inline-composer" onSubmit={handleAddBlockSubmit}>
-                  <div className="blocks-inline-composer-head">
-                    <div>
-                      <span className="blocks-panel-kicker">New block</span>
-                      <strong>在仓库里补一块新积木</strong>
-                    </div>
-                    <button
-                      type="button"
-                      className="blocks-inline-dismiss"
-                      onClick={() => setIsAddBlockOpen(false)}
-                      aria-label="收起追加积木表单"
-                    >
-                      收起
-                    </button>
-                  </div>
-
-                  <div className="blocks-inline-composer-grid">
-                    <label>
-                      <span>名称</span>
-                      <input
-                        type="text"
-                        value={blockDraft.name}
-                        onChange={(event) => updateBlockComposerDraft("name", event.target.value)}
-                        placeholder="例如 Browser Use"
-                      />
-                    </label>
-                    <label>
-                      <span>分类</span>
-                      <select value={blockDraft.cat} onChange={(event) => updateBlockComposerDraft("cat", event.target.value)}>
-                        {blockCategories
-                          .filter((category) => category !== "All")
-                          .map((category) => (
-                            <option key={category} value={category}>
-                              {blockCategoryLabels[category] ?? category}
-                            </option>
-                          ))}
-                      </select>
-                    </label>
-                  </div>
-
-                  <label>
-                    <span>GitHub</span>
-                    <input
-                      type="url"
-                      value={blockDraft.github}
-                      onChange={(event) => updateBlockComposerDraft("github", event.target.value)}
-                      placeholder="https://github.com/..."
-                    />
-                  </label>
-
-                  <label>
-                    <span>一句话说明</span>
-                    <textarea
-                      rows="3"
-                      value={blockDraft.desc}
-                      onChange={(event) => updateBlockComposerDraft("desc", event.target.value)}
-                      placeholder="它解决什么问题，适合先拿来做什么。"
-                    />
-                  </label>
-
-                  <div className="blocks-inline-composer-foot">
-                    <input
-                      type="password"
-                      value={blockDraft.syncCode}
-                      onChange={(event) => updateBlockComposerDraft("syncCode", event.target.value)}
-                      placeholder="同步码可选"
-                    />
-                    <button type="submit" className="primary-button" disabled={isSubmittingBlock}>
-                      {isSubmittingBlock ? "追加中..." : "追加到仓库"}
-                    </button>
-                  </div>
-
-                  {blockComposerMessage ? <p className="blocks-inline-composer-status">{blockComposerMessage}</p> : null}
-                </form>
-              ) : null}
 
               <div className="blocks-explorer-stack">
                 <section className="blocks-filter-card blocks-filter-card-muted">
