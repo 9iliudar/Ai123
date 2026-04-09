@@ -517,6 +517,9 @@ export default function Dashboard() {
           <a className="ghost-link" href="https://github.com/9iliudar/Ai123.git" target="_blank" rel="noreferrer">
             GitHub
           </a>
+          <a className="ghost-link" href="https://wiki.aibc.cafe" target="_blank" rel="noreferrer">
+            MyWiki
+          </a>
           <button className="ghost-button" type="button" onClick={() => setIsWarehouseOpen(true)}>
             积木仓库
           </button>
