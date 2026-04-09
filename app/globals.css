@@ -2991,34 +2991,16 @@ select {
   cursor: pointer;
 }
 
-.universe-top-actions .universe-add-trigger {
-  display: none;
-}
-
 .universe-add-trigger.is-active {
   border-color: color-mix(in srgb, var(--universe-accent, #c4b5fd) 42%, rgba(255, 255, 255, 0.12));
   background: color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 80%, rgba(255, 255, 255, 0.04));
 }
 
-.universe-bottom-controls {
+.universe-filter-row {
   position: absolute;
   left: 28px;
   bottom: 72px;
-  z-index: 5;
-  display: grid;
-  gap: 10px;
-}
-
-.universe-bottom-controls .universe-add-trigger {
-  justify-self: start;
-  padding: 9px 13px;
-  background: rgba(8, 11, 19, 0.62);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
-  font-size: 0.76rem;
-  line-height: 1;
-}
-
-.universe-filter-row {
+  z-index: 4;
   display: flex;
   gap: 8px;
   pointer-events: auto;
@@ -3132,34 +3114,20 @@ select {
 
 .universe-composer-panel {
   position: absolute;
-  left: 28px;
-  bottom: 146px;
+  top: 104px;
+  right: 88px;
   z-index: 6;
-  width: min(360px, calc(100vw - 64px));
+  width: min(520px, calc(100vw - 40px));
   display: grid;
   gap: 14px;
-  padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 18px;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
   background:
-    radial-gradient(circle at top right, color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 42%, transparent), transparent 42%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
-    rgba(8, 11, 19, 0.68);
-  box-shadow:
-    0 10px 28px rgba(0, 0, 0, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(16px);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(10px) scale(0.985);
-  transform-origin: left bottom;
-  transition: opacity 180ms ease, transform 180ms ease;
-}
-
-.universe-composer-panel.is-open {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0) scale(1);
+    radial-gradient(circle at top right, color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 90%, transparent), transparent 30%),
+    rgba(8, 11, 19, 0.9);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(22px);
 }
 
 .universe-composer-head,
@@ -3167,7 +3135,7 @@ select {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
 }
 
 .universe-composer-kicker {
@@ -3179,111 +3147,74 @@ select {
 
 .universe-composer-head strong {
   display: block;
-  margin-top: 3px;
-  letter-spacing: -0.01em;
-  font-size: 0.88rem;
-  font-weight: 500;
-  color: rgba(248, 250, 252, 0.9);
+  margin-top: 6px;
+  letter-spacing: -0.02em;
 }
 
-.universe-composer-head {
-  align-items: flex-start;
-}
-
-.universe-composer-strip {
+.universe-composer-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-  align-items: stretch;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .universe-composer-panel label {
   display: grid;
-  gap: 7px;
+  gap: 8px;
 }
 
 .universe-composer-panel label span,
 .universe-composer-status {
-  color: rgba(170, 179, 194, 0.84);
-  font-size: 0.74rem;
+  color: #aab3c2;
+  font-size: 0.82rem;
 }
 
 .universe-composer-panel input,
-.universe-composer-panel select {
+.universe-composer-panel select,
+.universe-composer-panel textarea {
   width: 100%;
-  min-width: 0;
-  padding: 9px 11px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.025);
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
   color: #f8fafc;
   outline: none;
 }
 
 .universe-composer-panel input:focus,
-.universe-composer-panel select:focus {
+.universe-composer-panel select:focus,
+.universe-composer-panel textarea:focus {
   border-color: color-mix(in srgb, var(--universe-accent, #c4b5fd) 42%, rgba(255, 255, 255, 0.12));
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 78%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 92%, transparent);
 }
 
-.universe-composer-select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  padding-right: 34px !important;
-  background-image:
-    linear-gradient(45deg, transparent 50%, rgba(248, 250, 252, 0.86) 50%),
-    linear-gradient(135deg, rgba(248, 250, 252, 0.86) 50%, transparent 50%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
-  background-position:
-    calc(100% - 16px) calc(50% - 2px),
-    calc(100% - 11px) calc(50% - 2px),
-    0 0;
-  background-size:
-    6px 6px,
-    6px 6px,
-    100% 100%;
-  background-repeat: no-repeat;
-}
-
-.universe-composer-select:hover {
-  border-color: color-mix(in srgb, var(--universe-accent, #c4b5fd) 24%, rgba(255, 255, 255, 0.1));
-  background-color: rgba(255, 255, 255, 0.04);
-}
-
-.universe-composer-wide {
-  min-width: 0;
-}
-
-.universe-composer-foot {
-  display: grid;
-  grid-template-columns: 1fr;
-  align-items: stretch;
-  gap: 12px;
+.universe-composer-panel textarea {
+  resize: vertical;
+  min-height: 88px;
 }
 
 .universe-composer-dismiss,
 .universe-composer-submit {
-  padding: 8px 11px;
+  padding: 10px 14px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.035);
+  background: rgba(255, 255, 255, 0.04);
   cursor: pointer;
-  font-size: 0.76rem;
 }
 
 .universe-composer-submit {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--universe-accent, #7c3aed) 74%, #6d28d9), color-mix(in srgb, var(--universe-accent, #7c3aed) 58%, #6d28d9));
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 34%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--universe-accent, #7c3aed) 84%, #6d28d9), #6d28d9);
 }
 
 .universe-composer-importance {
-  min-width: 0;
+  min-width: 112px;
+}
+
+.universe-composer-foot input {
+  flex: 1 1 auto;
 }
 
 .universe-composer-status {
   margin: 0;
   color: var(--universe-accent, #c4b5fd);
-  font-size: 0.74rem;
 }
 
 .universe-search-result {
@@ -4059,7 +3990,7 @@ select {
 
 @media (max-width: 960px) {
   .blocks-inline-composer-grid,
-  .universe-composer-strip {
+  .universe-composer-grid {
     grid-template-columns: 1fr;
   }
 
@@ -4089,20 +4020,10 @@ select {
     right: 28px;
   }
 
-  .universe-bottom-controls {
-    left: 20px;
-    right: 20px;
-    bottom: 124px;
-  }
-
-  .universe-bottom-controls .universe-add-trigger {
-    justify-self: flex-start;
-  }
-
   .universe-composer-panel {
-    left: 20px;
-    right: 20px;
-    bottom: 186px;
+    top: 152px;
+    left: 28px;
+    right: 28px;
     width: auto;
   }
 
@@ -4158,17 +4079,10 @@ select {
     width: auto;
   }
 
-  .universe-bottom-controls {
-    left: 12px;
-    right: 12px;
-    bottom: 114px;
-    gap: 8px;
-  }
-
   .universe-composer-panel {
-    left: 12px;
-    right: 12px;
-    bottom: 174px;
+    top: 146px;
+    left: 18px;
+    right: 18px;
     width: auto;
     padding: 16px;
   }
@@ -4206,6 +4120,8 @@ select {
   }
 
   .universe-filter-row {
+    left: 12px;
+    bottom: 114px;
     gap: 6px;
   }
 
