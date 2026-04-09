@@ -3226,6 +3226,31 @@ select {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 78%, transparent);
 }
 
+.universe-composer-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 34px !important;
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(248, 250, 252, 0.86) 50%),
+    linear-gradient(135deg, rgba(248, 250, 252, 0.86) 50%, transparent 50%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
+  background-position:
+    calc(100% - 16px) calc(50% - 2px),
+    calc(100% - 11px) calc(50% - 2px),
+    0 0;
+  background-size:
+    6px 6px,
+    6px 6px,
+    100% 100%;
+  background-repeat: no-repeat;
+}
+
+.universe-composer-select:hover {
+  border-color: color-mix(in srgb, var(--universe-accent, #c4b5fd) 24%, rgba(255, 255, 255, 0.1));
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
 .universe-composer-wide {
   min-width: 0;
 }

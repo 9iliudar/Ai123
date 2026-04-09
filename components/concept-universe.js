@@ -986,7 +986,11 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
               <div className="universe-composer-foot">
               <label className="universe-composer-importance">
                 <span>重要度</span>
-                <select value={conceptDraft.importance} onChange={(event) => updateConceptDraft("importance", event.target.value)}>
+                <select
+                  className="universe-composer-select"
+                  value={conceptDraft.importance}
+                  onChange={(event) => updateConceptDraft("importance", event.target.value)}
+                >
                   {[1, 2, 3, 4, 5].map((level) => (
                     <option key={level} value={level}>
                       {level}
