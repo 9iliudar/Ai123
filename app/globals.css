@@ -3133,22 +3133,25 @@ select {
 .universe-composer-panel {
   position: absolute;
   left: 28px;
-  bottom: 118px;
+  bottom: 146px;
   z-index: 6;
   width: min(360px, calc(100vw - 64px));
   display: grid;
-  gap: 12px;
-  padding: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 18px;
   background:
-    radial-gradient(circle at top right, color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 55%, transparent), transparent 38%),
-    rgba(8, 11, 19, 0.78);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(18px);
+    radial-gradient(circle at top right, color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 42%, transparent), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+    rgba(8, 11, 19, 0.68);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
   opacity: 0;
   pointer-events: none;
-  transform: translateY(12px);
+  transform: translateY(10px) scale(0.985);
   transform-origin: left bottom;
   transition: opacity 180ms ease, transform 180ms ease;
 }
@@ -3156,7 +3159,7 @@ select {
 .universe-composer-panel.is-open {
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .universe-composer-head,
@@ -3176,10 +3179,11 @@ select {
 
 .universe-composer-head strong {
   display: block;
-  margin-top: 4px;
-  letter-spacing: -0.02em;
-  font-size: 0.95rem;
-  font-weight: 600;
+  margin-top: 3px;
+  letter-spacing: -0.01em;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: rgba(248, 250, 252, 0.9);
 }
 
 .universe-composer-head {
@@ -3195,23 +3199,23 @@ select {
 
 .universe-composer-panel label {
   display: grid;
-  gap: 6px;
+  gap: 5px;
 }
 
 .universe-composer-panel label span,
 .universe-composer-status {
-  color: #9eabc0;
-  font-size: 0.76rem;
+  color: rgba(170, 179, 194, 0.84);
+  font-size: 0.74rem;
 }
 
 .universe-composer-panel input,
 .universe-composer-panel select {
   width: 100%;
   min-width: 0;
-  padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 9px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.025);
   color: #f8fafc;
   outline: none;
 }
@@ -3219,7 +3223,7 @@ select {
 .universe-composer-panel input:focus,
 .universe-composer-panel select:focus {
   border-color: color-mix(in srgb, var(--universe-accent, #c4b5fd) 42%, rgba(255, 255, 255, 0.12));
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 92%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 78%, transparent);
 }
 
 .universe-composer-wide {
@@ -3230,19 +3234,21 @@ select {
   display: grid;
   grid-template-columns: 1fr;
   align-items: stretch;
+  gap: 8px;
 }
 
 .universe-composer-dismiss,
 .universe-composer-submit {
-  padding: 9px 12px;
+  padding: 8px 11px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.035);
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.76rem;
 }
 
 .universe-composer-submit {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--universe-accent, #7c3aed) 84%, #6d28d9), #6d28d9);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--universe-accent, #7c3aed) 74%, #6d28d9), color-mix(in srgb, var(--universe-accent, #7c3aed) 58%, #6d28d9));
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 34%, transparent);
 }
 
 .universe-composer-importance {
@@ -4071,7 +4077,7 @@ select {
   .universe-composer-panel {
     left: 20px;
     right: 20px;
-    bottom: 172px;
+    bottom: 186px;
     width: auto;
   }
 
@@ -4137,7 +4143,7 @@ select {
   .universe-composer-panel {
     left: 12px;
     right: 12px;
-    bottom: 160px;
+    bottom: 174px;
     width: auto;
     padding: 16px;
   }
