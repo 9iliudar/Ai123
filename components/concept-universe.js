@@ -23,6 +23,7 @@ const PERSPECTIVE = 940;
 const CLOUD_RADIUS = 280;
 const MASTERY_STORAGE_KEY = "ai123_concept_mastery";
 const CUSTOM_CONCEPTS_KEY = "ai123_custom_concepts";
+const SYNC_CODE_KEY = "ai123_sync_code";
 const ALL_FRESHNESS = "ALL_FRESHNESS";
 const RECENT_FRESHNESS = "RECENT_FRESHNESS";
 const REMOVED_TEST_CONCEPT_IDS = new Set([
@@ -157,6 +158,16 @@ function isRecentAdded(value) {
   return Number.isFinite(addedAt) && addedAt >= ninetyDaysAgo;
 }
 
+function createConceptDraft(clusterId = conceptUniverse.clusters[0]?.id ?? "", syncCode = "") {
+  return {
+    name: "",
+    desc: "",
+    clusterId,
+    importance: 2,
+    syncCode,
+  };
+}
+
 export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   const [customConcepts, setCustomConcepts] = useState([]);
   const mergedNodes = useMemo(
@@ -180,6 +191,10 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   const [activeClusterId, setActiveClusterId] = useState(conceptUniverse.clusters[0]?.id ?? null);
   const [activeFreshness, setActiveFreshness] = useState(ALL_FRESHNESS);
   const [isClusterMenuOpen, setIsClusterMenuOpen] = useState(false);
+  const [isAddConceptOpen, setIsAddConceptOpen] = useState(false);
+  const [conceptDraft, setConceptDraft] = useState(() => createConceptDraft());
+  const [isSubmittingConcept, setIsSubmittingConcept] = useState(false);
+  const [conceptComposerMessage, setConceptComposerMessage] = useState("");
   const [isPointerDown, setIsPointerDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isSettling, setIsSettling] = useState(false);
@@ -314,6 +329,9 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
       window.localStorage.setItem(CUSTOM_CONCEPTS_KEY, JSON.stringify(parsedConcepts));
     }
 
+    const storedSyncCode = window.localStorage.getItem(SYNC_CODE_KEY) ?? "";
+    setConceptDraft(createConceptDraft(conceptUniverse.clusters[0]?.id ?? "", storedSyncCode));
+
     try {
       const stored = window.localStorage.getItem(MASTERY_STORAGE_KEY);
       if (!stored) {
@@ -342,6 +360,31 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     setCustomConcepts(parsedConcepts);
     window.localStorage.setItem(CUSTOM_CONCEPTS_KEY, JSON.stringify(parsedConcepts));
   }, [open]);
+
+  useEffect(() => {
+    if (!activeClusterId) {
+      return;
+    }
+
+    setConceptDraft((current) => ({
+      ...current,
+      clusterId: current.clusterId || activeClusterId,
+    }));
+  }, [activeClusterId]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const syncCode = conceptDraft.syncCode.trim();
+    if (!syncCode) {
+      window.localStorage.removeItem(SYNC_CODE_KEY);
+      return;
+    }
+
+    window.localStorage.setItem(SYNC_CODE_KEY, syncCode);
+  }, [conceptDraft.syncCode]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -761,6 +804,62 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     setSelectedId(nodeId);
   }
 
+  function updateConceptDraft(field, value) {
+    setConceptDraft((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  }
+
+  async function handleAddConceptSubmit(event) {
+    event.preventDefault();
+
+    if (!conceptDraft.name.trim()) {
+      return;
+    }
+
+    setIsSubmittingConcept(true);
+    setConceptComposerMessage("");
+
+    try {
+      const response = await fetch("/api/submit-item", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: "concept",
+          name: conceptDraft.name,
+          desc: conceptDraft.desc,
+          clusterId: conceptDraft.clusterId,
+          importance: Number(conceptDraft.importance) || 1,
+          syncCode: conceptDraft.syncCode.trim(),
+        }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.message || "追加概念失败");
+      }
+
+      const nextNode = payload.item;
+      const nextConcepts = sanitizeCustomConcepts([nextNode, ...customConcepts.filter((item) => item.id !== nextNode.id)]);
+      setCustomConcepts(nextConcepts);
+      window.localStorage.setItem(CUSTOM_CONCEPTS_KEY, JSON.stringify(nextConcepts));
+      setSelectedId(nextNode.id);
+      setIsAddConceptOpen(false);
+      setConceptComposerMessage(payload.mode === "remote" ? "已写入仓库" : "已追加到当前浏览器");
+      setConceptDraft((current) =>
+        createConceptDraft(current.clusterId || activeClusterId || (conceptUniverse.clusters[0]?.id ?? ""), current.syncCode)
+      );
+    } catch (error) {
+      window.alert(error.message || "追加概念失败，请稍后重试。");
+    } finally {
+      setIsSubmittingConcept(false);
+    }
+  }
+
   const sceneStateClass = [
     "universe-scene",
     isPointerDown ? "is-pointer-down" : "",
@@ -788,6 +887,16 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
           </div>
 
           <div className="universe-top-actions">
+            <button
+              type="button"
+              className={`universe-add-trigger ${isAddConceptOpen ? "is-active" : ""}`}
+              onClick={() => {
+                setIsAddConceptOpen((current) => !current);
+                setConceptComposerMessage("");
+              }}
+            >
+              追加概念
+            </button>
             <label className="universe-search">
               <input
                 type="text"
@@ -802,7 +911,77 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
           </div>
         </div>
 
-        {searchResults.length ? (
+        {isAddConceptOpen ? (
+          <form className="universe-composer-panel" onSubmit={handleAddConceptSubmit} onClick={(event) => event.stopPropagation()}>
+            <div className="universe-composer-head">
+              <div>
+                <span className="universe-composer-kicker">New concept</span>
+                <strong>把一个刚想到的概念轻轻放进宇宙里</strong>
+              </div>
+              <button type="button" className="universe-composer-dismiss" onClick={() => setIsAddConceptOpen(false)}>
+                收起
+              </button>
+            </div>
+
+            <div className="universe-composer-grid">
+              <label>
+                <span>名称</span>
+                <input
+                  type="text"
+                  value={conceptDraft.name}
+                  onChange={(event) => updateConceptDraft("name", event.target.value)}
+                  placeholder="例如 Tool Use"
+                />
+              </label>
+              <label>
+                <span>分类</span>
+                <select value={conceptDraft.clusterId} onChange={(event) => updateConceptDraft("clusterId", event.target.value)}>
+                  {clusters.map((cluster) => (
+                    <option key={cluster.id} value={cluster.id}>
+                      {cluster.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <label>
+              <span>一句话说明</span>
+              <textarea
+                rows="3"
+                value={conceptDraft.desc}
+                onChange={(event) => updateConceptDraft("desc", event.target.value)}
+                placeholder="先写下这个概念为何重要，之后再慢慢补关系。"
+              />
+            </label>
+
+            <div className="universe-composer-foot">
+              <label className="universe-composer-importance">
+                <span>重要度</span>
+                <select value={conceptDraft.importance} onChange={(event) => updateConceptDraft("importance", event.target.value)}>
+                  {[1, 2, 3, 4, 5].map((level) => (
+                    <option key={level} value={level}>
+                      {level}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <input
+                type="password"
+                value={conceptDraft.syncCode}
+                onChange={(event) => updateConceptDraft("syncCode", event.target.value)}
+                placeholder="同步码可选"
+              />
+              <button type="submit" className="universe-composer-submit" disabled={isSubmittingConcept}>
+                {isSubmittingConcept ? "追加中..." : "收录概念"}
+              </button>
+            </div>
+
+            {conceptComposerMessage ? <p className="universe-composer-status">{conceptComposerMessage}</p> : null}
+          </form>
+        ) : null}
+
+        {searchResults.length && !isAddConceptOpen ? (
           <div className="universe-search-panel">
             {searchResults.map((node) => (
               <button
