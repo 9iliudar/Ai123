@@ -973,9 +973,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
                   ))}
                 </select>
               </label>
-            </div>
-
-            <label className="universe-composer-wide">
+              <label className="universe-composer-wide">
               <span>一句话说明</span>
               <input
                 type="text"
@@ -983,9 +981,9 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
                 onChange={(event) => updateConceptDraft("desc", event.target.value)}
                 placeholder="先写下这个概念为何重要，之后再慢慢补关系。"
               />
-            </label>
+              </label>
 
-            <div className="universe-composer-foot">
+              <div className="universe-composer-foot">
               <label className="universe-composer-importance">
                 <span>重要度</span>
                 <select value={conceptDraft.importance} onChange={(event) => updateConceptDraft("importance", event.target.value)}>
@@ -1005,6 +1003,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
               <button type="submit" className="universe-composer-submit" disabled={isSubmittingConcept}>
                 {isSubmittingConcept ? "追加中..." : "收录概念"}
               </button>
+              </div>
             </div>
 
             {conceptComposerMessage ? <p className="universe-composer-status">{conceptComposerMessage}</p> : null}
@@ -1140,9 +1139,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
             >
               追加概念
             </button>
-          </div>
-
-          <div className="universe-filter-row">
+            <div className="universe-filter-row">
             <button
               type="button"
               className={`universe-filter-chip ${activeFreshness === ALL_FRESHNESS ? "active" : ""}`}
@@ -1158,6 +1155,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
               最近添加
               <span>{recentConceptCount}</span>
             </button>
+          </div>
           </div>
 
           <div className="universe-category-panel" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>
