@@ -2991,16 +2991,32 @@ select {
   cursor: pointer;
 }
 
+.universe-top-actions .universe-add-trigger {
+  display: none;
+}
+
 .universe-add-trigger.is-active {
   border-color: color-mix(in srgb, var(--universe-accent, #c4b5fd) 42%, rgba(255, 255, 255, 0.12));
   background: color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 80%, rgba(255, 255, 255, 0.04));
 }
 
-.universe-filter-row {
+.universe-bottom-controls {
   position: absolute;
   left: 28px;
   bottom: 72px;
-  z-index: 4;
+  z-index: 5;
+  display: grid;
+  gap: 10px;
+}
+
+.universe-bottom-controls .universe-add-trigger {
+  justify-self: start;
+  padding: 9px 13px;
+  background: rgba(8, 11, 19, 0.62);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+}
+
+.universe-filter-row {
   display: flex;
   gap: 8px;
   pointer-events: auto;
@@ -3114,20 +3130,31 @@ select {
 
 .universe-composer-panel {
   position: absolute;
-  top: 104px;
-  right: 88px;
+  left: 28px;
+  bottom: 118px;
   z-index: 6;
-  width: min(520px, calc(100vw - 40px));
+  width: min(960px, calc(100vw - 220px));
   display: grid;
-  gap: 14px;
-  padding: 18px;
+  gap: 10px;
+  padding: 14px 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
+  border-radius: 22px;
   background:
     radial-gradient(circle at top right, color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 90%, transparent), transparent 30%),
     rgba(8, 11, 19, 0.9);
   box-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
   backdrop-filter: blur(22px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(18px);
+  transform-origin: left bottom;
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.universe-composer-panel.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 
 .universe-composer-head,
@@ -3151,15 +3178,20 @@ select {
   letter-spacing: -0.02em;
 }
 
-.universe-composer-grid {
+.universe-composer-head {
+  align-items: flex-end;
+}
+
+.universe-composer-strip {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: minmax(150px, 1.15fr) minmax(126px, 0.85fr) minmax(260px, 2fr) 92px minmax(136px, 1.1fr) auto;
+  gap: 10px;
+  align-items: end;
 }
 
 .universe-composer-panel label {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .universe-composer-panel label span,
@@ -3169,32 +3201,30 @@ select {
 }
 
 .universe-composer-panel input,
-.universe-composer-panel select,
-.universe-composer-panel textarea {
+.universe-composer-panel select {
   width: 100%;
-  padding: 12px 14px;
+  min-width: 0;
+  padding: 11px 13px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: 14px;
   background: rgba(255, 255, 255, 0.04);
   color: #f8fafc;
   outline: none;
 }
 
 .universe-composer-panel input:focus,
-.universe-composer-panel select:focus,
-.universe-composer-panel textarea:focus {
+.universe-composer-panel select:focus {
   border-color: color-mix(in srgb, var(--universe-accent, #c4b5fd) 42%, rgba(255, 255, 255, 0.12));
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--universe-accent-soft, rgba(124, 58, 237, 0.18)) 92%, transparent);
 }
 
-.universe-composer-panel textarea {
-  resize: vertical;
-  min-height: 88px;
+.universe-composer-wide {
+  min-width: 0;
 }
 
 .universe-composer-dismiss,
 .universe-composer-submit {
-  padding: 10px 14px;
+  padding: 11px 14px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.04);
   cursor: pointer;
@@ -3205,11 +3235,7 @@ select {
 }
 
 .universe-composer-importance {
-  min-width: 112px;
-}
-
-.universe-composer-foot input {
-  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .universe-composer-status {
@@ -3990,7 +4016,7 @@ select {
 
 @media (max-width: 960px) {
   .blocks-inline-composer-grid,
-  .universe-composer-grid {
+  .universe-composer-strip {
     grid-template-columns: 1fr;
   }
 
@@ -4020,10 +4046,20 @@ select {
     right: 28px;
   }
 
+  .universe-bottom-controls {
+    left: 20px;
+    right: 20px;
+    bottom: 124px;
+  }
+
+  .universe-bottom-controls .universe-add-trigger {
+    justify-self: flex-start;
+  }
+
   .universe-composer-panel {
-    top: 152px;
-    left: 28px;
-    right: 28px;
+    left: 20px;
+    right: 20px;
+    bottom: 172px;
     width: auto;
   }
 
@@ -4079,10 +4115,17 @@ select {
     width: auto;
   }
 
+  .universe-bottom-controls {
+    left: 12px;
+    right: 12px;
+    bottom: 114px;
+    gap: 8px;
+  }
+
   .universe-composer-panel {
-    top: 146px;
-    left: 18px;
-    right: 18px;
+    left: 12px;
+    right: 12px;
+    bottom: 160px;
     width: auto;
     padding: 16px;
   }
@@ -4120,8 +4163,6 @@ select {
   }
 
   .universe-filter-row {
-    left: 12px;
-    bottom: 114px;
     gap: 6px;
   }
 

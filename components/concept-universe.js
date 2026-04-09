@@ -192,6 +192,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   const [activeFreshness, setActiveFreshness] = useState(ALL_FRESHNESS);
   const [isClusterMenuOpen, setIsClusterMenuOpen] = useState(false);
   const [isAddConceptOpen, setIsAddConceptOpen] = useState(false);
+  const [isAddConceptMounted, setIsAddConceptMounted] = useState(false);
   const [conceptDraft, setConceptDraft] = useState(() => createConceptDraft());
   const [isSubmittingConcept, setIsSubmittingConcept] = useState(false);
   const [conceptComposerMessage, setConceptComposerMessage] = useState("");
@@ -203,6 +204,7 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   const inertiaFrameRef = useRef(0);
   const moveFrameRef = useRef(0);
   const warpTimeoutsRef = useRef([]);
+  const composerTimeoutRef = useRef(0);
   const rotationRef = useRef(rotation);
   const suppressClickUntilRef = useRef(0);
 
@@ -401,12 +403,15 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
       window.cancelAnimationFrame(inertiaFrameRef.current);
       window.cancelAnimationFrame(moveFrameRef.current);
       warpTimeoutsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId));
+      window.clearTimeout(composerTimeoutRef.current);
       warpTimeoutsRef.current = [];
       inertiaFrameRef.current = 0;
       moveFrameRef.current = 0;
       setWarpGhost(null);
       setWarpOrigin({ x: "50%", y: "50%" });
       setArrivalOrigin({ x: 0, y: 0, width: 0, height: 0 });
+      setIsAddConceptOpen(false);
+      setIsAddConceptMounted(false);
     }
   }, [open]);
 
@@ -719,7 +724,11 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
   }
 
   function handlePointerDown(event) {
-    if (event.target.closest(".universe-node, .universe-hud, .universe-controls, .universe-search-panel, .universe-topbar, .universe-filter-row, .universe-category-panel, input")) {
+    if (
+      event.target.closest(
+        ".universe-node, .universe-hud, .universe-controls, .universe-search-panel, .universe-topbar, .universe-filter-row, .universe-category-panel, .universe-bottom-controls, input, textarea, select, button"
+      )
+    ) {
       return;
     }
 
@@ -811,6 +820,23 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
     }));
   }
 
+  function openConceptComposer() {
+    window.clearTimeout(composerTimeoutRef.current);
+    setIsAddConceptMounted(true);
+    window.requestAnimationFrame(() => {
+      setIsAddConceptOpen(true);
+    });
+    setConceptComposerMessage("");
+  }
+
+  function closeConceptComposer() {
+    setIsAddConceptOpen(false);
+    window.clearTimeout(composerTimeoutRef.current);
+    composerTimeoutRef.current = window.setTimeout(() => {
+      setIsAddConceptMounted(false);
+    }, 240);
+  }
+
   async function handleAddConceptSubmit(event) {
     event.preventDefault();
 
@@ -848,11 +874,11 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
       setCustomConcepts(nextConcepts);
       window.localStorage.setItem(CUSTOM_CONCEPTS_KEY, JSON.stringify(nextConcepts));
       setSelectedId(nextNode.id);
-      setIsAddConceptOpen(false);
       setConceptComposerMessage(payload.mode === "remote" ? "已写入仓库" : "已追加到当前浏览器");
       setConceptDraft((current) =>
         createConceptDraft(current.clusterId || activeClusterId || (conceptUniverse.clusters[0]?.id ?? ""), current.syncCode)
       );
+      closeConceptComposer();
     } catch (error) {
       window.alert(error.message || "追加概念失败，请稍后重试。");
     } finally {
@@ -911,19 +937,23 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
           </div>
         </div>
 
-        {isAddConceptOpen ? (
-          <form className="universe-composer-panel" onSubmit={handleAddConceptSubmit} onClick={(event) => event.stopPropagation()}>
+        {isAddConceptMounted ? (
+          <form
+            className={`universe-composer-panel ${isAddConceptOpen ? "is-open" : ""}`}
+            onSubmit={handleAddConceptSubmit}
+            onClick={(event) => event.stopPropagation()}
+          >
             <div className="universe-composer-head">
               <div>
                 <span className="universe-composer-kicker">New concept</span>
                 <strong>把一个刚想到的概念轻轻放进宇宙里</strong>
               </div>
-              <button type="button" className="universe-composer-dismiss" onClick={() => setIsAddConceptOpen(false)}>
+              <button type="button" className="universe-composer-dismiss" onClick={closeConceptComposer}>
                 收起
               </button>
             </div>
 
-            <div className="universe-composer-grid">
+            <div className="universe-composer-strip">
               <label>
                 <span>名称</span>
                 <input
@@ -945,10 +975,10 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
               </label>
             </div>
 
-            <label>
+            <label className="universe-composer-wide">
               <span>一句话说明</span>
-              <textarea
-                rows="3"
+              <input
+                type="text"
                 value={conceptDraft.desc}
                 onChange={(event) => updateConceptDraft("desc", event.target.value)}
                 placeholder="先写下这个概念为何重要，之后再慢慢补关系。"
@@ -1094,6 +1124,22 @@ export default function ConceptUniverse({ open, onClose, requestedConcept }) {
           <div className="universe-stats">
             <span>总词条：{conceptUniverse.nodes.length}</span>
             <span>当前节点：{centerNode.name}</span>
+          </div>
+
+          <div className="universe-bottom-controls" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>
+            <button
+              type="button"
+              className={`universe-add-trigger ${isAddConceptOpen ? "is-active" : ""}`}
+              onClick={() => {
+                if (isAddConceptOpen) {
+                  closeConceptComposer();
+                } else {
+                  openConceptComposer();
+                }
+              }}
+            >
+              追加概念
+            </button>
           </div>
 
           <div className="universe-filter-row">
