@@ -900,6 +900,11 @@ select {
   gap: 16px;
 }
 
+.blocks-explorer-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
 .blocks-explorer-head h3,
 .blocks-idea-hero h3 {
@@ -928,6 +933,98 @@ select {
   margin-top: 20px;
 }
 
+.blocks-composer-toggle.active {
+  border-color: rgba(124, 58, 237, 0.55);
+  background:
+    linear-gradient(180deg, rgba(124, 58, 237, 0.18), transparent 88%),
+    rgba(255, 255, 255, 0.04);
+}
+
+.blocks-inline-composer {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.06), transparent 28%),
+    linear-gradient(180deg, rgba(124, 58, 237, 0.1), transparent 72%),
+    rgba(17, 18, 25, 0.74);
+}
+
+.blocks-inline-composer-head,
+.blocks-inline-composer-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.blocks-inline-composer-head strong {
+  display: block;
+  margin-top: 6px;
+  letter-spacing: -0.02em;
+}
+
+.blocks-inline-dismiss {
+  padding: 8px 12px;
+  border: 1px solid rgba(63, 63, 70, 0.82);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #d4d4d8;
+  cursor: pointer;
+}
+
+.blocks-inline-composer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.blocks-inline-composer label {
+  display: grid;
+  gap: 8px;
+}
+
+.blocks-inline-composer label span,
+.blocks-inline-composer-status {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+}
+
+.blocks-inline-composer input,
+.blocks-inline-composer select,
+.blocks-inline-composer textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(63, 63, 70, 0.9);
+  background: rgba(13, 15, 22, 0.82);
+  color: var(--text);
+  outline: none;
+}
+
+.blocks-inline-composer input:focus,
+.blocks-inline-composer select:focus,
+.blocks-inline-composer textarea:focus {
+  border-color: rgba(124, 58, 237, 0.7);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.14);
+}
+
+.blocks-inline-composer textarea {
+  resize: vertical;
+  min-height: 88px;
+}
+
+.blocks-inline-composer-foot input {
+  flex: 1 1 auto;
+}
+
+.blocks-inline-composer-status {
+  margin: 0;
+  color: #c4b5fd;
+}
 
 .blocks-result-item,
 .blocks-recommendation-item {
@@ -3892,10 +3989,12 @@ select {
 }
 
 @media (max-width: 960px) {
+  .blocks-inline-composer-grid,
   .universe-composer-grid {
     grid-template-columns: 1fr;
   }
 
+  .blocks-inline-composer-foot,
   .universe-composer-foot {
     align-items: stretch;
     flex-direction: column;
